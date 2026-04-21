@@ -1,0 +1,239 @@
+/* ═══════════════════════════════════════════════════════════
+   MONSTERS INC. OS SIMULATOR — styles.css (PIXAR STYLE)
+   Tema: limpio, caricatura, colores pastel
+   ═══════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Quicksand:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&family=Baloo+2:wght@500;700&family=Nunito:wght@400;600&display=swap');
+
+/* ── VARIABLES ── */
+:root {
+  --bg-base:       #eaf6f6;
+  --bg-panel:      #ffffff;
+  --bg-panel2:     #f1f8f8;
+  --bg-input:      #ffffff;
+
+  --border:        #c7e4e4;
+  --border-bright: #9fd6d6;
+
+  --mi-blue:   #2f80c3;
+  --mi-teal:   #38b2ac;
+  --mi-green:  #7ed957;
+  --mi-lime:   #c7f464;
+  --mi-purple: #8e7cc3;
+
+  --text-primary:  #1f2d3d;
+  --text-muted:    #6b7c93;
+  --text-dim:      #9aa7b8;
+
+  --state-new:        var(--mi-purple);
+  --state-ready:      var(--mi-blue);
+  --state-running:    var(--mi-green);
+  --state-waiting:    var(--mi-lime);
+  --state-terminated: #a0aec0;
+
+  --font-display: 'Luckiest Guy', cursive;
+  --font-ui: 'Quicksand', sans-serif;
+  --font-mono: 'Quicksand', sans-serif;
+
+  --radius:  10px;
+  --radius-lg: 16px;
+  --shadow-soft: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg-base);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+}
+
+/* ── HEADER ── */
+.mi-header {
+  background: linear-gradient(135deg, var(--mi-blue), var(--mi-teal));
+  padding: 20px;
+  text-align: center;
+  box-shadow: var(--shadow-soft);
+}
+
+.title-main {
+  font-family: var(--font-display);
+  font-size: 42px;
+  color: white;
+}
+
+.title-sub {
+  font-size: 13px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* ── NAV ── */
+.mi-nav {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background: white;
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  padding: 10px 16px;
+  font-weight: bold;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+.nav-btn.active {
+  background: var(--mi-blue);
+  color: white;
+}
+
+/* ── MAIN ── */
+.mi-main {
+  padding: 24px;
+}
+
+/* ── PANEL ── */
+.panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+  margin-bottom: 20px;
+}
+
+.panel-title {
+  font-family: var(--font-display);
+  color: var(--mi-blue);
+  margin-bottom: 10px;
+}
+
+/* ── INPUTS ── */
+.mi-input, .mi-select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--font-ui);
+}
+
+/* ── BOTONES ── */
+.mi-btn {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.mi-btn.primary {
+  background: var(--mi-blue);
+  color: white;
+}
+
+.mi-btn.secondary {
+  background: var(--mi-teal);
+  color: white;
+}
+
+.mi-btn.danger {
+  background: #ff6b6b;
+  color: white;
+}
+
+/* ── TABLA ── */
+.mi-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.mi-table th {
+  background: var(--bg-panel2);
+  font-size: 12px;
+  color: var(--text-muted);
+  padding: 10px;
+}
+
+.mi-table td {
+  padding: 10px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── DOORS ── */
+.door-body {
+  width: 40px;
+  height: 60px;
+  border-radius: 10px 10px 4px 4px;
+  border: 2px solid rgba(0,0,0,0.1);
+}
+
+.door-body.state-new        { background: var(--state-new); }
+.door-body.state-ready      { background: var(--state-ready); }
+.door-body.state-running    { background: var(--state-running); }
+.door-body.state-waiting    { background: var(--state-waiting); }
+.door-body.state-terminated { background: var(--state-terminated); opacity: 0.6; }
+
+/* ── CPU / QUEUES ── */
+.cpu-door {
+  width: 80px;
+  height: 100px;
+  border-radius: 10px;
+  border: 2px solid var(--mi-green);
+  background: #e6fffa;
+}
+
+.ready-queue, .waiting-queue {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+}
+
+/* ── GANTT ── */
+.gantt-block {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: bold;
+}
+
+.gantt-block:nth-child(odd) {
+  background: var(--mi-blue);
+}
+.gantt-block:nth-child(even) {
+  background: var(--mi-teal);
+}
+
+/* ── MEMORY ── */
+.frame-door {
+  height: 80px;
+  border-radius: 10px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame-door.has-page {
+  background: var(--mi-blue);
+  color: white;
+}
+
+/* ── LOG ── */
+.event-log {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px;
+  font-size: 12px;
+}
+
+/* ── SCROLL ── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
