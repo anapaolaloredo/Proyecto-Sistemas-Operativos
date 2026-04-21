@@ -14,8 +14,7 @@
   --bg-input:      #ffffff;
   --border:        #b8dde8;
   --border-bright: #7ec8d8;
-
-  --mi-blue:    #1565c0;
+  --mi-blue:    #2079e0;
   --mi-teal:    #00838f;
   --mi-green:   #43a047;
   --mi-lime:    #9ccc65;
@@ -25,165 +24,65 @@
   --mi-yellow:  #f9a825;
   --mi-cyan:    #0097a7;
   --mi-pink:    #ad1457;
-
   --text-primary:  #1a2a3a;
   --text-muted:    #546e7a;
   --text-dim:      #90a4ae;
-
   --state-new:        #7b1fa2;
   --state-ready:      #1565c0;
   --state-running:    #2e7d32;
   --state-waiting:    #e65100;
   --state-terminated: #546e7a;
-
   --font-display: 'Luckiest Guy', cursive;
   --font-ui:      'Quicksand', sans-serif;
   --font-mono:    'Share Tech Mono', monospace;
-
   --radius:    10px;
   --radius-lg: 18px;
   --shadow:    0 4px 20px rgba(0,0,0,0.10);
   --shadow-lg: 0 8px 40px rgba(0,0,0,0.14);
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: var(--bg-base);
-  color: var(--text-primary);
-  font-family: var(--font-ui);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-.factory-bg {
-  position: fixed; inset: 0; z-index: -1;
-  background: linear-gradient(160deg, #dceefb 0%, #e8f5e9 50%, #f3e5f5 100%);
-  overflow: hidden;
-}
-.factory-bg::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: radial-gradient(circle at 20% 20%, rgba(21,101,192,0.06) 0%, transparent 60%),
-                    radial-gradient(circle at 80% 80%, rgba(123,31,162,0.06) 0%, transparent 60%);
-}
-
-.mi-header {
-  background: linear-gradient(135deg, #1565c0 0%, #0097a7 50%, #2e7d32 100%);
-  padding: 16px 24px;
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 16px; flex-wrap: wrap;
-  box-shadow: 0 4px 24px rgba(21,101,192,0.3);
-  position: relative; overflow: hidden;
-}
-.mi-header::before {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.04) 40px, rgba(255,255,255,0.04) 41px);
-}
+body { background: var(--bg-base); color: var(--text-primary); font-family: var(--font-ui); min-height: 100vh; overflow-x: hidden; }
+.factory-bg { position: fixed; inset: 0; z-index: -1; background: linear-gradient(160deg, #dceefb 0%, #e8f5e9 50%, #f3e5f5 100%); overflow: hidden; }
+.factory-bg::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle at 20% 20%, rgba(21,101,192,0.06) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(123,31,162,0.06) 0%, transparent 60%); }
+.mi-header { background: var(--mi-teal); padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; box-shadow: 0 4px 24px rgba(21,101,192,0.3); position: relative; overflow: hidden; }
+.mi-header::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255,255,255,0.04) 40px, rgba(255,255,255,0.04) 41px); }
 .header-logo { display: flex; align-items: center; gap: 14px; }
 .header-icon { font-size: 44px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.3)); }
-.title-main {
-  font-family: var(--font-display);
-  font-size: 30px; color: white; letter-spacing: 1px;
-  text-shadow: 2px 2px 0 rgba(0,0,0,0.2), 0 0 30px rgba(255,255,255,0.3);
-}
+.title-main { font-family: var(--font-display); font-size: 30px; color: white; letter-spacing: 1px; text-shadow: 2px 2px 0 rgba(0,0,0,0.2), 0 0 30px rgba(255,255,255,0.3); }
 .title-sub { font-size: 12px; color: rgba(255,255,255,0.8); letter-spacing: 0.5px; }
-.header-legend {
-  display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
-}
-.legend-item {
-  display: flex; align-items: center; gap: 6px;
-  background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 5px 10px; border-radius: 20px;
-  font-size: 12px; color: white; font-weight: 600;
-}
+.header-legend { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.legend-item { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.25); padding: 5px 10px; border-radius: 20px; font-size: 12px; color: white; font-weight: 600; }
 .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.legend-dot.new        { background: #ce93d8; }
-.legend-dot.ready      { background: #90caf9; }
-.legend-dot.running    { background: #a5d6a7; }
-.legend-dot.waiting    { background: #ffcc80; }
+.legend-dot.new { background: #ce93d8; }
+.legend-dot.ready { background: #90caf9; }
+.legend-dot.running { background: #a5d6a7; }
+.legend-dot.waiting { background: #ffcc80; }
 .legend-dot.terminated { background: #b0bec5; }
-
-.mi-nav {
-  display: flex; gap: 6px; padding: 12px 24px;
-  background: white; border-bottom: 2px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto;
-}
-.nav-btn {
-  display: flex; align-items: center; gap: 8px;
-  background: none; border: 2px solid transparent;
-  padding: 9px 18px; border-radius: 50px;
-  font-family: var(--font-ui); font-weight: 700; font-size: 13px;
-  color: var(--text-muted); cursor: pointer; white-space: nowrap;
-  transition: all 0.2s;
-}
+.mi-nav { display: flex; gap: 6px; padding: 12px 24px; background: white; border-bottom: 2px solid var(--border); box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow-x: auto; }
+.nav-btn { display: flex; align-items: center; gap: 8px; background: none; border: 2px solid transparent; padding: 9px 18px; border-radius: 50px; font-family: var(--font-ui); font-weight: 700; font-size: 13px; color: var(--text-muted); cursor: pointer; white-space: nowrap; transition: all 0.2s; }
 .nav-btn:hover { background: var(--bg-panel2); color: var(--mi-blue); border-color: var(--border); }
-.nav-btn.active {
-  background: var(--mi-blue); color: white;
-  border-color: var(--mi-blue);
-  box-shadow: 0 4px 12px rgba(21,101,192,0.35);
-}
+.nav-btn.active { background: var(--mi-blue); color: white; border-color: var(--mi-blue); box-shadow: 0 4px 12px rgba(21,101,192,0.35); }
 .nav-icon { font-size: 16px; }
-
 .mi-main { padding: 20px 24px; max-width: 1400px; margin: 0 auto; }
 .tab-content { display: none; }
 .tab-content.active { display: block; }
-
 .section-header { margin-bottom: 20px; }
-.section-header h2 {
-  font-family: var(--font-display); font-size: 24px; color: var(--mi-blue);
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-}
-.badge {
-  font-family: var(--font-ui); font-size: 11px; font-weight: 700;
-  background: var(--mi-teal); color: white;
-  padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px;
-}
+.section-header h2 { font-family: var(--font-display); font-size: 24px; color: var(--mi-blue); display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.badge { font-family: var(--font-ui); font-size: 11px; font-weight: 700; background: var(--mi-teal); color: white; padding: 3px 10px; border-radius: 20px; letter-spacing: 0.5px; }
 .section-desc { font-size: 13px; color: var(--text-muted); margin-top: 4px; }
-
-.panel {
-  background: var(--bg-panel); border: 1.5px solid var(--border);
-  border-radius: var(--radius-lg); padding: 20px;
-  box-shadow: var(--shadow); margin-bottom: 20px;
-}
-.panel-title {
-  font-family: var(--font-display); font-size: 15px;
-  color: var(--mi-blue); margin-bottom: 16px;
-  display: flex; align-items: center; gap: 8px;
-}
+.panel { background: var(--bg-panel); border: 1.5px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); margin-bottom: 20px; }
+.panel-title { font-family: var(--font-display); font-size: 15px; color: var(--mi-blue); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
 .panel-grid { display: grid; grid-template-columns: 340px 1fr; gap: 20px; }
 @media (max-width: 900px) { .panel-grid { grid-template-columns: 1fr; } }
-
 .form-group { margin-bottom: 12px; }
-.form-group label {
-  display: block; font-size: 12px; font-weight: 700;
-  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
-  margin-bottom: 5px;
-}
+.form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 5px; }
 .hint { font-weight: 400; text-transform: none; color: var(--text-dim); }
 .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.mi-input, .mi-select {
-  width: 100%; padding: 9px 12px;
-  border: 1.5px solid var(--border); border-radius: var(--radius);
-  font-family: var(--font-ui); font-size: 14px; font-weight: 600;
-  color: var(--text-primary); background: white;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.mi-input:focus, .mi-select:focus {
-  outline: none; border-color: var(--mi-blue);
-  box-shadow: 0 0 0 3px rgba(21,101,192,0.15);
-}
+.mi-input, .mi-select { width: 100%; padding: 9px 12px; border: 1.5px solid var(--border); border-radius: var(--radius); font-family: var(--font-ui); font-size: 14px; font-weight: 600; color: var(--text-primary); background: white; transition: border-color 0.2s, box-shadow 0.2s; }
+.mi-input:focus, .mi-select:focus { outline: none; border-color: var(--mi-blue); box-shadow: 0 0 0 3px rgba(21,101,192,0.15); }
 .mi-range { width: 100%; accent-color: var(--mi-blue); }
-
 .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-.mi-btn {
-  padding: 9px 16px; border-radius: var(--radius);
-  border: none; cursor: pointer; font-family: var(--font-ui);
-  font-size: 13px; font-weight: 700; transition: all 0.2s;
-  display: flex; align-items: center; gap: 6px;
-}
+.mi-btn { padding: 9px 16px; border-radius: var(--radius); border: none; cursor: pointer; font-family: var(--font-ui); font-size: 13px; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; gap: 6px; }
 .mi-btn:active { transform: scale(0.97); }
 .mi-btn.primary   { background: var(--mi-blue);   color: white; box-shadow: 0 3px 10px rgba(21,101,192,0.35); }
 .mi-btn.secondary { background: var(--mi-teal);   color: white; box-shadow: 0 3px 10px rgba(0,131,143,0.35); }
@@ -195,208 +94,89 @@ body {
 .mi-btn:hover.secondary { background: #00acc1; }
 .mi-btn:hover.ghost     { background: var(--bg-panel2); }
 .mi-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
 .table-wrapper { overflow-x: auto; border-radius: var(--radius); }
 .mi-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.mi-table thead th {
-  background: var(--bg-panel2); font-size: 11px; font-weight: 700;
-  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;
-  padding: 10px 12px; white-space: nowrap; border-bottom: 2px solid var(--border);
-}
+.mi-table thead th { background: var(--bg-panel2); font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 12px; white-space: nowrap; border-bottom: 2px solid var(--border); }
 .mi-table tbody tr { transition: background 0.15s; }
 .mi-table tbody tr:hover { background: var(--bg-panel2); }
 .mi-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); font-weight: 600; vertical-align: middle; }
 .mi-table .avg-row td { background: rgba(21,101,192,0.06); font-weight: 700; color: var(--mi-blue); }
-
-.state-badge {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700;
-}
+.state-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
 .state-badge.new        { background: #f3e5f5; color: var(--state-new); }
 .state-badge.ready      { background: #e3f2fd; color: var(--state-ready); }
 .state-badge.running    { background: #e8f5e9; color: var(--state-running); }
 .state-badge.waiting    { background: #fff3e0; color: var(--state-waiting); }
 .state-badge.terminated { background: #eceff1; color: var(--state-terminated); }
-
-.process-card {
-  display: inline-flex; flex-direction: column; align-items: center;
-  gap: 4px; margin: 6px;
-}
-.door-body {
-  width: 42px; height: 64px; border-radius: 10px 10px 3px 3px;
-  border: 2px solid rgba(0,0,0,0.12);
-  display: flex; align-items: center; justify-content: center;
-  font-size: 11px; font-weight: 800; color: white;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: all 0.4s;
-  position: relative; cursor: default;
-}
-.door-knob {
-  position: absolute; right: 6px; top: 50%; transform: translateY(-50%);
-  width: 5px; height: 5px; border-radius: 50%; background: rgba(0,0,0,0.25);
-}
+.process-card { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; margin: 6px; }
+.door-body { width: 42px; height: 64px; border-radius: 10px 10px 3px 3px; border: 2px solid rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: white; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: all 0.4s; position: relative; cursor: default; }
+.door-knob { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 5px; height: 5px; border-radius: 50%; background: rgba(0,0,0,0.25); }
 .door-body.state-new        { background: linear-gradient(135deg,#9c27b0,#7b1fa2); }
 .door-body.state-ready      { background: linear-gradient(135deg,#1976d2,#1565c0); }
 .door-body.state-running    { background: linear-gradient(135deg,#43a047,#2e7d32); animation: pulse-run 1s infinite; }
 .door-body.state-waiting    { background: linear-gradient(135deg,#ff8f00,#e65100); }
 .door-body.state-terminated { background: linear-gradient(135deg,#78909c,#546e7a); opacity: 0.6; }
-@keyframes pulse-run {
-  0%,100% { box-shadow: 0 3px 8px rgba(0,0,0,0.2); }
-  50%      { box-shadow: 0 3px 20px rgba(46,125,50,0.6); }
-}
+@keyframes pulse-run { 0%,100% { box-shadow: 0 3px 8px rgba(0,0,0,0.2); } 50% { box-shadow: 0 3px 20px rgba(46,125,50,0.6); } }
 .door-label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
-
 .conveyor-area { position: relative; overflow: hidden; border-radius: var(--radius); }
-.conveyor-belt {
-  background: linear-gradient(135deg, #37474f, #263238);
-  border-radius: var(--radius); padding: 12px;
-  min-height: 110px; position: relative; overflow: hidden;
-}
-.belt-track {
-  position: absolute; bottom: 0; left: 0; right: 0; height: 8px;
-  background: repeating-linear-gradient(90deg, #455a64, #455a64 20px, #37474f 20px, #37474f 40px);
-  animation: belt-move 1s linear infinite;
-}
+.conveyor-belt { background: linear-gradient(135deg, #37474f, #263238); border-radius: var(--radius); padding: 12px; min-height: 110px; position: relative; overflow: hidden; }
+.belt-track { position: absolute; bottom: 0; left: 0; right: 0; height: 8px; background: repeating-linear-gradient(90deg, #455a64, #455a64 20px, #37474f 20px, #37474f 40px); animation: belt-move 1s linear infinite; }
 @keyframes belt-move { from { background-position: 0 0; } to { background-position: 40px 0; } }
 .belt-doors { display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 10px; }
-.conveyor-labels {
-  display: flex; justify-content: space-between;
-  padding: 6px 12px; font-size: 11px; font-weight: 700;
-  color: var(--text-muted); background: var(--bg-panel2); border-radius: 0 0 var(--radius) var(--radius);
-}
-.count-badge {
-  display: inline-flex; align-items: center; justify-content: center;
-  min-width: 22px; height: 22px; border-radius: 50%;
-  background: var(--mi-orange); color: white; font-size: 12px; font-weight: 700;
-}
+.conveyor-labels { display: flex; justify-content: space-between; padding: 6px 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); background: var(--bg-panel2); border-radius: 0 0 var(--radius) var(--radius); }
+.count-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 22px; height: 22px; border-radius: 50%; background: var(--mi-orange); color: white; font-size: 12px; font-weight: 700; }
 .empty-state { text-align: center; padding: 30px; color: var(--text-dim); }
 .empty-icon { font-size: 36px; display: block; margin-bottom: 8px; }
 .empty-sub { font-size: 12px; margin-top: 4px; }
 .empty-row td { padding: 0 !important; border: none !important; }
-
-.file-drop {
-  display: block; border: 2px dashed var(--border-bright);
-  border-radius: var(--radius); padding: 16px; text-align: center;
-  cursor: pointer; transition: all 0.2s; color: var(--text-muted);
-  font-size: 13px; font-weight: 600; background: var(--bg-panel2);
-}
+.file-drop { display: block; border: 2px dashed var(--border-bright); border-radius: var(--radius); padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s; color: var(--text-muted); font-size: 13px; font-weight: 600; background: var(--bg-panel2); }
 .file-drop:hover { border-color: var(--mi-blue); background: #e3f2fd; }
-.divider {
-  display: flex; align-items: center; gap: 10px;
-  color: var(--text-dim); font-size: 12px; margin: 12px 0;
-}
+.divider { display: flex; align-items: center; gap: 10px; color: var(--text-dim); font-size: 12px; margin: 12px 0; }
 .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
 .file-format { font-size: 11px; color: var(--text-dim); margin-top: 8px; text-align: center; }
 .file-format code { background: var(--bg-panel2); padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); }
-
 .scheduling-grid { grid-template-columns: 300px 1fr; }
-.cpu-area {
-  display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 12px;
-  margin-bottom: 16px; align-items: start;
-}
+.cpu-area { display: grid; grid-template-columns: 1fr 2fr 1fr; gap: 12px; margin-bottom: 16px; align-items: start; }
 .cpu-box, .queue-box { text-align: center; }
-.cpu-box-inner {
-  background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-  border: 2px solid var(--mi-green); border-radius: var(--radius);
-  padding: 16px; min-height: 100px;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-}
-.cpu-label, .queue-label {
-  font-size: 11px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px;
-}
+.cpu-box-inner { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border: 2px solid var(--mi-green); border-radius: var(--radius); padding: 16px; min-height: 100px; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.cpu-label, .queue-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 8px; }
 .cpu-running-pid { font-family: var(--font-display); font-size: 28px; color: var(--mi-green); }
 .cpu-running-info { font-size: 11px; color: var(--text-muted); font-weight: 600; }
 .cpu-idle { font-size: 28px; opacity: 0.4; }
-.ready-queue-inner, .waiting-queue-inner {
-  background: var(--bg-panel2); border: 1.5px solid var(--border);
-  border-radius: var(--radius); padding: 8px; min-height: 80px;
-  display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start;
-}
-.queue-chip {
-  padding: 4px 10px; border-radius: 20px;
-  font-size: 12px; font-weight: 700; color: white;
-  animation: chip-appear 0.3s ease;
-}
-@keyframes chip-appear {
-  from { transform: scale(0) rotate(-10deg); opacity: 0; }
-  to   { transform: scale(1) rotate(0deg);  opacity: 1; }
-}
+.ready-queue-inner, .waiting-queue-inner { background: var(--bg-panel2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 8px; min-height: 80px; display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start; }
+.queue-chip { padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; color: white; animation: chip-appear 0.3s ease; }
+@keyframes chip-appear { from { transform: scale(0) rotate(-10deg); opacity: 0; } to { transform: scale(1) rotate(0deg); opacity: 1; } }
 .queue-empty-msg { font-size: 12px; color: var(--text-dim); padding: 4px; width: 100%; text-align: center; }
-
 .gantt-area { margin-bottom: 16px; }
-.gantt-title {
-  font-size: 12px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px;
-}
+.gantt-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 10px; }
 .gantt-chart-wrapper { overflow-x: auto; border-radius: var(--radius); }
-.gantt-chart {
-  display: flex; min-height: 56px; align-items: stretch;
-  border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden;
-}
-.gantt-empty {
-  width: 100%; display: flex; align-items: center; justify-content: center;
-  font-size: 13px; color: var(--text-dim); padding: 20px;
-  background: var(--bg-panel2);
-}
-.gantt-block {
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-width: 40px; padding: 6px 4px; color: white; font-size: 12px; font-weight: 800;
-  border-right: 1px solid rgba(255,255,255,0.3); transition: opacity 0.2s;
-  flex-shrink: 0;
-}
+.gantt-chart { display: flex; min-height: 56px; align-items: stretch; border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.gantt-empty { width: 100%; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-dim); padding: 20px; background: var(--bg-panel2); }
+.gantt-block { display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 40px; padding: 6px 4px; color: white; font-size: 12px; font-weight: 800; border-right: 1px solid rgba(255,255,255,0.3); transition: opacity 0.2s; flex-shrink: 0; }
 .gantt-block:hover { opacity: 0.85; }
 .gantt-pid { font-size: 11px; }
 .gantt-time { font-size: 9px; opacity: 0.8; }
 .gantt-idle { background: #b0bec5 !important; }
-.gantt-timeline {
-  display: flex; font-size: 10px; color: var(--text-dim);
-  font-family: var(--font-mono); padding-top: 4px; overflow-x: auto;
-}
+.gantt-timeline { display: flex; font-size: 10px; color: var(--text-dim); font-family: var(--font-mono); padding-top: 4px; overflow-x: auto; }
 .gantt-tick { min-width: 40px; text-align: left; flex-shrink: 0; }
-
-.metrics-box {
-  margin-top: 16px; padding: 14px;
-  background: linear-gradient(135deg, #e3f2fd, #e8f5e9);
-  border-radius: var(--radius); border: 1.5px solid var(--border-bright);
-}
-.metrics-title {
-  font-size: 12px; font-weight: 800; text-transform: uppercase;
-  letter-spacing: 0.5px; color: var(--mi-blue); margin-bottom: 10px;
-}
+.metrics-box { margin-top: 16px; padding: 14px; background: linear-gradient(135deg, #e3f2fd, #e8f5e9); border-radius: var(--radius); border: 1.5px solid var(--border-bright); }
+.metrics-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mi-blue); margin-bottom: 10px; }
 .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.metric-item {
-  background: white; border-radius: 8px; padding: 10px;
-  text-align: center; border: 1px solid var(--border);
-}
+.metric-item { background: white; border-radius: 8px; padding: 10px; text-align: center; border: 1px solid var(--border); }
 .metric-label { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; display: block; }
 .metric-val { font-family: var(--font-display); font-size: 20px; color: var(--mi-blue); display: block; margin-top: 2px; }
 .metric-val.good { color: var(--mi-green); }
 .metric-val.warn { color: var(--mi-orange); }
-
 .speed-control { display: flex; align-items: center; gap: 8px; font-size: 16px; }
 .speed-control input { flex: 1; }
 .mt-16 { margin-top: 16px; }
-
 .results-area { animation: fade-in 0.4s ease; }
 @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-.states-flow {
-  display: flex; align-items: center; flex-wrap: wrap;
-  gap: 0; padding: 20px; background: var(--bg-panel2); border-radius: var(--radius);
-  justify-content: center;
-}
+.states-flow { display: flex; align-items: center; flex-wrap: wrap; gap: 0; padding: 20px; background: var(--bg-panel2); border-radius: var(--radius); justify-content: center; }
 .arrow-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; margin: 0 4px; }
 .arrow-label { font-size: 9px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; }
 .arrow-line { font-size: 18px; color: var(--mi-teal); }
 .states-secondary { display: flex; justify-content: center; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
-.secondary-arrow { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--text-muted); font-weight: 600; }
-
-.state-node-box {
-  display: inline-flex; flex-direction: column; align-items: center;
-  gap: 4px; padding: 14px 20px; border-radius: var(--radius);
-  border: 2.5px solid; min-width: 110px; text-align: center;
-  transition: all 0.3s;
-}
+.state-node-box { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 20px; border-radius: var(--radius); border: 2.5px solid; min-width: 110px; text-align: center; transition: all 0.3s; }
 .state-node-box.active { transform: scale(1.08); box-shadow: 0 6px 20px rgba(0,0,0,0.2); }
 .state-node-box.new        { background: #f3e5f5; border-color: var(--state-new); }
 .state-node-box.ready      { background: #e3f2fd; border-color: var(--state-ready); }
@@ -411,12 +191,7 @@ body {
 .sn-count.running    { color: var(--state-running); }
 .sn-count.waiting    { color: var(--state-waiting); }
 .sn-count.terminated { color: var(--state-terminated); }
-
-.event-log {
-  background: #263238; border-radius: var(--radius);
-  padding: 12px; height: 300px; overflow-y: auto;
-  font-family: var(--font-mono); font-size: 12px;
-}
+.event-log { background: #263238; border-radius: var(--radius); padding: 12px; height: 300px; overflow-y: auto; font-family: var(--font-mono); font-size: 12px; }
 .log-line { padding: 2px 0; color: #b0bec5; }
 .log-line.info    { color: #81d4fa; }
 .log-line.success { color: #a5d6a7; }
@@ -425,423 +200,95 @@ body {
 .log-line.ctx     { color: #ce93d8; }
 .log-empty { color: #546e7a; font-style: italic; }
 .log-time { color: #546e7a; margin-right: 8px; }
-
-.toast-container {
-  position: fixed; bottom: 20px; right: 20px; z-index: 9999;
-  display: flex; flex-direction: column; gap: 8px;
-}
-.toast {
-  padding: 12px 18px; border-radius: var(--radius);
-  font-size: 13px; font-weight: 600; color: white;
-  box-shadow: var(--shadow-lg); animation: toast-in 0.3s ease; max-width: 320px;
-}
+.toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 12px 18px; border-radius: var(--radius); font-size: 13px; font-weight: 600; color: white; box-shadow: var(--shadow-lg); animation: toast-in 0.3s ease; max-width: 320px; }
 .toast.info    { background: var(--mi-blue); }
 .toast.success { background: var(--mi-green); }
 .toast.warn    { background: var(--mi-orange); }
 .toast.error   { background: var(--mi-red); }
-@keyframes toast-in {
-  from { transform: translateX(100px); opacity: 0; }
-  to   { transform: translateX(0);     opacity: 1; }
-}
-
+@keyframes toast-in { from { transform: translateX(100px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 4px; }
-
-.ctx-counter {
-  display: inline-flex; align-items: center; gap: 6px;
-  background: #fff3e0; border: 1.5px solid #ffcc02;
-  border-radius: 20px; padding: 4px 12px;
-  font-size: 12px; font-weight: 700; color: var(--mi-orange);
-}
-
-.sim-info-bar {
-  display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
-  padding: 10px 14px; background: var(--bg-panel2);
-  border-radius: var(--radius); border: 1.5px solid var(--border);
-  margin-bottom: 12px; font-size: 12px; font-weight: 700; color: var(--text-muted);
-}
+.ctx-counter { display: inline-flex; align-items: center; gap: 6px; background: #fff3e0; border: 1.5px solid #ffcc02; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 700; color: var(--mi-orange); }
+.sim-info-bar { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 10px 14px; background: var(--bg-panel2); border-radius: var(--radius); border: 1.5px solid var(--border); margin-bottom: 12px; font-size: 12px; font-weight: 700; color: var(--text-muted); }
 .sim-time { font-family: var(--font-display); font-size: 18px; color: var(--mi-blue); }
 .sim-status { padding: 3px 10px; border-radius: 20px; font-size: 11px; }
 .sim-status.running { background: #e8f5e9; color: var(--mi-green); }
 .sim-status.idle    { background: #eceff1; color: var(--text-muted); }
 .sim-status.done    { background: #e3f2fd; color: var(--mi-blue); }
-
 .mlq-level { margin-bottom: 10px; }
-.mlq-level-header {
-  display: flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px;
-}
+.mlq-level-header { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
 .mlq-bar { height: 8px; border-radius: 4px; width: 80px; }
 
-/* ══════════════════════════════════════
+/* ═══════════════════════════════════════
    MONSTERS INC. DOOR SIMULATION STYLES
-   ══════════════════════════════════════ */
-
-.mi-doors-panel {
-  background: linear-gradient(160deg, #1a237e 0%, #283593 40%, #1565c0 100%);
-  border: 2px solid #3949ab;
-  border-radius: var(--radius-lg);
-  padding: 0;
-  overflow: hidden;
-  margin-bottom: 20px;
-  box-shadow: 0 8px 40px rgba(21,33,126,0.4);
-  position: relative;
-}
-
-/* Polka-dot background texture like Monsters Inc. */
-.mi-doors-panel::before {
-  content: '';
-  position: absolute; inset: 0;
-  background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
-  background-size: 20px 20px;
-  pointer-events: none;
-}
-
-.doors-header {
-  background: linear-gradient(90deg, #0d47a1, #1565c0, #0d47a1);
-  padding: 14px 20px;
-  display: flex; align-items: center; justify-content: space-between;
-  border-bottom: 2px solid rgba(255,255,255,0.15);
-  position: relative;
-}
-
-.doors-header-title {
-  font-family: var(--font-display);
-  font-size: 20px; color: white; letter-spacing: 2px;
-  display: flex; align-items: center; gap: 10px;
-  text-shadow: 0 0 20px rgba(255,255,255,0.4);
-}
-
-.doors-header-badge {
-  background: rgba(255,255,255,0.15);
-  border: 1px solid rgba(255,255,255,0.3);
-  color: #90caf9; font-size: 10px; font-weight: 700;
-  padding: 3px 10px; border-radius: 20px; letter-spacing: 1px;
-}
-
-.doors-scream-energy {
-  display: flex; align-items: center; gap: 16px;
-}
-
-.scream-stat {
-  text-align: center;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 10px; padding: 8px 14px; min-width: 80px;
-}
-.scream-stat-val {
-  font-family: var(--font-display); font-size: 22px; color: #f9a825;
-  display: block; line-height: 1;
-}
+   ═══════════════════════════════════════ */
+.mi-doors-panel { background: var(--bg-panel2); border: 2px solid #3949ab; border-radius: var(--radius-lg); padding: 0; overflow: hidden; margin-bottom: 20px; box-shadow: 0 8px 40px rgba(21,33,126,0.4); position: relative; }
+.mi-doors-panel::before { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px); background-size: 20px 20px; pointer-events: none; }
+.doors-header { background: var(--mi-blue); padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(255,255,255,0.15); position: relative; }
+.doors-header-title { font-family: var(--font-display); font-size: 20px; color: white; letter-spacing: 2px; display: flex; align-items: center; gap: 10px; text-shadow: 0 0 20px rgba(255,255,255,0.4); }
+.doors-header-badge { background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); color: #90caf9; font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; }
+.doors-scream-energy { display: flex; align-items: center; gap: 16px; }
+.scream-stat { text-align: center; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 8px 14px; min-width: 80px; }
+.scream-stat-val { font-family: var(--font-display); font-size: 22px; color: #f9a825; display: block; line-height: 1; }
 .scream-stat-lbl { font-size: 10px; color: rgba(255,255,255,0.6); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
-
-/* SCREAM METER */
-.scream-meter-wrap {
-  background: rgba(0,0,0,0.3);
-  border-radius: 10px; padding: 12px 20px;
-  display: flex; align-items: center; gap: 12px;
-  border-bottom: 2px solid rgba(255,255,255,0.08);
-}
-.scream-meter-label {
-  font-family: var(--font-display); font-size: 13px; color: #f9a825;
-  letter-spacing: 1px; white-space: nowrap;
-}
-.scream-bar-track {
-  flex: 1; height: 18px; background: rgba(0,0,0,0.4);
-  border-radius: 9px; overflow: hidden;
-  border: 1.5px solid rgba(255,255,255,0.15);
-  position: relative;
-}
-.scream-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #f9a825, #ff6f00, #ff3d00);
-  border-radius: 9px;
-  width: 0%;
-  transition: width 0.5s ease;
-  position: relative;
-  box-shadow: 0 0 10px rgba(255,111,0,0.6);
-}
-.scream-bar-fill::after {
-  content: '';
-  position: absolute; inset: 0;
-  background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 9px);
-}
-.scream-pct {
-  font-family: var(--font-display); font-size: 14px; color: #f9a825;
-  min-width: 48px; text-align: right;
-}
-
-/* DOORS BODY */
-.doors-body {
-  padding: 20px;
-  display: grid;
-  grid-template-columns: 1fr 240px;
-  gap: 20px;
-}
-
-/* WAITING ROOM */
-.waiting-room {
-  background: rgba(0,0,0,0.25);
-  border: 1.5px solid rgba(255,255,255,0.1);
-  border-radius: var(--radius-lg); padding: 16px;
-  margin-bottom: 16px;
-}
-.waiting-room-title {
-  font-family: var(--font-display); font-size: 14px; color: #90caf9;
-  letter-spacing: 1px; margin-bottom: 12px;
-  display: flex; align-items: center; justify-content: space-between;
-}
-.waiting-room-count {
-  background: #1565c0; color: white;
-  font-size: 11px; padding: 3px 10px; border-radius: 20px;
-}
-
-/* Theater seats */
-.theater-seats {
-  display: flex; flex-wrap: wrap; gap: 6px;
-  padding: 10px; border-radius: var(--radius);
-  background: rgba(0,0,0,0.2);
-  min-height: 80px;
-}
-
-.theater-seat {
-  position: relative; display: flex; flex-direction: column;
-  align-items: center; gap: 2px; cursor: default;
-}
-
-.seat-chair {
-  width: 44px; height: 38px;
-  background: linear-gradient(180deg, #7b1fa2, #6a1b9a);
-  border-radius: 6px 6px 0 0;
-  border: 1.5px solid rgba(255,255,255,0.15);
-  position: relative; display: flex; align-items: center; justify-content: center;
-  font-size: 18px;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
-}
-.seat-chair::after {
-  content: '';
-  position: absolute; bottom: -6px; left: 4px; right: 4px;
-  height: 6px; background: linear-gradient(180deg, #4a148c, #311b92);
-  border-radius: 0 0 4px 4px;
-}
-.seat-label {
-  font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.7);
-  margin-top: 8px; font-family: var(--font-mono);
-}
-
-.seat-chair.empty {
-  background: linear-gradient(180deg, #37474f, #263238);
-  opacity: 0.4;
-}
-.seat-chair.has-monster {
-  animation: seat-bounce 0.4s ease;
-}
-@keyframes seat-bounce {
-  0%   { transform: scale(0.8); }
-  60%  { transform: scale(1.1); }
-  100% { transform: scale(1); }
-}
-
-/* DOOR STATIONS */
+.scream-meter-wrap { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 2px solid rgba(255,255,255,0.08); }
+.scream-meter-label { font-family: var(--font-display); font-size: 13px; color: #000000; letter-spacing: 1px; white-space: nowrap; }
+.scream-bar-track { flex: 1; height: 18px; background: rgba(0,0,0,0.4); border-radius: 9px; overflow: hidden; border: 1.5px solid rgba(255,255,255,0.15); position: relative; }
+.scream-bar-fill { height: 100%; background: linear-gradient(90deg, #f9a825, #ff6f00, #ff3d00); border-radius: 9px; width: 0%; transition: width 0.5s ease; position: relative; box-shadow: 0 0 10px rgba(255,111,0,0.6); }
+.scream-bar-fill::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(255,255,255,0.1) 8px, rgba(255,255,255,0.1) 9px); }
+.scream-pct { font-family: var(--font-display); font-size: 14px; color: #f9a825; min-width: 48px; text-align: right; }
+.doors-body { padding: 20px; display: grid; grid-template-columns: 1fr 240px; gap: 20px; }
+.waiting-room { background: rgba(0,0,0,0.25); border: 1.5px solid rgba(255,255,255,0.1); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; }
+.waiting-room-title { font-family: var(--font-display); font-size: 14px; color: #008cff; letter-spacing: 1px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+.waiting-room-count { background: #1565c0; color: white; font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+.theater-seats { display: flex; flex-wrap: wrap; gap: 6px; padding: 10px; border-radius: var(--radius); background: rgba(0,0,0,0.2); min-height: 80px; }
+.theater-seat { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: default; }
+.seat-chair { width: 44px; height: 38px; background: linear-gradient(180deg, #7b1fa2, #6a1b9a); border-radius: 6px 6px 0 0; border: 1.5px solid rgba(255,255,255,0.15); position: relative; display: flex; align-items: center; justify-content: center; font-size: 18px; box-shadow: 0 3px 8px rgba(0,0,0,0.3); }
+.seat-chair::after { content: ''; position: absolute; bottom: -6px; left: 4px; right: 4px; height: 6px; background: linear-gradient(180deg, #4a148c, #311b92); border-radius: 0 0 4px 4px; }
+.seat-label { font-size: 9px; font-weight: 700; color: rgba(255,255,255,0.7); margin-top: 8px; font-family: var(--font-mono); }
+.seat-chair.empty { background: linear-gradient(180deg, #37474f, #263238); opacity: 0.4; }
+.seat-chair.has-monster { animation: seat-bounce 0.4s ease; }
+@keyframes seat-bounce { 0% { transform: scale(0.8); } 60% { transform: scale(1.1); } 100% { transform: scale(1); } }
 .door-stations-area {}
-.door-stations-title {
-  font-family: var(--font-display); font-size: 14px; color: #90caf9;
-  letter-spacing: 1px; margin-bottom: 12px; text-align: center;
-}
-
-.door-stations-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 14px;
-}
-
-/* The BIG Monsters Inc door */
-.door-station {
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
-}
-
-.door-station-label {
-  font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5);
-  font-family: var(--font-mono); letter-spacing: 1px;
-}
-
-.mi-door-frame {
-  position: relative;
-  width: 100px; height: 140px;
-}
-
-/* Door frame/archway */
-.mi-door-arch {
-  position: absolute; inset: 0;
-  background: linear-gradient(180deg, #4a4a4a, #2d2d2d);
-  border-radius: 12px 12px 4px 4px;
-  border: 3px solid #5d5d5d;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.05);
-}
-
-/* The actual door panel */
-.mi-door-panel {
-  position: absolute;
-  top: 4px; left: 4px; right: 4px; bottom: 4px;
-  border-radius: 8px 8px 2px 2px;
-  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  gap: 4px; overflow: hidden;
-  cursor: pointer;
-}
-
-.mi-door-panel.idle {
-  background: linear-gradient(160deg, #1a237e, #283593);
-  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4);
-}
-
-.mi-door-panel.running {
-  animation: door-glow 0.8s ease-in-out infinite alternate;
-}
-@keyframes door-glow {
-  0%  { box-shadow: 0 0 15px rgba(67,160,71,0.6), inset 0 2px 8px rgba(0,0,0,0.2); }
-  100%{ box-shadow: 0 0 30px rgba(67,160,71,0.9), inset 0 2px 8px rgba(0,0,0,0.1); }
-}
-
-.mi-door-panel.complete {
-  background: linear-gradient(160deg, #37474f, #263238);
-  opacity: 0.6;
-}
-
-/* Door knob */
-.mi-door-knob {
-  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
-  width: 8px; height: 8px; border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #ffd54f, #f9a825);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-}
-
-/* Door number plate */
-.mi-door-number {
-  position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
-  background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.8);
-  font-size: 9px; font-weight: 700; font-family: var(--font-mono);
-  padding: 2px 8px; border-radius: 4px; white-space: nowrap;
-}
-
-/* Monster emoji inside door */
-.mi-door-monster {
-  font-size: 24px; line-height: 1;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-  animation: monster-wiggle 0.5s ease infinite alternate;
-}
-@keyframes monster-wiggle {
-  0%  { transform: rotate(-5deg) scale(1); }
-  100%{ transform: rotate(5deg) scale(1.05); }
-}
-
-.mi-door-pid {
-  font-family: var(--font-display); font-size: 13px; color: white;
-  text-shadow: 0 0 8px rgba(255,255,255,0.5);
-}
-
-.mi-door-progress {
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 4px; background: rgba(0,0,0,0.3);
-}
-.mi-door-progress-fill {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, #43a047, #a5d6a7);
-  transition: width 0.3s ease;
-  border-radius: 0 2px 2px 0;
-}
-
-/* DOOR STATUS BADGE */
-.door-status-badge {
-  font-size: 10px; font-weight: 700; padding: 3px 10px;
-  border-radius: 20px; font-family: var(--font-mono);
-}
-.door-status-badge.idle      { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
-.door-status-badge.running   { background: rgba(67,160,71,0.2);    color: #a5d6a7; }
-.door-status-badge.complete  { background: rgba(84,110,122,0.2);   color: #90a4ae; }
-
-/* SCREAM LOG (right sidebar) */
-.scream-sidebar {
-  display: flex; flex-direction: column; gap: 12px;
-}
-
-.scream-log-panel {
-  background: rgba(0,0,0,0.3);
-  border: 1.5px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-lg); padding: 14px;
-  flex: 1;
-}
-
-.scream-log-title {
-  font-family: var(--font-display); font-size: 13px; color: #f9a825;
-  letter-spacing: 1px; margin-bottom: 10px;
-}
-
-.scream-log-entries {
-  height: 200px; overflow-y: auto;
-  display: flex; flex-direction: column; gap: 4px;
-}
-
-.scream-log-entry {
-  display: flex; align-items: center; gap: 6px;
-  font-size: 11px; color: rgba(255,255,255,0.6);
-  padding: 4px 6px; border-radius: 6px;
-  background: rgba(255,255,255,0.04);
-  animation: log-appear 0.3s ease;
-}
-@keyframes log-appear {
-  from { opacity: 0; transform: translateX(-10px); }
-  to   { opacity: 1; transform: translateX(0); }
-}
-.scream-log-entry .entry-pid {
-  font-family: var(--font-display); font-size: 12px;
-  flex-shrink: 0;
-}
-.scream-log-entry .entry-time {
-  font-family: var(--font-mono); font-size: 9px;
-  color: rgba(255,255,255,0.3); margin-left: auto; flex-shrink: 0;
-}
-
-.scream-log-empty {
-  font-size: 11px; color: rgba(255,255,255,0.25); font-style: italic;
-  text-align: center; padding: 20px;
-}
-
-/* Top scorers */
-.top-monsters {
-  background: rgba(0,0,0,0.3);
-  border: 1.5px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius-lg); padding: 14px;
-}
-
-.top-monsters-title {
-  font-family: var(--font-display); font-size: 13px; color: #ce93d8;
-  letter-spacing: 1px; margin-bottom: 10px;
-}
-
-.top-monster-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
-  font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600;
-}
-.top-monster-rank {
-  font-family: var(--font-display); font-size: 14px; color: #f9a825;
-  min-width: 20px;
-}
-.top-monster-bar {
-  flex: 1; height: 6px; background: rgba(255,255,255,0.08);
-  border-radius: 3px; overflow: hidden;
-}
-.top-monster-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #7b1fa2, #ce93d8);
-  border-radius: 3px;
-  transition: width 0.5s ease;
-}
-
-/* Door panel colors per PID */
+.door-stations-title { font-family: var(--font-display); font-size: 14px; color: #008cff; letter-spacing: 1px; margin-bottom: 12px; text-align: center; }
+.door-stations-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 14px; }
+.door-station { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.door-station-label { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.5); font-family: var(--font-mono); letter-spacing: 1px; }
+.mi-door-frame { position: relative; width: 100px; height: 140px; }
+.mi-door-arch { position: absolute; inset: 0; background: linear-gradient(180deg, #4a4a4a, #2d2d2d); border-radius: 12px 12px 4px 4px; border: 3px solid #5d5d5d; box-shadow: 0 6px 20px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.05); }
+.mi-door-panel { position: absolute; top: 4px; left: 4px; right: 4px; bottom: 4px; border-radius: 8px 8px 2px 2px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; overflow: hidden; cursor: pointer; }
+.mi-door-panel.idle { background: linear-gradient(160deg, #1a237e, #283593); box-shadow: inset 0 2px 8px rgba(0,0,0,0.4); }
+.mi-door-panel.running { animation: door-glow 0.8s ease-in-out infinite alternate; }
+@keyframes door-glow { 0% { box-shadow: 0 0 15px rgba(67,160,71,0.6), inset 0 2px 8px rgba(0,0,0,0.2); } 100% { box-shadow: 0 0 30px rgba(67,160,71,0.9), inset 0 2px 8px rgba(0,0,0,0.1); } }
+.mi-door-panel.complete { background: linear-gradient(160deg, #37474f, #263238); opacity: 0.6; }
+.mi-door-knob { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, #ffd54f, #f9a825); box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+.mi-door-number { position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.5); color: rgba(255,255,255,0.8); font-size: 9px; font-weight: 700; font-family: var(--font-mono); padding: 2px 8px; border-radius: 4px; white-space: nowrap; }
+.mi-door-monster { font-size: 24px; line-height: 1; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); animation: monster-wiggle 0.5s ease infinite alternate; }
+@keyframes monster-wiggle { 0% { transform: rotate(-5deg) scale(1); } 100% { transform: rotate(5deg) scale(1.05); } }
+.mi-door-pid { font-family: var(--font-display); font-size: 13px; color: white; text-shadow: 0 0 8px rgba(255,255,255,0.5); }
+.mi-door-progress { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: rgba(0,0,0,0.3); }
+.mi-door-progress-fill { height: 100%; width: 0%; background: linear-gradient(90deg, #43a047, #a5d6a7); transition: width 0.3s ease; border-radius: 0 2px 2px 0; }
+.door-status-badge { font-size: 10px; font-weight: 700; padding: 3px 10px; border-radius: 20px; font-family: var(--font-mono); }
+.door-status-badge.idle     { background: rgba(255,255,255,0.08); color: rgba(255,255,255,0.4); }
+.door-status-badge.running  { background: rgba(67,160,71,0.2); color: #a5d6a7; }
+.door-status-badge.complete { background: rgba(84,110,122,0.2); color: #90a4ae; }
+.scream-sidebar { display: flex; flex-direction: column; gap: 12px; }
+.scream-log-panel { background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); padding: 14px; flex: 1; }
+.scream-log-title { font-family: var(--font-display); font-size: 13px; color: #f9a825; letter-spacing: 1px; margin-bottom: 10px; }
+.scream-log-entries { height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; }
+.scream-log-entry { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgba(255,255,255,0.6); padding: 4px 6px; border-radius: 6px; background: rgba(255,255,255,0.04); animation: log-appear 0.3s ease; }
+@keyframes log-appear { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+.scream-log-entry .entry-pid { font-family: var(--font-display); font-size: 12px; flex-shrink: 0; }
+.scream-log-entry .entry-time { font-family: var(--font-mono); font-size: 9px; color: rgba(255,255,255,0.3); margin-left: auto; flex-shrink: 0; }
+.scream-log-empty { font-size: 11px; color: rgba(255,255,255,0.25); font-style: italic; text-align: center; padding: 20px; }
+.top-monsters { background: rgba(0,0,0,0.3); border: 1.5px solid rgba(255,255,255,0.08); border-radius: var(--radius-lg); padding: 14px; }
+.top-monsters-title { font-family: var(--font-display); font-size: 13px; color: #ce93d8; letter-spacing: 1px; margin-bottom: 10px; }
+.top-monster-row { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; }
+.top-monster-rank { font-family: var(--font-display); font-size: 14px; color: #f9a825; min-width: 20px; }
+.top-monster-bar { flex: 1; height: 6px; background: rgba(255,255,255,0.08); border-radius: 3px; overflow: hidden; }
+.top-monster-bar-fill { height: 100%; background: linear-gradient(90deg, #7b1fa2, #ce93d8); border-radius: 3px; transition: width 0.5s ease; }
 .door-color-0 { background: linear-gradient(160deg, #0d47a1, #1565c0) !important; }
 .door-color-1 { background: linear-gradient(160deg, #4a148c, #7b1fa2) !important; }
 .door-color-2 { background: linear-gradient(160deg, #006064, #00838f) !important; }
@@ -852,38 +299,9 @@ body {
 .door-color-7 { background: linear-gradient(160deg, #004d40, #00695c) !important; }
 .door-color-8 { background: linear-gradient(160deg, #b71c1c, #c62828) !important; }
 .door-color-9 { background: linear-gradient(160deg, #263238, #37474f) !important; }
-
-/* Scare floor effect when running */
-.scare-flash {
-  animation: scare-flash-anim 0.3s ease !important;
-}
-@keyframes scare-flash-anim {
-  0%   { filter: brightness(1); }
-  50%  { filter: brightness(2) hue-rotate(30deg); }
-  100% { filter: brightness(1); }
-}
-
-/* Door open animation */
-@keyframes door-open {
-  0%   { transform: perspective(400px) rotateY(0deg); }
-  100% { transform: perspective(400px) rotateY(-75deg); }
-}
-@keyframes door-close {
-  0%   { transform: perspective(400px) rotateY(-75deg); }
-  100% { transform: perspective(400px) rotateY(0deg); }
-}
-.door-opening { animation: door-open 0.4s ease forwards; transform-origin: left center; }
-.door-closing { animation: door-close 0.4s ease forwards; transform-origin: left center; }
-
-/* STATUS bar below doors */
-.doors-status-bar {
-  padding: 10px 20px;
-  background: rgba(0,0,0,0.3);
-  border-top: 1px solid rgba(255,255,255,0.08);
-  display: flex; align-items: center; justify-content: center;
-  gap: 8px; font-size: 12px; color: rgba(255,255,255,0.5);
-  font-family: var(--font-mono);
-}
+.scare-flash { animation: scare-flash-anim 0.3s ease !important; }
+@keyframes scare-flash-anim { 0% { filter: brightness(1); } 50% { filter: brightness(2) hue-rotate(30deg); } 100% { filter: brightness(1); } }
+.doors-status-bar { padding: 10px 20px; background: rgba(0,0,0,0.3); border-top: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 12px; color: rgba(255,255,255,0.5); font-family: var(--font-mono); }
 .doors-status-bar span { display: flex; align-items: center; gap: 4px; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
 .status-dot.new        { background: #ce93d8; }
@@ -891,6 +309,67 @@ body {
 .status-dot.running    { background: #a5d6a7; box-shadow: 0 0 6px rgba(165,214,167,0.6); }
 .status-dot.waiting    { background: #ffcc80; }
 .status-dot.terminated { background: #546e7a; }
+
+/* ═══════════════════════════════════════
+   MÓDULO 3 — MEMORY / PAGINACIÓN STYLES
+   ═══════════════════════════════════════ */
+.memory-grid { grid-template-columns: 320px 1fr; }
+
+/* Step controls bar */
+.step-bar { display: flex; align-items: center; gap: 12px; background: var(--bg-panel2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 14px; }
+.step-bar-info { font-size: 12px; font-weight: 700; color: var(--text-muted); white-space: nowrap; }
+.step-progress-wrap { flex: 1; height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.step-progress-fill { height: 100%; background: var(--mi-blue); border-radius: 3px; transition: width .3s; }
+
+/* Frames vault */
+.frames-vault { display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; background: var(--bg-panel2); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 14px; min-height: 100px; }
+.frame-slot { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.frame-door-mem { width: 62px; height: 86px; border-radius: 10px 10px 3px 3px; border: 2.5px solid var(--border); background: var(--bg-panel2); display: flex; align-items: center; justify-content: center; position: relative; transition: all .3s; }
+.frame-door-mem.has-page { border-color: var(--mi-blue); background: #e3f2fd; }
+.frame-door-mem.fault-flash { animation: mem-fault-anim .5s ease; border-color: var(--mi-red) !important; background: #ffebee !important; }
+.frame-door-mem.hit-flash  { animation: mem-hit-anim .5s ease; border-color: var(--mi-green) !important; background: #e8f5e9 !important; }
+@keyframes mem-fault-anim { 0%,100% { transform: scale(1); } 50% { transform: scale(1.12); box-shadow: 0 0 18px rgba(198,40,40,.5); } }
+@keyframes mem-hit-anim   { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); box-shadow: 0 0 14px rgba(67,160,71,.4); } }
+.frame-page-num { font-family: var(--font-display); font-size: 22px; color: var(--mi-blue); }
+.frame-door-mem .frame-knob { position: absolute; right: 7px; top: 50%; transform: translateY(-50%); width: 6px; height: 6px; border-radius: 50%; background: rgba(0,0,0,0.15); }
+.frame-label { font-size: 10px; font-weight: 700; color: var(--text-muted); }
+
+/* Fault/hit counters */
+.mem-counters { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 14px; }
+.mem-counter-card { background: var(--bg-panel2); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 12px; text-align: center; }
+.mem-counter-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+.mem-counter-val { font-family: var(--font-display); font-size: 26px; display: block; }
+.mem-counter-val.faults { color: var(--mi-red); }
+.mem-counter-val.hits   { color: var(--mi-green); }
+.mem-counter-val.rate   { color: var(--mi-blue); }
+.mem-counter-val.total  { color: var(--mi-orange); }
+
+/* Page reference history table */
+.mem-table-wrap { overflow-x: auto; max-height: 260px; overflow-y: auto; border: 1.5px solid var(--border); border-radius: var(--radius); }
+.mem-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: var(--font-mono); }
+.mem-table th { background: var(--bg-panel2); font-size: 10px; font-weight: 700; text-transform: uppercase; color: var(--text-muted); padding: 8px 10px; white-space: nowrap; position: sticky; top: 0; border-bottom: 2px solid var(--border); }
+.mem-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); text-align: center; font-weight: 700; }
+.mem-table .cell-ref  { color: var(--mi-orange); font-weight: 800; }
+.mem-table .cell-loaded { background: #e3f2fd; color: var(--mi-blue); }
+.mem-table .cell-hit    { background: #e8f5e9; color: var(--mi-green); }
+.mem-table .cell-fault  { background: #ffebee; color: var(--mi-red); font-weight: 800; }
+.mem-table .cell-empty  { color: var(--text-dim); }
+
+/* Fragmentation panel */
+.frag-panel { margin-top: 14px; }
+.frag-bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.frag-pid-label { font-size: 12px; font-weight: 700; min-width: 32px; }
+.frag-bar-track { flex: 1; height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
+.frag-bar-used { height: 100%; background: var(--mi-blue); border-radius: 7px 0 0 7px; transition: width .4s; }
+.frag-bar-wasted { height: 100%; background: #ffcc80; margin-left: auto; }
+.frag-info { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
+
+/* Reference string display */
+.ref-string-display { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px; background: var(--bg-panel2); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; min-height: 36px; }
+.ref-chip { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 700; font-family: var(--font-mono); background: white; border: 1.5px solid var(--border); color: var(--text-primary); transition: .2s; }
+.ref-chip.active { background: var(--mi-blue); color: white; border-color: var(--mi-blue); transform: scale(1.1); }
+.ref-chip.fault  { background: var(--mi-red); color: white; border-color: var(--mi-red); }
+.ref-chip.hit    { background: var(--mi-green); color: white; border-color: var(--mi-green); }
 </style>
 </head>
 <body>
@@ -899,10 +378,10 @@ body {
 
 <header class="mi-header">
   <div class="header-logo">
-    <span class="header-icon">🏭</span>
+    <span class="header-icon"></span>
     <div>
       <h1 class="title-main">MONSTERS INCORPORATED</h1>
-      <p class="title-sub">Operating System Process Simulator v2.0</p>
+      <p class="title-sub">Operating System Process Simulator</p>
     </div>
   </div>
   <div class="header-legend">
@@ -915,106 +394,74 @@ body {
 </header>
 
 <nav class="mi-nav">
-  <button class="nav-btn active" data-tab="processes"><span class="nav-icon">👹</span> Módulo 1 — Procesos</button>
-  <button class="nav-btn" data-tab="scheduling"><span class="nav-icon">⚡</span> Módulo 2 — CPU Scheduling</button>
-  <button class="nav-btn" data-tab="states"><span class="nav-icon">📊</span> Diagrama de Estados</button>
+  <button class="nav-btn active" data-tab="processes"><span class="nav-icon"></span> Módulo 1 — Procesos</button>
+  <button class="nav-btn" data-tab="scheduling"><span class="nav-icon"></span> Módulo 2 — CPU Scheduling</button>
+  <button class="nav-btn" data-tab="memory"><span class="nav-icon"></span> Módulo 3 — Paginación</button>
+  <button class="nav-btn" data-tab="states"><span class="nav-icon"></span> Diagrama de Estados</button>
 </nav>
 
 <main class="mi-main">
 
-  <!-- TAB 1 -->
+  <!-- ══════════ TAB 1: PROCESOS ══════════ -->
   <section class="tab-content active" id="tab-processes">
     <div class="section-header">
-      <h2>👹 Monster Registry <span class="badge">Procesos</span></h2>
+      <h2>Monster Registry <span class="badge">Procesos</span></h2>
       <p class="section-desc">Registra procesos con PID, Arrival Time, Burst Time, Priority y número de páginas</p>
     </div>
     <div class="panel-grid">
       <div class="panel">
         <div class="panel-title">➕ Nuevo Proceso</div>
-        <div class="form-group">
-          <label>PID <span class="hint">(ID único)</span></label>
-          <input type="number" id="f-pid" class="mi-input" placeholder="1" min="1" value="1"/>
+        <div class="form-group"><label>PID <span class="hint">(ID único)</span></label><input type="number" id="f-pid" class="mi-input" placeholder="1" min="1" value="1"/></div>
+        <div class="form-row">
+          <div class="form-group"><label>Arrival Time</label><input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0" value="0"/></div>
+          <div class="form-group"><label>Burst Time</label><input type="number" id="f-burst" class="mi-input" placeholder="5" min="1" value="5"/></div>
         </div>
         <div class="form-row">
-          <div class="form-group">
-            <label>Arrival Time</label>
-            <input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0" value="0"/>
-          </div>
-          <div class="form-group">
-            <label>Burst Time</label>
-            <input type="number" id="f-burst" class="mi-input" placeholder="5" min="1" value="5"/>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label>Priority <span class="hint">(menor=mayor)</span></label>
-            <input type="number" id="f-priority" class="mi-input" placeholder="1" min="1" value="1"/>
-          </div>
-          <div class="form-group">
-            <label>Páginas</label>
-            <input type="number" id="f-pages" class="mi-input" placeholder="4" min="1" value="4"/>
-          </div>
+          <div class="form-group"><label>Priority <span class="hint">(menor=mayor)</span></label><input type="number" id="f-priority" class="mi-input" placeholder="1" min="1" value="1"/></div>
+          <div class="form-group"><label>Páginas</label><input type="number" id="f-pages" class="mi-input" placeholder="4" min="1" value="4"/></div>
         </div>
         <div class="btn-row">
-          <button class="mi-btn primary" id="btn-add-process">⚡ Agregar</button>
-          <button class="mi-btn secondary" id="btn-load-example">📂 Ejemplo</button>
+          <button class="mi-btn primary" id="btn-add-process"> Agregar</button>
+          <button class="mi-btn secondary" id="btn-load-example"> Ejemplo</button>
         </div>
         <div class="divider"><span>ó</span></div>
-        <label class="file-drop" id="file-drop">
-          <span>📁 Arrastra archivo .txt/.csv aquí</span>
-          <input type="file" id="file-input" accept=".txt,.csv" style="display:none"/>
-        </label>
+        <label class="file-drop" id="file-drop"><span>📁 Arrastra archivo .txt/.csv aquí</span><input type="file" id="file-input" accept=".txt,.csv" style="display:none"/></label>
         <div class="file-format">Formato: <code>PID,Arrival,Burst,Priority,Pages</code></div>
       </div>
-
       <div class="panel">
-        <div class="panel-title">📋 Procesos Registrados <span id="process-count" class="count-badge">0</span></div>
+        <div class="panel-title">Procesos Registrados <span id="process-count" class="count-badge">0</span></div>
         <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Haz clic en un valor para editarlo en línea.</p>
         <div class="table-wrapper">
           <table class="mi-table" id="process-table">
-            <thead>
-              <tr><th>PID</th><th>Arrival</th><th>Burst</th><th>Priority</th><th>Páginas</th><th>Estado</th><th></th></tr>
-            </thead>
-            <tbody id="process-tbody">
-              <tr class="empty-row"><td colspan="7">
-                <div class="empty-state"><span class="empty-icon">👾</span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div>
-              </td></tr>
-            </tbody>
+            <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>Priority</th><th>Páginas</th><th>Estado</th><th></th></tr></thead>
+            <tbody id="process-tbody"><tr class="empty-row"><td colspan="7"><div class="empty-state"><span class="empty-icon"></span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr></tbody>
           </table>
         </div>
         <div class="btn-row" style="margin-top:12px">
-          <button class="mi-btn danger" id="btn-clear-all">🗑️ Limpiar Todo</button>
+          <button class="mi-btn danger" id="btn-clear-all">Limpiar Todo</button>
           <button class="mi-btn ghost" id="btn-go-sched">▶ Ir a Scheduling</button>
         </div>
       </div>
     </div>
-
     <div class="panel">
-      <div class="panel-title">🏭 Línea de Producción <span class="hint">— Vista de Estados</span></div>
+      <div class="panel-title">Línea de Producción <span class="hint">— Vista de Estados</span></div>
       <div class="conveyor-area">
-        <div class="conveyor-belt">
-          <div class="belt-track"></div>
-          <div class="belt-doors" id="belt-doors"></div>
-        </div>
-        <div class="conveyor-labels">
-          <span>🟣 NEW</span><span>🔵 READY</span><span>🟢 RUNNING</span><span>🟡 WAITING</span><span>⚫ DONE</span>
-        </div>
+        <div class="conveyor-belt"><div class="belt-track"></div><div class="belt-doors" id="belt-doors"></div></div>
+        <div class="conveyor-labels"><span>🟣 NEW</span><span>🔵 READY</span><span>🟢 RUNNING</span><span>🟡 WAITING</span><span>⚫ DONE</span></div>
       </div>
     </div>
   </section>
 
-  <!-- TAB 2 -->
+  <!-- ══════════ TAB 2: SCHEDULING ══════════ -->
   <section class="tab-content" id="tab-scheduling">
     <div class="section-header">
       <h2>⚡ Scare Floor <span class="badge">CPU Scheduling</span></h2>
       <p class="section-desc">Selecciona el algoritmo, configura parámetros y observa la simulación en tiempo real</p>
     </div>
-
     <div class="panel-grid scheduling-grid">
       <div class="panel">
-        <div class="panel-title">⚙️ Configuración</div>
-        <div class="form-group">
-          <label>Algoritmo</label>
+        <div class="panel-title">Configuración</div>
+        <div class="form-group"><label>Algoritmo</label>
           <select id="sched-algo" class="mi-select">
             <optgroup label="── Non-Preemptive ──">
               <option value="fcfs">FCFS — First Come First Served</option>
@@ -1030,104 +477,51 @@ body {
             </optgroup>
           </select>
         </div>
-
-        <div id="quantum-group" style="display:none" class="form-group">
-          <label>Quantum (time slice)</label>
-          <input type="number" id="sched-quantum" class="mi-input" value="2" min="1"/>
-        </div>
-
+        <div id="quantum-group" style="display:none" class="form-group"><label>Quantum (time slice)</label><input type="number" id="sched-quantum" class="mi-input" value="2" min="1"/></div>
         <div id="mlq-config" style="display:none">
-          <div class="form-group">
-            <label>Niveles MLQ / MLFQ</label>
-            <div class="mlq-level">
-              <div class="mlq-level-header"><span class="mlq-bar" style="background:#1565c0"></span>Nivel 0 — Round Robin (Q=<input type="number" id="mlq-q0" value="2" min="1" style="width:40px;padding:1px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px">)</div>
-            </div>
-            <div class="mlq-level">
-              <div class="mlq-level-header"><span class="mlq-bar" style="background:#00838f"></span>Nivel 1 — Round Robin (Q=<input type="number" id="mlq-q1" value="4" min="1" style="width:40px;padding:1px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px">)</div>
-            </div>
-            <div class="mlq-level">
-              <div class="mlq-level-header"><span class="mlq-bar" style="background:#2e7d32"></span>Nivel 2 — FCFS</div>
-            </div>
+          <div class="form-group"><label>Niveles MLQ / MLFQ</label>
+            <div class="mlq-level"><div class="mlq-level-header"><span class="mlq-bar" style="background:#1565c0"></span>Nivel 0 — Round Robin (Q=<input type="number" id="mlq-q0" value="2" min="1" style="width:40px;padding:1px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px">)</div></div>
+            <div class="mlq-level"><div class="mlq-level-header"><span class="mlq-bar" style="background:#00838f"></span>Nivel 1 — Round Robin (Q=<input type="number" id="mlq-q1" value="4" min="1" style="width:40px;padding:1px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px">)</div></div>
+            <div class="mlq-level"><div class="mlq-level-header"><span class="mlq-bar" style="background:#2e7d32"></span>Nivel 2 — FCFS</div></div>
           </div>
         </div>
-
         <div class="btn-row">
           <button class="mi-btn primary" id="btn-run-sched">▶ Ejecutar</button>
           <button class="mi-btn secondary" id="btn-step-sched">⏭ Paso a Paso</button>
           <button class="mi-btn ghost" id="btn-reset-sched">↺ Reset</button>
         </div>
-
-        <div class="form-group mt-16">
-          <label>Velocidad de Animación</label>
-          <div class="speed-control">
-            <span>🐢</span>
-            <input type="range" id="sched-speed" min="100" max="2000" value="700" class="mi-range"/>
-            <span>⚡</span>
-          </div>
-        </div>
-
+        <div class="form-group mt-16"><label>Velocidad de Animación</label><div class="speed-control"><span>🐢</span><input type="range" id="sched-speed" min="100" max="2000" value="700" class="mi-range"/><span>⚡</span></div></div>
         <div class="metrics-box" id="metrics-box">
-          <div class="metrics-title">📊 Métricas Globales</div>
+          <div class="metrics-title">Métricas Globales</div>
           <div class="metrics-grid">
-            <div class="metric-item">
-              <span class="metric-label">CPU Util.</span>
-              <span class="metric-val" id="m-cpu">—</span>
-            </div>
-            <div class="metric-item">
-              <span class="metric-label">Avg Wait</span>
-              <span class="metric-val" id="m-wait">—</span>
-            </div>
-            <div class="metric-item">
-              <span class="metric-label">Avg TAT</span>
-              <span class="metric-val" id="m-tat">—</span>
-            </div>
-            <div class="metric-item">
-              <span class="metric-label">Avg Resp</span>
-              <span class="metric-val" id="m-resp">—</span>
-            </div>
+            <div class="metric-item"><span class="metric-label">CPU Util.</span><span class="metric-val" id="m-cpu">—</span></div>
+            <div class="metric-item"><span class="metric-label">Avg Wait</span><span class="metric-val" id="m-wait">—</span></div>
+            <div class="metric-item"><span class="metric-label">Avg TAT</span><span class="metric-val" id="m-tat">—</span></div>
+            <div class="metric-item"><span class="metric-label">Avg Resp</span><span class="metric-val" id="m-resp">—</span></div>
           </div>
         </div>
       </div>
-
       <div class="panel">
         <div class="sim-info-bar" id="sim-info-bar">
-          <span>⏱ Tiempo: <span class="sim-time" id="sim-time-display">0</span></span>
+          <span>Tiempo: <span class="sim-time" id="sim-time-display">0</span></span>
           <span class="sim-status idle" id="sim-status-badge">Inactivo</span>
-          <span class="ctx-counter">🔄 Context Switches: <span id="ctx-switch-count">0</span></span>
+          <span class="ctx-counter">Context Switches: <span id="ctx-switch-count">0</span></span>
         </div>
-
         <div class="cpu-area">
-          <div class="cpu-box">
-            <div class="cpu-label">⚡ CPU</div>
-            <div class="cpu-box-inner" id="cpu-box-inner"><span class="cpu-idle">💤</span></div>
-          </div>
-          <div class="queue-box">
-            <div class="queue-label">📋 Cola Ready</div>
-            <div class="ready-queue-inner" id="ready-queue"><span class="queue-empty-msg">Vacía</span></div>
-          </div>
-          <div class="queue-box">
-            <div class="queue-label">⏳ Waiting / Blocked</div>
-            <div class="waiting-queue-inner" id="waiting-queue"><span class="queue-empty-msg">Vacía</span></div>
-          </div>
+          <div class="cpu-box"><div class="cpu-label">CPU</div><div class="cpu-box-inner" id="cpu-box-inner"><span class="cpu-idle">💤</span></div></div>
+          <div class="queue-box"><div class="queue-label">Cola Ready</div><div class="ready-queue-inner" id="ready-queue"><span class="queue-empty-msg">Vacía</span></div></div>
+          <div class="queue-box"><div class="queue-label">Waiting / Blocked</div><div class="waiting-queue-inner" id="waiting-queue"><span class="queue-empty-msg">Vacía</span></div></div>
         </div>
-
         <div class="gantt-area">
-          <div class="gantt-title">📅 Diagrama de Gantt</div>
-          <div class="gantt-chart-wrapper">
-            <div class="gantt-chart" id="gantt-chart">
-              <div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div>
-            </div>
-          </div>
+          <div class="gantt-title">Diagrama de Gantt</div>
+          <div class="gantt-chart-wrapper"><div class="gantt-chart" id="gantt-chart"><div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div></div></div>
           <div class="gantt-timeline" id="gantt-timeline"></div>
         </div>
-
         <div class="results-area" id="results-area" style="display:none">
-          <div class="gantt-title">📊 Resultados por Proceso</div>
+          <div class="gantt-title">Resultados por Proceso</div>
           <div class="table-wrapper">
             <table class="mi-table" id="results-table">
-              <thead>
-                <tr><th>PID</th><th>Arrival</th><th>Burst</th><th>Completion</th><th>Turnaround</th><th>Waiting</th><th>Response</th></tr>
-              </thead>
+              <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>Completion</th><th>Turnaround</th><th>Waiting</th><th>Response</th></tr></thead>
               <tbody id="results-tbody"></tbody>
             </table>
           </div>
@@ -1135,81 +529,41 @@ body {
       </div>
     </div>
 
-    <!-- ═══════════════════════════════════════
-         MONSTERS INC. SCARE FLOOR SIMULATION
-    ═══════════════════════════════════════ -->
+    <!-- MONSTERS INC. SCARE FLOOR -->
     <div class="mi-doors-panel">
-      <!-- Header -->
       <div class="doors-header">
-        <div class="doors-header-title">
-          🚪 SCARE FLOOR — DOOR STATIONS
-          <span class="doors-header-badge">SIMULACIÓN ACTIVA</span>
-        </div>
+        <div class="doors-header-title">SCARE FLOOR — DOOR STATIONS <span class="doors-header-badge">SIMULACIÓN ACTIVA</span></div>
         <div class="doors-scream-energy">
-          <div class="scream-stat">
-            <span class="scream-stat-val" id="door-completed">0</span>
-            <span class="scream-stat-lbl">Completados</span>
-          </div>
-          <div class="scream-stat">
-            <span class="scream-stat-val" id="door-running-count">0</span>
-            <span class="scream-stat-lbl">Working</span>
-          </div>
-          <div class="scream-stat" style="min-width:90px">
-            <span class="scream-stat-val" id="door-total">0</span>
-            <span class="scream-stat-lbl">Total PIDs</span>
-          </div>
+          <div class="scream-stat"><span class="scream-stat-val" id="door-completed">0</span><span class="scream-stat-lbl">Completados</span></div>
+          <div class="scream-stat"><span class="scream-stat-val" id="door-running-count">0</span><span class="scream-stat-lbl">Working</span></div>
+          <div class="scream-stat" style="min-width:90px"><span class="scream-stat-val" id="door-total">0</span><span class="scream-stat-lbl">Total PIDs</span></div>
         </div>
       </div>
-
-      <!-- Scream energy bar -->
       <div class="scream-meter-wrap">
-        <span class="scream-meter-label">⚡ SCREAM ENERGY</span>
-        <div class="scream-bar-track">
-          <div class="scream-bar-fill" id="scream-bar-fill"></div>
-        </div>
+        <span class="scream-meter-label">SCREAM ENERGY</span>
+        <div class="scream-bar-track"><div class="scream-bar-fill" id="scream-bar-fill"></div></div>
         <span class="scream-pct" id="scream-pct">0%</span>
       </div>
-
-      <!-- Body -->
       <div class="doors-body">
         <div>
-          <!-- Waiting Room -->
           <div class="waiting-room">
-            <div class="waiting-room-title">
-              🎭 WAITING ROOM — Monsters in Queue
-              <span class="waiting-room-count" id="waiting-room-count">0 waiting</span>
-            </div>
-            <div class="theater-seats" id="theater-seats">
-              <!-- Seats rendered by JS -->
-            </div>
+            <div class="waiting-room-title">WAITING ROOM — Monsters in Queue<span class="waiting-room-count" id="waiting-room-count">0 waiting</span></div>
+            <div class="theater-seats" id="theater-seats"></div>
           </div>
-
-          <!-- Door Stations -->
-          <div class="door-stations-title">🚪 DOOR STATIONS — Active Scare Portals</div>
-          <div class="door-stations-grid" id="door-stations-grid">
-            <!-- Doors rendered by JS -->
-          </div>
+          <div class="door-stations-title">DOOR STATIONS — Active Scare Portals</div>
+          <div class="door-stations-grid" id="door-stations-grid"></div>
         </div>
-
-        <!-- Right sidebar -->
         <div class="scream-sidebar">
           <div class="scream-log-panel">
-            <div class="scream-log-title">📜 SCARE LOG</div>
-            <div class="scream-log-entries" id="scream-log-entries">
-              <div class="scream-log-empty">Los sustos aparecerán aquí...</div>
-            </div>
+            <div class="scream-log-title">SCARE LOG</div>
+            <div class="scream-log-entries" id="scream-log-entries"><div class="scream-log-empty">Los sustos aparecerán aquí...</div></div>
           </div>
-
           <div class="top-monsters">
-            <div class="top-monsters-title">🏆 TOP MONSTERS</div>
-            <div id="top-monsters-list">
-              <div style="font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;text-align:center;padding:10px">Ejecuta para ver rankings</div>
-            </div>
+            <div class="top-monsters-title">TOP MONSTERS</div>
+            <div id="top-monsters-list"><div style="font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;text-align:center;padding:10px">Ejecuta para ver rankings</div></div>
           </div>
         </div>
       </div>
-
-      <!-- Status bar -->
       <div class="doors-status-bar">
         <span><span class="status-dot new"></span> New Process</span>
         <span><span class="status-dot ready"></span> Ready Queue</span>
@@ -1218,46 +572,126 @@ body {
         <span><span class="status-dot terminated"></span> Terminated (Complete)</span>
       </div>
     </div>
-
   </section>
 
-  <!-- TAB 3 -->
+  <!-- ══════════ TAB 3: MEMORIA ══════════ -->
+  <section class="tab-content" id="tab-memory">
+    <div class="section-header">
+      <h2>Door Vault <span class="badge">Paginación de Memoria</span></h2>
+      <p class="section-desc">Configura los marcos, la cadena de referencias y observa el reemplazo de páginas paso a paso</p>
+    </div>
+
+    <div class="panel-grid memory-grid">
+
+      <!-- CONFIG PANEL -->
+      <div class="panel">
+        <div class="panel-title">Configuración de Memoria</div>
+
+        <div class="form-row">
+          <div class="form-group"><label>Marcos (Frames)</label><input type="number" id="mem-frames" class="mi-input" value="3" min="1" max="10" onchange="initMemFramesUI()"/></div>
+          <div class="form-group"><label>Tamaño de Página (KB)</label><input type="number" id="mem-pagesize" class="mi-input" value="4" min="1"/></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group"><label>Tamaño de Memoria (KB)</label><input type="number" id="mem-total" class="mi-input" value="32" min="1"/></div>
+          <div class="form-group"><label>Páginas por proceso</label><input type="number" id="mem-pages-proc" class="mi-input" value="4" min="1" readonly style="background:var(--bg-panel2)" title="Se toma de los procesos registrados"/></div>
+        </div>
+
+        <div class="form-group">
+          <label>Cadena de Referencias <span class="hint">(separadas por coma)</span></label>
+          <input type="text" id="mem-refs" class="mi-input" placeholder="1,2,3,4,1,2,5,1,2,3,4,5"/>
+        </div>
+
+        <div class="form-group">
+          <label>Algoritmo de Reemplazo</label>
+          <select id="mem-algo" class="mi-select">
+            <option value="fifo">FIFO — First In First Out</option>
+            <option value="lru">LRU — Least Recently Used</option>
+            <option value="optimal">Óptimo</option>
+            <option value="clock">Clock</option>
+            <option value="second">Segunda Oportunidad</option>
+          </select>
+        </div>
+
+        <div class="btn-row">
+          <button class="mi-btn primary" id="btn-run-mem">▶ Ejecutar</button>
+          <button class="mi-btn secondary" id="btn-step-mem" disabled>⏭ Paso</button>
+          <button class="mi-btn ghost" id="btn-reset-mem">↺ Reset</button>
+        </div>
+
+        <div class="form-group mt-16"><label>Velocidad</label>
+          <div class="speed-control"><span>🐢</span><input type="range" id="mem-speed" min="100" max="2000" value="700" class="mi-range"/><span>⚡</span></div>
+        </div>
+
+        <!-- Counters -->
+        <div class="mem-counters">
+          <div class="mem-counter-card"><span class="mem-counter-label">💥 Page Faults</span><span class="mem-counter-val faults" id="mem-fault-count">0</span></div>
+          <div class="mem-counter-card"><span class="mem-counter-label">✅ Page Hits</span><span class="mem-counter-val hits" id="mem-hit-count">0</span></div>
+          <div class="mem-counter-card"><span class="mem-counter-label">📊 Hit Rate</span><span class="mem-counter-val rate" id="mem-hit-rate">—</span></div>
+          <div class="mem-counter-card"><span class="mem-counter-label">📄 Total Refs</span><span class="mem-counter-val total" id="mem-total-refs">0</span></div>
+        </div>
+
+        <!-- Fragmentation -->
+        <div class="frag-panel panel" style="margin-top:14px;padding:14px">
+          <div class="panel-title" style="font-size:13px;margin-bottom:10px"> Fragmentación Interna</div>
+          <div id="frag-list"><p style="font-size:12px;color:var(--text-dim)">Ejecuta la simulación para ver fragmentación.</p></div>
+          <div style="display:flex;gap:14px;font-size:10px;color:var(--text-muted);margin-top:8px">
+            <span><span style="display:inline-block;width:10px;height:10px;background:var(--mi-blue);border-radius:2px;margin-right:4px"></span>Usado</span>
+            <span><span style="display:inline-block;width:10px;height:10px;background:#ffcc80;border-radius:2px;margin-right:4px"></span>Frag. interna</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISUALIZATION PANEL -->
+      <div class="panel">
+
+        <!-- Step progress bar -->
+        <div class="step-bar" id="mem-step-bar" style="display:none">
+          <span class="step-bar-info" id="mem-step-label">Paso 0 / 0</span>
+          <div class="step-progress-wrap"><div class="step-progress-fill" id="mem-step-fill" style="width:0%"></div></div>
+          <button class="mi-btn ghost" style="padding:5px 12px;font-size:12px" id="btn-mem-playpause" onclick="toggleMemPlay()">⏸ Pausar</button>
+        </div>
+
+        <!-- Reference string chips -->
+        <div class="panel-title" style="font-size:13px;margin-bottom:6px">Cadena de Referencias</div>
+        <div class="ref-string-display" id="ref-chips"></div>
+
+        <!-- Frames vault -->
+        <div class="panel-title" style="font-size:13px;margin-bottom:6px">Memoria Principal — Frames</div>
+        <div class="frames-vault" id="frames-vault"></div>
+
+        <!-- Page history table -->
+        <div class="panel-title" style="font-size:13px;margin-bottom:6px">Historial de Referencias</div>
+        <div class="mem-table-wrap">
+          <table class="mem-table" id="mem-hist-table">
+            <thead><tr id="mem-hist-head"><th>Ref</th><th>Resultado</th></tr></thead>
+            <tbody id="mem-hist-body"></tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════ TAB 4: ESTADOS ══════════ -->
   <section class="tab-content" id="tab-states">
     <div class="section-header">
-      <h2>📊 Control Room <span class="badge">Diagrama de Estados</span></h2>
+      <h2>Control Room <span class="badge">Diagrama de Estados</span></h2>
       <p class="section-desc">Visualización en tiempo real del flujo de procesos entre estados</p>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
       <div class="panel">
-        <div class="panel-title">🔄 Diagrama de Transición de Estados</div>
+        <div class="panel-title"> Diagrama de Transición de Estados</div>
         <div class="states-flow">
-          <div class="state-node-box new" id="state-box-new">
-            <span class="sn-icon">🟣</span><span class="sn-name">NEW</span>
-            <span class="sn-count new" id="cnt-new">0</span>
-          </div>
+          <div class="state-node-box new" id="state-box-new"><span class="sn-icon">🟣</span><span class="sn-name">NEW</span><span class="sn-count new" id="cnt-new">0</span></div>
           <div class="arrow-wrap"><span class="arrow-label">admit</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box ready" id="state-box-ready">
-            <span class="sn-icon">🔵</span><span class="sn-name">READY</span>
-            <span class="sn-count ready" id="cnt-ready">0</span>
-          </div>
+          <div class="state-node-box ready" id="state-box-ready"><span class="sn-icon">🔵</span><span class="sn-name">READY</span><span class="sn-count ready" id="cnt-ready">0</span></div>
           <div class="arrow-wrap"><span class="arrow-label">dispatch</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box running" id="state-box-running">
-            <span class="sn-icon">🟢</span><span class="sn-name">RUNNING</span>
-            <span class="sn-count running" id="cnt-running">0</span>
-          </div>
+          <div class="state-node-box running" id="state-box-running"><span class="sn-icon">🟢</span><span class="sn-name">RUNNING</span><span class="sn-count running" id="cnt-running">0</span></div>
           <div class="arrow-wrap"><span class="arrow-label">exit</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box terminated" id="state-box-terminated">
-            <span class="sn-icon">⚫</span><span class="sn-name">TERMINATED</span>
-            <span class="sn-count terminated" id="cnt-terminated">0</span>
-          </div>
+          <div class="state-node-box terminated" id="state-box-terminated"><span class="sn-icon">⚫</span><span class="sn-name">TERMINATED</span><span class="sn-count terminated" id="cnt-terminated">0</span></div>
         </div>
         <div class="states-secondary">
-          <div class="secondary-arrow">
-            <div class="state-node-box waiting" id="state-box-waiting" style="display:inline-flex">
-              <span class="sn-icon">🟡</span><span class="sn-name">WAITING</span>
-              <span class="sn-count waiting" id="cnt-waiting">0</span>
-            </div>
-          </div>
+          <div class="state-node-box waiting" id="state-box-waiting" style="display:inline-flex"><span class="sn-icon">🟡</span><span class="sn-name">WAITING</span><span class="sn-count waiting" id="cnt-waiting">0</span></div>
           <div style="font-size:12px;color:var(--text-muted);padding:10px;display:flex;flex-direction:column;gap:4px;justify-content:center">
             <div>← I/O wait (Running → Waiting)</div>
             <div>→ I/O done (Waiting → Ready)</div>
@@ -1267,12 +701,8 @@ body {
       </div>
       <div class="panel">
         <div class="panel-title">📟 Event Log <span class="hint">— Tiempo real</span></div>
-        <div class="event-log" id="event-log">
-          <div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div>
-        </div>
-        <div class="btn-row" style="margin-top:10px">
-          <button class="mi-btn ghost" id="btn-clear-log">🗑️ Limpiar Log</button>
-        </div>
+        <div class="event-log" id="event-log"><div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div></div>
+        <div class="btn-row" style="margin-top:10px"><button class="mi-btn ghost" id="btn-clear-log">🗑️ Limpiar Log</button></div>
       </div>
     </div>
   </section>
@@ -1285,20 +715,26 @@ body {
 'use strict';
 
 // ══════════════════════════════════════
-// MONSTER EMOJIS for PIDs
+// EMOJIS & COLORS
 // ══════════════════════════════════════
 const MONSTER_EMOJIS = ['👾','🐲','🦎','👻','🐙','🦑','🐸','🤖','👽','🦄','🐉','🦊','🦝','🐺','🎃'];
+const COLORS = ['#1565c0','#7b1fa2','#00838f','#2e7d32','#e65100','#ad1457','#4527a0','#00695c','#c62828','#37474f'];
 const pidMonsterMap = {};
+const pidColorMap = {};
+let pidColorIdx = 0;
 
 function getMonsterEmoji(pid) {
-  if (!(pid in pidMonsterMap)) {
-    pidMonsterMap[pid] = MONSTER_EMOJIS[(pid - 1) % MONSTER_EMOJIS.length];
-  }
+  if (!(pid in pidMonsterMap)) pidMonsterMap[pid] = MONSTER_EMOJIS[(pid-1) % MONSTER_EMOJIS.length];
   return pidMonsterMap[pid];
 }
+function getPidColor(pid) {
+  if (!(pid in pidColorMap)) pidColorMap[pid] = COLORS[pidColorIdx++ % COLORS.length];
+  return pidColorMap[pid];
+}
+function getPidColorIdx(pid) { getPidColor(pid); return Object.keys(pidColorMap).indexOf(String(pid)) % COLORS.length; }
 
 // ══════════════════════════════════════
-// STATE
+// GLOBAL STATE
 // ══════════════════════════════════════
 let processes = [];
 let schedResult = null;
@@ -1306,19 +742,21 @@ let simInterval = null;
 let simStep = 0;
 let simRunning = false;
 let ctxSwitches = 0;
-let pidColorMap = {};
-let pidColorIdx = 0;
-const COLORS = ['#1565c0','#7b1fa2','#00838f','#2e7d32','#e65100','#ad1457','#4527a0','#00695c','#c62828','#37474f'];
+let ganttFull = [];
+let stepPointer = 0;
 
-// Door simulation state
-let doorState = {
-  screamUnits: 0,
-  totalUnits: 0,
-  completed: 0,
-  running: 0,
-  scareLog: [],
-  topMonsters: {}
-};
+// Door sim state
+let doorState = { screamUnits:0, totalUnits:0, completed:0, running:0, scareLog:[], topMonsters:{} };
+let doorProcessState = {};
+let currentDoorPid = null;
+let screamTotal = 0;
+
+// Memory state
+let memHistory = [];
+let memStepIdx = 0;
+let memInterval = null;
+let memPaused = false;
+let memCurrentRefs = [];
 
 // ══════════════════════════════════════
 // UTILS
@@ -1326,34 +764,22 @@ let doorState = {
 function toast(msg, type='info') {
   const c = document.getElementById('toast-container');
   const t = document.createElement('div');
-  t.className = `toast ${type}`; t.textContent = msg;
-  c.appendChild(t);
+  t.className = `toast ${type}`; t.textContent = msg; c.appendChild(t);
   setTimeout(() => t.remove(), 3000);
-}
-
-function getPidColor(pid) {
-  if (!(pid in pidColorMap)) pidColorMap[pid] = COLORS[pidColorIdx++ % COLORS.length];
-  return pidColorMap[pid];
-}
-
-function getPidColorIdx(pid) {
-  getPidColor(pid);
-  return Object.keys(pidColorMap).indexOf(String(pid)) % COLORS.length;
 }
 
 function log(msg, type='info') {
   const el = document.getElementById('event-log');
-  const line = document.createElement('div');
-  line.className = `log-line ${type}`;
-  const now = simStep !== undefined ? `[T=${simStep}]` : '';
-  line.innerHTML = `<span class="log-time">${now}</span>${msg}`;
-  el.appendChild(line);
-  el.scrollTop = el.scrollHeight;
+  const empty = el.querySelector('.log-empty'); if (empty) empty.remove();
+  const line = document.createElement('div'); line.className = `log-line ${type}`;
+  const tLabel = simStep !== undefined ? `[T=${simStep}] ` : '';
+  line.innerHTML = `<span class="log-time">${tLabel}</span>${msg}`;
+  el.appendChild(line); el.scrollTop = el.scrollHeight;
 }
 
 function updateStateCounts() {
-  const counts = {new:0,ready:0,running:0,waiting:0,terminated:0};
-  processes.forEach(p => { if(counts[p.state]!==undefined) counts[p.state]++; });
+  const counts = {new:0, ready:0, running:0, waiting:0, terminated:0};
+  processes.forEach(p => { if (counts[p.state] !== undefined) counts[p.state]++; });
   ['new','ready','running','waiting','terminated'].forEach(s =>
     document.getElementById('cnt-'+s).textContent = counts[s]);
 }
@@ -1361,17 +787,13 @@ function updateStateCounts() {
 function setProcessState(pid, state) {
   const p = processes.find(x => x.pid == pid);
   if (!p || p.state === state) return;
-  const old = p.state;
-  p.state = state;
+  const old = p.state; p.state = state;
   log(`P${pid}: ${old} → <b>${state.toUpperCase()}</b>`, stateLogType(state));
   renderProcessTable(); renderConveyor(); updateStateCounts();
   const box = document.getElementById(`state-box-${state}`);
   if (box) { box.classList.add('active'); setTimeout(() => box.classList.remove('active'), 600); }
 }
-
-function stateLogType(s) {
-  return {new:'info',ready:'info',running:'success',waiting:'warn',terminated:'ctx'}[s]||'info';
-}
+function stateLogType(s) { return {new:'info',ready:'info',running:'success',waiting:'warn',terminated:'ctx'}[s]||'info'; }
 
 // ══════════════════════════════════════
 // NAVIGATION
@@ -1386,7 +808,7 @@ document.querySelectorAll('.nav-btn').forEach(btn => {
 });
 
 // ══════════════════════════════════════
-// PROCESS MANAGEMENT
+// MODULE 1 — PROCESSES
 // ══════════════════════════════════════
 document.getElementById('btn-add-process').addEventListener('click', addProcess);
 document.getElementById('f-pid').addEventListener('keydown', e => { if(e.key==='Enter') addProcess(); });
@@ -1400,9 +822,10 @@ function addProcess() {
   if (!pid||pid<1) { toast('PID inválido','error'); return; }
   if (!burst||burst<1) { toast('Burst Time debe ser ≥ 1','error'); return; }
   if (processes.find(p=>p.pid===pid)) { toast(`PID ${pid} ya existe`,'warn'); return; }
-  processes.push({pid,arrival,burst,burstOrig:burst,priority,pages,state:'new',remaining:burst});
+  processes.push({pid, arrival, burst, burstOrig:burst, priority, pages, state:'new', remaining:burst});
   getPidColor(pid);
   renderProcessTable(); renderConveyor(); updateStateCounts();
+  syncMemPagesFromProcesses();
   document.getElementById('f-pid').value = pid+1;
   toast(`P${pid} agregado ✓`,'success');
   log(`P${pid} creado — Arrival:${arrival}, Burst:${burst}, Priority:${priority}, Pages:${pages}`,'info');
@@ -1410,27 +833,20 @@ function addProcess() {
 }
 
 document.getElementById('btn-load-example').addEventListener('click', () => {
-  processes = []; pidColorMap = {}; pidColorIdx = 0;
-  const example = [
-    {pid:1,arrival:0,burst:8,priority:3,pages:4},
-    {pid:2,arrival:1,burst:4,priority:1,pages:2},
-    {pid:3,arrival:2,burst:9,priority:4,pages:5},
-    {pid:4,arrival:3,burst:5,priority:2,pages:3},
-    {pid:5,arrival:4,burst:2,priority:1,pages:2},
-    {pid:6,arrival:5,burst:6,priority:3,pages:3},
-  ];
-  example.forEach(p => {
-    processes.push({...p,burstOrig:p.burst,state:'new',remaining:p.burst});
-    getPidColor(p.pid);
-  });
+  processes = []; for (const k in pidColorMap) { delete pidColorMap[k]; } pidColorIdx = 0;
+  const ex = [{pid:1,arrival:0,burst:8,priority:3,pages:4},{pid:2,arrival:1,burst:4,priority:1,pages:2},
+    {pid:3,arrival:2,burst:9,priority:4,pages:5},{pid:4,arrival:3,burst:5,priority:2,pages:3},
+    {pid:5,arrival:4,burst:2,priority:1,pages:2},{pid:6,arrival:5,burst:6,priority:3,pages:3}];
+  ex.forEach(p => { processes.push({...p, burstOrig:p.burst, state:'new', remaining:p.burst}); getPidColor(p.pid); });
   renderProcessTable(); renderConveyor(); updateStateCounts();
+  syncMemPagesFromProcesses();
   updateDoorSimulation();
   toast('6 procesos de ejemplo cargados ✓','success');
 });
 
 document.getElementById('btn-clear-all').addEventListener('click', () => {
   if (processes.length===0) return;
-  processes=[]; pidColorMap={}; pidColorIdx=0;
+  processes=[]; for (const k in pidColorMap) { delete pidColorMap[k]; } pidColorIdx=0;
   renderProcessTable(); renderConveyor(); updateStateCounts();
   updateDoorSimulation();
   toast('Procesos eliminados','warn');
@@ -1444,8 +860,12 @@ document.getElementById('btn-go-sched').addEventListener('click', () => {
   document.getElementById('tab-scheduling').classList.add('active');
 });
 
-document.getElementById('file-drop').addEventListener('click', ()=>document.getElementById('file-input').click());
-document.getElementById('file-input').addEventListener('change', e => {
+const fd = document.getElementById('file-drop');
+fd.addEventListener('click', ()=>document.getElementById('file-input').click());
+fd.addEventListener('dragover', e=>{e.preventDefault();fd.style.background='#e3f2fd';});
+fd.addEventListener('dragleave', ()=>{fd.style.background='';});
+fd.addEventListener('drop', e=>{e.preventDefault();fd.style.background='';const file=e.dataTransfer.files[0];if(!file)return;document.getElementById('file-input').files=e.dataTransfer.files;document.getElementById('file-input').dispatchEvent(new Event('change'));});
+document.getElementById('file-input').addEventListener('change', e=>{
   const file=e.target.files[0]; if(!file) return;
   const reader=new FileReader();
   reader.onload=ev=>{
@@ -1454,34 +874,29 @@ document.getElementById('file-input').addEventListener('change', e => {
     lines.forEach(line=>{
       const parts=line.split(',').map(s=>s.trim());
       if(parts.length<4) return;
-      const pid=parseInt(parts[0]),arrival=parseInt(parts[1])||0,
-            burst=parseInt(parts[2]),priority=parseInt(parts[3])||1,pages=parseInt(parts[4])||4;
+      const pid=parseInt(parts[0]),arrival=parseInt(parts[1])||0,burst=parseInt(parts[2]),priority=parseInt(parts[3])||1,pages=parseInt(parts[4])||4;
       if(!pid||!burst||processes.find(p=>p.pid===pid)) return;
       processes.push({pid,arrival,burst,burstOrig:burst,priority,pages,state:'new',remaining:burst});
       getPidColor(pid); added++;
     });
-    renderProcessTable(); renderConveyor(); updateStateCounts();
-    updateDoorSimulation();
+    renderProcessTable(); renderConveyor(); updateStateCounts(); syncMemPagesFromProcesses(); updateDoorSimulation();
     toast(`${added} procesos importados ✓`,'success');
   };
   reader.readAsText(file);
 });
 
-const fd=document.getElementById('file-drop');
-fd.addEventListener('dragover',e=>{e.preventDefault();fd.style.background='#e3f2fd';});
-fd.addEventListener('dragleave',()=>{fd.style.background='';});
-fd.addEventListener('drop',e=>{
-  e.preventDefault();fd.style.background='';
-  const file=e.dataTransfer.files[0]; if(!file) return;
-  document.getElementById('file-input').files=e.dataTransfer.files;
-  document.getElementById('file-input').dispatchEvent(new Event('change'));
-});
+function syncMemPagesFromProcesses() {
+  if (processes.length > 0) {
+    const avgPages = Math.round(processes.reduce((s,p)=>s+p.pages,0)/processes.length);
+    document.getElementById('mem-pages-proc').value = avgPages;
+  }
+}
 
 function renderProcessTable() {
   const tbody=document.getElementById('process-tbody');
   document.getElementById('process-count').textContent=processes.length;
-  if(processes.length===0){
-    tbody.innerHTML=`<tr class="empty-row"><td colspan="7"><div class="empty-state"><span class="empty-icon">👾</span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr>`;
+  if(!processes.length){
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="7"><div class="empty-state"><span class="empty-icon"></span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr>`;
     return;
   }
   tbody.innerHTML=processes.map(p=>`
@@ -1497,8 +912,7 @@ function renderProcessTable() {
   tbody.querySelectorAll('.editable').forEach(td=>{
     td.style.cursor='pointer';
     td.addEventListener('dblclick',()=>{
-      const row=td.closest('tr');
-      const pid=parseInt(row.dataset.pid),field=td.dataset.field,val=td.textContent;
+      const row=td.closest('tr'), pid=parseInt(row.dataset.pid), field=td.dataset.field, val=td.textContent;
       td.innerHTML=`<input type="number" value="${val}" style="width:60px;padding:2px 4px;font-size:13px;border:1.5px solid var(--mi-blue);border-radius:4px"/>`;
       const inp=td.querySelector('input'); inp.focus(); inp.select();
       inp.addEventListener('blur',()=>saveEdit(pid,field,inp.value));
@@ -1508,50 +922,34 @@ function renderProcessTable() {
 }
 
 function saveEdit(pid,field,val){
-  const v=parseInt(val);
-  if(isNaN(v)||v<1){renderProcessTable();return;}
+  const v=parseInt(val); if(isNaN(v)||v<1){renderProcessTable();return;}
   const p=processes.find(x=>x.pid===pid); if(!p) return;
-  p[field]=v;
-  if(field==='burst'){p.burstOrig=v;p.remaining=v;}
+  p[field]=v; if(field==='burst'){p.burstOrig=v;p.remaining=v;}
   renderProcessTable(); toast(`P${pid}.${field} → ${v}`,'info');
 }
 
-function removeProcess(pid){
-  processes=processes.filter(p=>p.pid!==pid);
-  renderProcessTable(); renderConveyor(); updateStateCounts();
-  updateDoorSimulation();
-}
+function removeProcess(pid){ processes=processes.filter(p=>p.pid!==pid); renderProcessTable(); renderConveyor(); updateStateCounts(); updateDoorSimulation(); }
 
 function renderConveyor(){
   const belt=document.getElementById('belt-doors');
-  if(processes.length===0){belt.innerHTML='';return;}
-  belt.innerHTML=processes.map(p=>`
-    <div class="process-card">
-      <div class="door-body state-${p.state}" title="P${p.pid}|${p.state}">
-        <span>P${p.pid}</span><span class="door-knob"></span>
-      </div>
-      <div class="door-label">${p.state}</div>
-    </div>`).join('');
+  if(!processes.length){belt.innerHTML='';return;}
+  belt.innerHTML=processes.map(p=>`<div class="process-card"><div class="door-body state-${p.state}" title="P${p.pid}|${p.state}"><span>P${p.pid}</span><span class="door-knob"></span></div><div class="door-label">${p.state}</div></div>`).join('');
 }
 
 // ══════════════════════════════════════
-// CPU SCHEDULING
+// MODULE 2 — CPU SCHEDULING
 // ══════════════════════════════════════
 document.getElementById('sched-algo').addEventListener('change',function(){
   const v=this.value;
   document.getElementById('quantum-group').style.display=(v==='rr'||v==='srtf')?'block':'none';
   document.getElementById('mlq-config').style.display=(v==='mlq'||v==='mlfq')?'block':'none';
 });
-
 document.getElementById('btn-run-sched').addEventListener('click',runScheduling);
 document.getElementById('btn-step-sched').addEventListener('click',stepScheduling);
 document.getElementById('btn-reset-sched').addEventListener('click',resetScheduling);
 
-let ganttFull=[]; let stepPointer=0;
-
 function resetScheduling(){
-  clearInterval(simInterval);
-  simRunning=false; simStep=0; stepPointer=0; ctxSwitches=0; ganttFull=[];
+  clearInterval(simInterval); simRunning=false; simStep=0; stepPointer=0; ctxSwitches=0; ganttFull=[];
   processes.forEach(p=>{p.state='new';p.remaining=p.burstOrig;});
   renderProcessTable(); renderConveyor(); updateStateCounts();
   document.getElementById('gantt-chart').innerHTML='<div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div>';
@@ -1565,7 +963,6 @@ function resetScheduling(){
   document.getElementById('sim-status-badge').className='sim-status idle';
   document.getElementById('sim-status-badge').textContent='Inactivo';
   ['m-cpu','m-wait','m-tat','m-resp'].forEach(id=>document.getElementById(id).textContent='—');
-  // Reset door sim
   resetDoorSimulation();
   toast('Reset ✓','info');
 }
@@ -1573,18 +970,12 @@ function resetScheduling(){
 function runScheduling(){
   if(processes.length===0){toast('Agrega procesos primero','warn');return;}
   if(simRunning){clearInterval(simInterval);simRunning=false;document.getElementById('btn-run-sched').textContent='▶ Ejecutar';return;}
-  resetScheduling();
-  computeSchedule();
+  resetScheduling(); computeSchedule();
   if(ganttFull.length===0){toast('Sin resultados','warn');return;}
-  simRunning=true;
-  document.getElementById('btn-run-sched').textContent='⏸ Pausar';
+  simRunning=true; document.getElementById('btn-run-sched').textContent='⏸ Pausar';
   const speed=()=>2100-parseInt(document.getElementById('sched-speed').value);
   function tick(){
-    if(stepPointer>=ganttFull.length){
-      clearInterval(simInterval);simRunning=false;
-      document.getElementById('btn-run-sched').textContent='▶ Ejecutar';
-      finishSimulation(); return;
-    }
+    if(stepPointer>=ganttFull.length){clearInterval(simInterval);simRunning=false;document.getElementById('btn-run-sched').textContent='▶ Ejecutar';finishSimulation();return;}
     applyStep(stepPointer++);
     simInterval=setTimeout(tick,speed());
   }
@@ -1600,38 +991,26 @@ function stepScheduling(){
 }
 
 function applyStep(i){
-  const seg=ganttFull[i];
-  simStep=seg.end;
+  const seg=ganttFull[i]; simStep=seg.end;
   document.getElementById('sim-time-display').textContent=seg.end;
   document.getElementById('sim-status-badge').className='sim-status running';
   document.getElementById('sim-status-badge').textContent=`Ejecutando T=${seg.start}→${seg.end}`;
-
   const cpu=document.getElementById('cpu-box-inner');
-  if(seg.pid===null){
-    cpu.innerHTML='<span class="cpu-idle">💤 Idle</span>';
-  } else {
-    cpu.innerHTML=`<div class="cpu-running-pid" style="color:${getPidColor(seg.pid)}">P${seg.pid}</div>
-      <div class="cpu-running-info">T:${seg.start}→${seg.end} | R:${seg.remaining!==undefined?seg.remaining:'—'}</div>`;
+  if(seg.pid===null){cpu.innerHTML='<span class="cpu-idle">💤 Idle</span>';}
+  else{
+    cpu.innerHTML=`<div class="cpu-running-pid" style="color:${getPidColor(seg.pid)}">P${seg.pid}</div><div class="cpu-running-info">T:${seg.start}→${seg.end}</div>`;
     setProcessState(seg.pid,'running');
   }
-
   const rq=document.getElementById('ready-queue');
   if(seg.ready&&seg.ready.length>0){
     rq.innerHTML=seg.ready.map(pid=>`<span class="queue-chip" style="background:${getPidColor(pid)}">P${pid}</span>`).join('');
     seg.ready.forEach(pid=>{const p=processes.find(x=>x.pid===pid);if(p&&p.state!=='running')setProcessState(pid,'ready');});
-  } else {
-    rq.innerHTML='<span class="queue-empty-msg">Vacía</span>';
-  }
-
+  } else {rq.innerHTML='<span class="queue-empty-msg">Vacía</span>';}
   if(i>0&&ganttFull[i-1].pid!==seg.pid&&ganttFull[i-1].pid!==null&&seg.pid!==null){
-    ctxSwitches++;
-    document.getElementById('ctx-switch-count').textContent=ctxSwitches;
+    ctxSwitches++; document.getElementById('ctx-switch-count').textContent=ctxSwitches;
     log(`Context Switch: P${ganttFull[i-1].pid} → P${seg.pid}`,'ctx');
   }
-
   renderGanttPartial(i+1);
-
-  // Update door simulation
   updateDoorSimulationStep(seg);
 }
 
@@ -1639,206 +1018,43 @@ function finishSimulation(){
   processes.forEach(p=>{if(p.state!=='terminated')setProcessState(p.pid,'terminated');});
   document.getElementById('sim-status-badge').className='sim-status done';
   document.getElementById('sim-status-badge').textContent='Completado ✓';
-  renderResults();
-  renderGanttPartial(ganttFull.length);
-  finishDoorSimulation();
+  renderResults(); renderGanttPartial(ganttFull.length); finishDoorSimulation();
   toast('Simulación completada ✓','success');
 }
 
-// ── ALGORITHMS ──
+// ── ALGORITHMS (same as friend's version) ──
 function computeSchedule(){
   const algo=document.getElementById('sched-algo').value;
   const quantum=parseInt(document.getElementById('sched-quantum').value)||2;
   const procs=processes.map(p=>({...p,remaining:p.burstOrig,responseRecorded:false,completionTime:0,responseTime:0,firstRun:-1}));
   let result;
   switch(algo){
-    case 'fcfs': result=fcfs(procs); break;
-    case 'sjf':  result=sjf(procs); break;
-    case 'hrrn': result=hrrn(procs); break;
-    case 'rr':   result=roundRobin(procs,quantum); break;
-    case 'srtf': result=srtf(procs); break;
-    case 'priority_p': result=priorityPreemptive(procs); break;
-    case 'mlq':  result=multilevelQueue(procs); break;
-    case 'mlfq': result=mlfq(procs); break;
+    case 'fcfs': result=fcfs(procs); break; case 'sjf': result=sjf(procs); break;
+    case 'hrrn': result=hrrn(procs); break; case 'rr': result=roundRobin(procs,quantum); break;
+    case 'srtf': result=srtf(procs); break; case 'priority_p': result=priorityPreemptive(procs); break;
+    case 'mlq': result=multilevelQueue(procs); break; case 'mlfq': result=mlfq(procs); break;
     default: result=fcfs(procs);
   }
   ganttFull=result.gantt; schedResult=result; stepPointer=0;
   log(`Algoritmo: ${algo.toUpperCase()} | Procesos: ${procs.length}`,'info');
 }
 
-function fcfs(procs){
-  const sorted=[...procs].sort((a,b)=>a.arrival-b.arrival);
-  const gantt=[]; let t=0;
-  sorted.forEach(p=>{
-    if(t<p.arrival){gantt.push({pid:null,start:t,end:p.arrival,ready:[]});t=p.arrival;}
-    p.firstRun=t;
-    gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready:sorted.filter(x=>x.pid!==p.pid&&x.arrival<=t+p.burstOrig&&x.completionTime===0).map(x=>x.pid)});
-    t+=p.burstOrig; p.completionTime=t; p.responseTime=p.firstRun-p.arrival;
-  });
-  return {gantt,procs:sorted};
-}
-
-function sjf(procs){
-  const clone=procs.map(p=>({...p}));
-  const gantt=[]; let t=0; const done=new Set();
-  while(done.size<clone.length){
-    const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);
-    if(avail.length===0){const next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}
-    const p=avail.sort((a,b)=>a.burstOrig-b.burstOrig)[0];
-    if(p.firstRun<0)p.firstRun=t;
-    const ready=avail.filter(x=>x.pid!==p.pid).map(x=>x.pid);
-    gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});
-    t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);
-  }
-  return {gantt,procs:clone};
-}
-
-function hrrn(procs){
-  const clone=procs.map(p=>({...p}));
-  const gantt=[]; let t=0; const done=new Set();
-  while(done.size<clone.length){
-    const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);
-    if(avail.length===0){const next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}
-    const p=avail.map(x=>({...x,ratio:(t-x.arrival+x.burstOrig)/x.burstOrig})).sort((a,b)=>b.ratio-a.ratio)[0];
-    const orig=clone.find(x=>x.pid===p.pid);
-    if(orig.firstRun<0)orig.firstRun=t;
-    const ready=avail.filter(x=>x.pid!==orig.pid).map(x=>x.pid);
-    gantt.push({pid:orig.pid,start:t,end:t+orig.burstOrig,ready});
-    t+=orig.burstOrig;orig.completionTime=t;orig.responseTime=orig.firstRun-orig.arrival;done.add(orig.pid);
-  }
-  return {gantt,procs:clone};
-}
-
-function roundRobin(procs,q){
-  const clone=procs.map(p=>({...p}));
-  const gantt=[]; let t=0; const queue=[]; const done=new Set();
-  const arrived=new Set(); let i=0;
-  clone.sort((a,b)=>a.arrival-b.arrival);
-  function checkArrivals(){while(i<clone.length&&clone[i].arrival<=t){if(!arrived.has(clone[i].pid)){queue.push(clone[i]);arrived.add(clone[i].pid);}i++;}}
-  checkArrivals();
-  while(done.size<clone.length){
-    if(queue.length===0){const next=clone.find(p=>!done.has(p.pid)&&p.arrival>t);if(!next)break;gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;checkArrivals();continue;}
-    const p=queue.shift();
-    if(p.firstRun<0)p.firstRun=t;
-    const run=Math.min(q,p.remaining);
-    const ready=queue.map(x=>x.pid);
-    gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});
-    t+=run;p.remaining-=run;checkArrivals();
-    if(p.remaining>0)queue.push(p);
-    else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}
-  }
-  return {gantt,procs:clone};
-}
-
-function srtf(procs){
-  const clone=procs.map(p=>({...p}));
-  const gantt=[]; let t=0; const done=new Set();
-  let current=null; let segStart=0;
-  const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1]?.arrival+10;
-  while(done.size<clone.length&&t<=maxT){
-    const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);
-    const best=avail.sort((a,b)=>a.remaining-b.remaining)[0]||null;
-    if(!best){t++;continue;}
-    if(best.firstRun<0)best.firstRun=t;
-    if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}
-    best.remaining--;t++;
-    if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}
-  }
-  return {gantt,procs:clone};
-}
-
-function priorityPreemptive(procs){
-  const clone=procs.map(p=>({...p}));
-  const gantt=[]; let t=0; const done=new Set();
-  let current=null; let segStart=0;
-  const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+20;
-  while(done.size<clone.length&&t<=maxT){
-    const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);
-    const best=avail.sort((a,b)=>a.priority-b.priority)[0]||null;
-    if(!best){t++;continue;}
-    if(best.firstRun<0)best.firstRun=t;
-    if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}
-    best.remaining--;t++;
-    if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}
-  }
-  return {gantt,procs:clone};
-}
-
-function multilevelQueue(procs){
-  const q0=parseInt(document.getElementById('mlq-q0').value)||2;
-  const q1=parseInt(document.getElementById('mlq-q1').value)||4;
-  const clone=procs.map(p=>({...p,level:p.priority<=2?0:p.priority<=4?1:2}));
-  const gantt=[]; let t=0; const done=new Set(); const arrived=new Set();
-  const queues=[[],[],[]]; clone.sort((a,b)=>a.arrival-b.arrival); let ai=0;
-  function checkArrivals(){while(ai<clone.length&&clone[ai].arrival<=t){if(!arrived.has(clone[ai].pid)){queues[clone[ai].level].push(clone[ai]);arrived.add(clone[ai].pid);}ai++;}}
-  checkArrivals();
-  const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1].arrival+10;
-  while(done.size<clone.length&&t<=maxT){
-    checkArrivals();
-    let q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;
-    if(!q||q.length===0){t++;continue;}
-    const p=q.shift();
-    if(p.firstRun<0)p.firstRun=t;
-    const quantum=p.level===0?q0:p.level===1?q1:p.burstOrig;
-    const run=Math.min(quantum,p.remaining);
-    const ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);
-    gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});
-    t+=run;p.remaining-=run;checkArrivals();
-    if(p.remaining>0)q.push(p);
-    else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}
-  }
-  return {gantt,procs:clone};
-}
-
-function mlfq(procs){
-  const q0=parseInt(document.getElementById('mlq-q0').value)||2;
-  const q1=parseInt(document.getElementById('mlq-q1').value)||4;
-  const clone=procs.map(p=>({...p,mLevel:0}));
-  const gantt=[]; let t=0; const done=new Set(); const arrived=new Set();
-  const queues=[[],[],[]]; clone.sort((a,b)=>a.arrival-b.arrival); let ai=0;
-  function checkArrivals(){while(ai<clone.length&&clone[ai].arrival<=t){if(!arrived.has(clone[ai].pid)){queues[0].push(clone[ai]);arrived.add(clone[ai].pid);}ai++;}}
-  checkArrivals();
-  const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1].arrival+10;
-  while(done.size<clone.length&&t<=maxT){
-    checkArrivals();
-    const q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;
-    if(!q||q.length===0){t++;continue;}
-    const p=q.shift();
-    if(p.firstRun<0)p.firstRun=t;
-    const quantum=p.mLevel===0?q0:p.mLevel===1?q1:p.remaining;
-    const run=Math.min(quantum,p.remaining);
-    const ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);
-    gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});
-    t+=run;p.remaining-=run;checkArrivals();
-    if(p.remaining>0){if(p.mLevel<2)p.mLevel++;queues[p.mLevel].push(p);}
-    else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}
-  }
-  return {gantt,procs:clone};
-}
+function fcfs(procs){const sorted=[...procs].sort((a,b)=>a.arrival-b.arrival);const gantt=[];let t=0;const done=new Set();sorted.forEach(p=>{if(t<p.arrival){gantt.push({pid:null,start:t,end:p.arrival,ready:[]});t=p.arrival;}p.firstRun=t;const ready=sorted.filter(x=>x.pid!==p.pid&&x.arrival<=t&&!done.has(x.pid)).map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);});return{gantt,procs:sorted};}
+function sjf(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);if(!avail.length){const next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}const p=avail.sort((a,b)=>a.burstOrig-b.burstOrig)[0];if(p.firstRun<0)p.firstRun=t;const ready=avail.filter(x=>x.pid!==p.pid).map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}return{gantt,procs:clone};}
+function hrrn(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);if(!avail.length){const next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}const p=avail.map(x=>({...x,ratio:(t-x.arrival+x.burstOrig)/x.burstOrig})).sort((a,b)=>b.ratio-a.ratio)[0];const orig=clone.find(x=>x.pid===p.pid);if(orig.firstRun<0)orig.firstRun=t;const ready=avail.filter(x=>x.pid!==orig.pid).map(x=>x.pid);gantt.push({pid:orig.pid,start:t,end:t+orig.burstOrig,ready});t+=orig.burstOrig;orig.completionTime=t;orig.responseTime=orig.firstRun-orig.arrival;done.add(orig.pid);}return{gantt,procs:clone};}
+function roundRobin(procs,q){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const queue=[];const done=new Set();const arrived=new Set();let i=0;clone.sort((a,b)=>a.arrival-b.arrival);function check(){while(i<clone.length&&clone[i].arrival<=t){if(!arrived.has(clone[i].pid)){queue.push(clone[i]);arrived.add(clone[i].pid);}i++;}}check();while(done.size<clone.length){if(!queue.length){const next=clone.find(p=>!done.has(p.pid)&&p.arrival>t);if(!next)break;gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;check();continue;}const p=queue.shift();if(p.firstRun<0)p.firstRun=t;const run=Math.min(q,p.remaining);const ready=queue.map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0)queue.push(p);else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
+function srtf(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();let current=null;let segStart=0;const maxT=Math.max(...clone.map(p=>p.arrival))+clone.reduce((s,p)=>s+p.burstOrig,0)+10;while(done.size<clone.length&&t<=maxT){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);const best=avail.sort((a,b)=>a.remaining-b.remaining)[0]||null;if(!best){t++;continue;}if(best.firstRun<0)best.firstRun=t;if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}best.remaining--;t++;if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}}return{gantt,procs:clone};}
+function priorityPreemptive(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();let current=null;let segStart=0;const maxT=Math.max(...clone.map(p=>p.arrival))+clone.reduce((s,p)=>s+p.burstOrig,0)+10;while(done.size<clone.length&&t<=maxT){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);const best=avail.sort((a,b)=>a.priority-b.priority)[0]||null;if(!best){t++;continue;}if(best.firstRun<0)best.firstRun=t;if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}best.remaining--;t++;if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}}return{gantt,procs:clone};}
+function multilevelQueue(procs){const q0=parseInt(document.getElementById('mlq-q0').value)||2;const q1=parseInt(document.getElementById('mlq-q1').value)||4;const clone=procs.map(p=>({...p,level:p.priority<=2?0:p.priority<=4?1:2}));const gantt=[];let t=0;const done=new Set();const arrived=new Set();const queues=[[],[],[]];clone.sort((a,b)=>a.arrival-b.arrival);let ai=0;function check(){while(ai<clone.length&&clone[ai].arrival<=t){if(!arrived.has(clone[ai].pid)){queues[clone[ai].level].push(clone[ai]);arrived.add(clone[ai].pid);}ai++;}}check();const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1].arrival+10;while(done.size<clone.length&&t<=maxT){check();let q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;if(!q||!q.length){t++;continue;}const p=q.shift();if(p.firstRun<0)p.firstRun=t;const quantum=p.level===0?q0:p.level===1?q1:p.burstOrig;const run=Math.min(quantum,p.remaining);const ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0)q.push(p);else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
+function mlfq(procs){const q0=parseInt(document.getElementById('mlq-q0').value)||2;const q1=parseInt(document.getElementById('mlq-q1').value)||4;const clone=procs.map(p=>({...p,mLevel:0}));const gantt=[];let t=0;const done=new Set();const arrived=new Set();const queues=[[],[],[]];clone.sort((a,b)=>a.arrival-b.arrival);let ai=0;function check(){while(ai<clone.length&&clone[ai].arrival<=t){if(!arrived.has(clone[ai].pid)){queues[0].push(clone[ai]);arrived.add(clone[ai].pid);}ai++;}}check();const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1].arrival+10;while(done.size<clone.length&&t<=maxT){check();const q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;if(!q||!q.length){t++;continue;}const p=q.shift();if(p.firstRun<0)p.firstRun=t;const quantum=p.mLevel===0?q0:p.mLevel===1?q1:p.remaining;const run=Math.min(quantum,p.remaining);const ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0){if(p.mLevel<2)p.mLevel++;queues[p.mLevel].push(p);}else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
 
 function renderGanttPartial(upTo){
-  const chart=document.getElementById('gantt-chart');
-  const timeline=document.getElementById('gantt-timeline');
+  const chart=document.getElementById('gantt-chart'), tl=document.getElementById('gantt-timeline');
   const segs=ganttFull.slice(0,upTo);
-  if(segs.length===0){chart.innerHTML='<div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div>';return;}
-  const merged=[];
-  segs.forEach(s=>{
-    if(merged.length>0&&merged[merged.length-1].pid===s.pid&&merged[merged.length-1].end===s.start)
-      merged[merged.length-1].end=s.end;
-    else merged.push({...s});
-  });
-  const totalT=merged[merged.length-1].end-merged[0].start;
-  chart.innerHTML=merged.map(s=>{
-    const bg=s.pid===null?'#b0bec5':getPidColor(s.pid);
-    const label=s.pid===null?'IDLE':`P${s.pid}`;
-    return `<div class="gantt-block${s.pid===null?' gantt-idle':''}"
-      style="background:${bg};flex:${s.end-s.start}" title="P${s.pid}|T:${s.start}-${s.end}">
-      <span class="gantt-pid">${label}</span>
-      <span class="gantt-time">${s.start}-${s.end}</span>
-    </div>`;
-  }).join('');
-  timeline.innerHTML=merged.map(s=>`<div class="gantt-tick" style="flex:${s.end-s.start}">${s.start}</div>`).join('')
-    +`<div class="gantt-tick">${merged[merged.length-1].end}</div>`;
+  if(!segs.length){chart.innerHTML='<div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div>';return;}
+  const merged=[];segs.forEach(s=>{if(merged.length>0&&merged[merged.length-1].pid===s.pid&&merged[merged.length-1].end===s.start)merged[merged.length-1].end=s.end;else merged.push({...s});});
+  chart.innerHTML=merged.map(s=>{const bg=s.pid===null?'#b0bec5':getPidColor(s.pid);const label=s.pid===null?'IDLE':`P${s.pid}`;return`<div class="gantt-block${s.pid===null?' gantt-idle':''}" style="background:${bg};flex:${s.end-s.start}" title="P${s.pid}|T:${s.start}-${s.end}"><span class="gantt-pid">${label}</span><span class="gantt-time">${s.start}-${s.end}</span></div>`;}).join('');
+  tl.innerHTML=merged.map(s=>`<div class="gantt-tick" style="flex:${s.end-s.start}">${s.start}</div>`).join('')+`<div class="gantt-tick">${merged[merged.length-1].end}</div>`;
 }
 
 function renderResults(){
@@ -1847,18 +1063,7 @@ function renderResults(){
   const tbody=document.getElementById('results-tbody');
   let totalWait=0,totalTAT=0,totalResp=0,totalBurst=0;
   const totalTime=Math.max(...procs.map(p=>p.completionTime));
-  tbody.innerHTML=procs.map(p=>{
-    const tat=p.completionTime-p.arrival;
-    const wait=tat-p.burstOrig;
-    const resp=Math.max(0,p.responseTime);
-    totalWait+=wait;totalTAT+=tat;totalResp+=resp;totalBurst+=p.burstOrig;
-    return `<tr><td><span style="font-weight:800;color:${getPidColor(p.pid)}">P${p.pid}</span></td>
-      <td>${p.arrival}</td><td>${p.burstOrig}</td><td>${p.completionTime}</td>
-      <td>${tat}</td><td>${Math.max(0,wait)}</td><td>${resp}</td></tr>`;
-  }).join('')+`<tr class="avg-row"><td colspan="3">Promedio</td><td>—</td>
-    <td>${(totalTAT/procs.length).toFixed(2)}</td>
-    <td>${(totalWait/procs.length).toFixed(2)}</td>
-    <td>${(totalResp/procs.length).toFixed(2)}</td></tr>`;
+  tbody.innerHTML=procs.map(p=>{const tat=p.completionTime-p.arrival;const wait=Math.max(0,tat-p.burstOrig);const resp=Math.max(0,p.responseTime);totalWait+=wait;totalTAT+=tat;totalResp+=resp;totalBurst+=p.burstOrig;return`<tr><td><span style="font-weight:800;color:${getPidColor(p.pid)}">P${p.pid}</span></td><td>${p.arrival}</td><td>${p.burstOrig}</td><td>${p.completionTime}</td><td>${tat}</td><td>${Math.max(0,wait)}</td><td>${resp}</td></tr>`;}).join('')+`<tr class="avg-row"><td colspan="3">Promedio</td><td>—</td><td>${(totalTAT/procs.length).toFixed(2)}</td><td>${(totalWait/procs.length).toFixed(2)}</td><td>${(totalResp/procs.length).toFixed(2)}</td></tr>`;
   document.getElementById('results-area').style.display='block';
   const cpu=(totalBurst/totalTime*100).toFixed(1);
   document.getElementById('m-cpu').textContent=cpu+'%';
@@ -1869,238 +1074,396 @@ function renderResults(){
 }
 
 // ══════════════════════════════════════
-// DOOR SIMULATION
+// DOOR SIMULATION (unchanged from friend)
 // ══════════════════════════════════════
-let doorProcessState = {}; // pid -> {burstOrig, done, progress}
-let currentDoorPid = null;
-let screamTotal = 0;
+function resetDoorSimulation(){doorState={screamUnits:0,totalUnits:0,completed:0,running:0,scareLog:[],topMonsters:{}};doorProcessState={};currentDoorPid=null;screamTotal=0;updateDoorSimulation();}
+function updateDoorSimulation(){processes.forEach(p=>{if(!doorProcessState[p.pid])doorProcessState[p.pid]={burstOrig:p.burstOrig,done:0,progress:0};});doorState.totalUnits=processes.reduce((s,p)=>s+p.burstOrig,0);renderDoorSimulation();}
+function updateDoorSimulationStep(seg){if(seg.pid===null){currentDoorPid=null;}else{const pid=seg.pid;currentDoorPid=pid;const dur=seg.end-seg.start;if(!doorProcessState[pid]){const p=processes.find(x=>x.pid===pid);doorProcessState[pid]={burstOrig:p?p.burstOrig:dur,done:0,progress:0};}doorProcessState[pid].done+=dur;const orig=doorProcessState[pid].burstOrig;doorProcessState[pid].progress=Math.min(100,(doorProcessState[pid].done/orig)*100);screamTotal+=dur;doorState.screamUnits=screamTotal;doorState.totalUnits=Math.max(doorState.totalUnits,screamTotal);if(!doorState.topMonsters[pid])doorState.topMonsters[pid]=0;doorState.topMonsters[pid]+=dur;doorState.scareLog.push({pid,time:seg.start,emoji:getMonsterEmoji(pid)});if(doorState.scareLog.length>30)doorState.scareLog.shift();}doorState.completed=Object.values(doorProcessState).filter(d=>d.progress>=100).length;doorState.running=currentDoorPid!==null?1:0;renderDoorSimulation();}
+function finishDoorSimulation(){processes.forEach(p=>{if(!doorProcessState[p.pid])doorProcessState[p.pid]={burstOrig:p.burstOrig,done:p.burstOrig,progress:100};doorProcessState[p.pid].progress=100;doorProcessState[p.pid].done=doorProcessState[p.pid].burstOrig;});currentDoorPid=null;doorState.completed=processes.length;doorState.running=0;renderDoorSimulation();}
+function renderDoorSimulation(){const procs=processes;document.getElementById('door-completed').textContent=doorState.completed;document.getElementById('door-running-count').textContent=doorState.running;document.getElementById('door-total').textContent=procs.length;const totalBurst=procs.reduce((s,p)=>s+p.burstOrig,0)||1;const pct=Math.min(100,(screamTotal/totalBurst)*100);document.getElementById('scream-bar-fill').style.width=pct+'%';document.getElementById('scream-pct').textContent=Math.round(pct)+'%';renderWaitingRoom();renderDoorStations();renderScareLog();renderTopMonsters();}
+function renderWaitingRoom(){const el=document.getElementById('theater-seats');const MAX=14;const waiting=processes.filter(p=>{const ds=doorProcessState[p.pid];return !ds||ds.progress<100;});document.getElementById('waiting-room-count').textContent=waiting.length+' waiting';let html='';for(let i=0;i<MAX;i++){const p=waiting[i];if(p){const isR=p.pid===currentDoorPid;html+=`<div class="theater-seat"><div class="seat-chair has-monster${isR?' scare-flash':''}" title="P${p.pid}">${getMonsterEmoji(p.pid)}</div><div class="seat-label" style="color:${getPidColor(p.pid)}">P${p.pid}</div></div>`;}else{html+=`<div class="theater-seat"><div class="seat-chair empty"></div><div class="seat-label" style="opacity:0.2">#${i+1}</div></div>`;}}el.innerHTML=html;}
+function renderDoorStations(){const el=document.getElementById('door-stations-grid');if(!processes.length){el.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:20px;font-style:italic"> Las puertas aparecerán cuando agregues procesos</div>`;return;}el.innerHTML=processes.map(p=>{const ds=doorProcessState[p.pid]||{progress:0,done:0,burstOrig:p.burstOrig};const isR=p.pid===currentDoorPid;const isDone=ds.progress>=100;const colorIdx=getPidColorIdx(p.pid);let panelClass=isDone?'complete':isR?'running':'idle';const doorColorClass=isDone?'':`door-color-${colorIdx}`;return`<div class="door-station"><div class="door-station-label">DOOR #${p.pid}</div><div class="mi-door-frame"><div class="mi-door-arch"></div><div class="mi-door-panel ${panelClass} ${doorColorClass}" title="P${p.pid} | ${Math.round(ds.progress)}% complete">${isR?`<div class="mi-door-monster">${getMonsterEmoji(p.pid)}</div><div class="mi-door-pid">P${p.pid}</div>`:isDone?`<div style="font-size:20px">✅</div><div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700">DONE</div>`:`<div style="font-size:18px;opacity:0.3">${getMonsterEmoji(p.pid)}</div><div class="mi-door-pid" style="opacity:0.5">P${p.pid}</div>`}<div class="mi-door-knob"></div><div class="mi-door-number">D${p.pid}</div><div class="mi-door-progress"><div class="mi-door-progress-fill" style="width:${ds.progress}%"></div></div></div></div><div class="door-status-badge ${panelClass}">${isDone?'✓ DONE':isR?'⚡ SCARE':'IDLE'}</div></div>`;}).join('');}
+function renderScareLog(){const el=document.getElementById('scream-log-entries');if(!doorState.scareLog.length){el.innerHTML='<div class="scream-log-empty">Los sustos aparecerán aquí...</div>';return;}el.innerHTML=[...doorState.scareLog].reverse().slice(0,20).map(e=>`<div class="scream-log-entry"><span>${e.emoji}</span><span class="entry-pid" style="color:${getPidColor(e.pid)}">P${e.pid}</span><span style="color:rgba(255,255,255,0.4)">⚡ scared!</span><span class="entry-time">T=${e.time}</span></div>`).join('');el.scrollTop=0;}
+function renderTopMonsters(){const el=document.getElementById('top-monsters-list');const entries=Object.entries(doorState.topMonsters).sort((a,b)=>b[1]-a[1]).slice(0,5);if(!entries.length){el.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;text-align:center;padding:10px">Ejecuta para ver rankings</div>';return;}const maxVal=entries[0][1];const medals=['🥇','🥈','🥉','🏅','🏅'];el.innerHTML=entries.map(([pid,val],i)=>{const bw=Math.round((val/maxVal)*100);return`<div class="top-monster-row"><span class="top-monster-rank">${medals[i]}</span><span>${getMonsterEmoji(parseInt(pid))}</span><span style="color:${getPidColor(parseInt(pid))};font-size:12px;font-weight:700">P${pid}</span><div class="top-monster-bar"><div class="top-monster-bar-fill" style="width:${bw}%"></div></div><span style="font-size:10px;color:rgba(255,255,255,0.4);min-width:24px;text-align:right">${val}u</span></div>`;}).join('');}
 
-function resetDoorSimulation() {
-  doorState = { screamUnits: 0, totalUnits: 0, completed: 0, running: 0, scareLog: [], topMonsters: {} };
-  doorProcessState = {};
-  currentDoorPid = null;
-  screamTotal = 0;
-  updateDoorSimulation();
+// ══════════════════════════════════════
+// MODULE 3 — MEMORY / PAGINACIÓN
+// ══════════════════════════════════════
+
+function initMemFramesUI() {
+  const n = parseInt(document.getElementById('mem-frames').value) || 3;
+  const vault = document.getElementById('frames-vault');
+  vault.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'frame-slot';
+    slot.innerHTML = `
+      <div class="frame-door-mem" id="mframe-${i}">
+        <span class="frame-page-num" id="mframe-num-${i}">—</span>
+        <div class="frame-knob"></div>
+      </div>
+      <div class="frame-label">Frame ${i}</div>`;
+    vault.appendChild(slot);
+  }
+  // Table header
+  const head = document.getElementById('mem-hist-head');
+  head.innerHTML = '<th>Ref</th>';
+  for (let i = 0; i < n; i++) head.innerHTML += `<th>F${i}</th>`;
+  head.innerHTML += '<th>Resultado</th>';
+  document.getElementById('mem-hist-body').innerHTML = '';
+}
+initMemFramesUI();
+
+document.getElementById('btn-run-mem').addEventListener('click', runMemory);
+document.getElementById('btn-step-mem').addEventListener('click', doMemStep);
+document.getElementById('btn-reset-mem').addEventListener('click', resetMemory);
+
+function resetMemory() {
+  clearInterval(memInterval); memHistory = []; memStepIdx = 0; memPaused = false; memCurrentRefs = [];
+  initMemFramesUI();
+  document.getElementById('mem-fault-count').textContent = '0';
+  document.getElementById('mem-hit-count').textContent = '0';
+  document.getElementById('mem-hit-rate').textContent = '—';
+  document.getElementById('mem-total-refs').textContent = '0';
+  document.getElementById('mem-step-bar').style.display = 'none';
+  document.getElementById('btn-step-mem').disabled = true;
+  document.getElementById('ref-chips').innerHTML = '';
+  document.getElementById('frag-list').innerHTML = '<p style="font-size:12px;color:var(--text-dim)">Ejecuta la simulación para ver fragmentación.</p>';
+  document.getElementById('btn-mem-playpause').textContent = '⏸ Pausar';
 }
 
-function updateDoorSimulation() {
-  // Rebuild door process state from processes
-  processes.forEach(p => {
-    if (!doorProcessState[p.pid]) {
-      doorProcessState[p.pid] = { burstOrig: p.burstOrig, done: 0, progress: 0 };
-    }
-  });
-  doorState.totalUnits = processes.reduce((s, p) => s + p.burstOrig, 0);
-  renderDoorSimulation();
-}
+function runMemory() {
+  resetMemory();
+  const refsRaw = document.getElementById('mem-refs').value;
+  const refs = refsRaw.split(/[,\s]+/).map(Number).filter(n => !isNaN(n) && n >= 0);
+  const frames = parseInt(document.getElementById('mem-frames').value) || 3;
+  const algo = document.getElementById('mem-algo').value;
+  const pageSize = parseInt(document.getElementById('mem-pagesize').value) || 4;
 
-function updateDoorSimulationStep(seg) {
-  if (seg.pid === null) {
-    currentDoorPid = null;
-  } else {
-    const pid = seg.pid;
-    currentDoorPid = pid;
-    const duration = seg.end - seg.start;
+  if (!refs.length) { toast('Ingresa la cadena de referencias', 'warn'); return; }
 
-    if (!doorProcessState[pid]) {
-      const p = processes.find(x => x.pid === pid);
-      doorProcessState[pid] = { burstOrig: p ? p.burstOrig : duration, done: 0, progress: 0 };
-    }
+  memCurrentRefs = refs;
+  document.getElementById('mem-total-refs').textContent = refs.length;
 
-    doorProcessState[pid].done += duration;
-    const orig = doorProcessState[pid].burstOrig;
-    doorProcessState[pid].progress = Math.min(100, (doorProcessState[pid].done / orig) * 100);
+  // Build ref chips
+  const chipsEl = document.getElementById('ref-chips');
+  chipsEl.innerHTML = refs.map((r, i) => `<span class="ref-chip" id="rchip-${i}">${r}</span>`).join('');
 
-    // Scream energy
-    screamTotal += duration;
-    doorState.screamUnits = screamTotal;
-    doorState.totalUnits = Math.max(doorState.totalUnits, screamTotal);
-
-    // Top monsters
-    if (!doorState.topMonsters[pid]) doorState.topMonsters[pid] = 0;
-    doorState.topMonsters[pid] += duration;
-
-    // Scare log entry
-    doorState.scareLog.push({ pid, time: seg.start, emoji: getMonsterEmoji(pid) });
-    if (doorState.scareLog.length > 30) doorState.scareLog.shift();
+  // Compute history
+  switch(algo) {
+    case 'fifo':   memHistory = memFIFO(refs, frames); break;
+    case 'lru':    memHistory = memLRU(refs, frames); break;
+    case 'optimal':memHistory = memOptimal(refs, frames); break;
+    case 'clock':  memHistory = memClock(refs, frames); break;
+    case 'second': memHistory = memSecondChance(refs, frames); break;
+    default:       memHistory = memFIFO(refs, frames);
   }
 
-  // Count completed
-  doorState.completed = Object.values(doorProcessState).filter(d => d.progress >= 100).length;
-  doorState.running = currentDoorPid !== null ? 1 : 0;
+  // Table header
+  const head = document.getElementById('mem-hist-head');
+  head.innerHTML = '<th>Ref</th>';
+  for (let i = 0; i < frames; i++) head.innerHTML += `<th>F${i}</th>`;
+  head.innerHTML += '<th>Resultado</th>';
 
-  renderDoorSimulation();
+  // Fragmentation
+  renderFragmentation(pageSize);
+
+  document.getElementById('mem-step-bar').style.display = 'flex';
+  document.getElementById('btn-step-mem').disabled = false;
+
+  log(`Paginación ${algo.toUpperCase()} — ${refs.length} refs, ${frames} marcos`, 'info');
+  toast(`▶ Simulando ${algo.toUpperCase()}`, 'success');
+
+  // Auto play
+  memStepIdx = 0; memPaused = false;
+  startMemAuto();
 }
 
-function finishDoorSimulation() {
-  // Mark all as done
-  processes.forEach(p => {
-    if (!doorProcessState[p.pid]) doorProcessState[p.pid] = { burstOrig: p.burstOrig, done: p.burstOrig, progress: 100 };
-    doorProcessState[p.pid].progress = 100;
-    doorProcessState[p.pid].done = doorProcessState[p.pid].burstOrig;
-  });
-  currentDoorPid = null;
-  doorState.completed = processes.length;
-  doorState.running = 0;
-  renderDoorSimulation();
+function startMemAuto() {
+  clearInterval(memInterval);
+  const speed = () => 2100 - parseInt(document.getElementById('mem-speed').value);
+  function tick() {
+    if (memPaused) { memInterval = setTimeout(tick, 100); return; }
+    if (memStepIdx >= memHistory.length) { clearInterval(memInterval); toast('✅ Paginación completada', 'success'); return; }
+    applyMemStep();
+    memInterval = setTimeout(tick, speed());
+  }
+  tick();
 }
 
-function renderDoorSimulation() {
-  const procs = processes;
-
-  // Stats
-  document.getElementById('door-completed').textContent = doorState.completed;
-  document.getElementById('door-running-count').textContent = doorState.running;
-  document.getElementById('door-total').textContent = procs.length;
-
-  // Scream bar
-  const totalBurst = procs.reduce((s, p) => s + p.burstOrig, 0) || 1;
-  const pct = Math.min(100, (screamTotal / totalBurst) * 100);
-  document.getElementById('scream-bar-fill').style.width = pct + '%';
-  document.getElementById('scream-pct').textContent = Math.round(pct) + '%';
-
-  // Waiting room theater seats
-  renderWaitingRoom();
-
-  // Door stations
-  renderDoorStations();
-
-  // Scare log
-  renderScareLog();
-
-  // Top monsters
-  renderTopMonsters();
+function doMemStep() {
+  if (!memHistory.length) return;
+  if (memStepIdx >= memHistory.length) { toast('Simulación completada', 'info'); return; }
+  applyMemStep();
 }
 
-function renderWaitingRoom() {
-  const el = document.getElementById('theater-seats');
-  const MAX_SEATS = 14;
-  // Processes not yet completed = in waiting room
-  const waiting = processes.filter(p => {
-    const ds = doorProcessState[p.pid];
-    return !ds || ds.progress < 100;
-  });
+function toggleMemPlay() {
+  memPaused = !memPaused;
+  document.getElementById('btn-mem-playpause').textContent = memPaused ? '▶ Reanudar' : '⏸ Pausar';
+}
 
-  document.getElementById('waiting-room-count').textContent = waiting.length + ' waiting';
+function applyMemStep() {
+  const step = memHistory[memStepIdx];
+  const idx = memStepIdx;
+  memStepIdx++;
 
-  let html = '';
-  for (let i = 0; i < MAX_SEATS; i++) {
-    const p = waiting[i];
-    if (p) {
-      const isRunning = p.pid === currentDoorPid;
-      html += `
-        <div class="theater-seat">
-          <div class="seat-chair has-monster${isRunning ? ' scare-flash' : ''}" title="P${p.pid}">
-            ${getMonsterEmoji(p.pid)}
-          </div>
-          <div class="seat-label" style="color:${getPidColor(p.pid)}">P${p.pid}</div>
-        </div>`;
+  // Highlight ref chip
+  document.querySelectorAll('.ref-chip').forEach(c => c.classList.remove('active'));
+  const chip = document.getElementById(`rchip-${idx}`);
+  if (chip) {
+    chip.classList.add('active');
+    chip.classList.add(step.fault ? 'fault' : 'hit');
+    chip.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+  }
+
+  // Update frames
+  step.frames.forEach((page, i) => {
+    const door = document.getElementById(`mframe-${i}`);
+    const num  = document.getElementById(`mframe-num-${i}`);
+    if (!door) return;
+    door.className = 'frame-door-mem';
+    if (page !== -1) {
+      door.classList.add('has-page');
+      num.textContent = page;
+      if (step.loaded_at === i) {
+        door.classList.add(step.fault ? 'fault-flash' : 'hit-flash');
+        setTimeout(() => { door.classList.remove('fault-flash','hit-flash'); }, 500);
+      }
     } else {
-      html += `<div class="theater-seat"><div class="seat-chair empty"></div><div class="seat-label" style="opacity:0.2">#${i+1}</div></div>`;
+      num.textContent = '—';
     }
-  }
-  el.innerHTML = html;
+  });
+
+  // Counters
+  const faults = memHistory.slice(0, memStepIdx).filter(s => s.fault).length;
+  const hits = memStepIdx - faults;
+  document.getElementById('mem-fault-count').textContent = faults;
+  document.getElementById('mem-hit-count').textContent = hits;
+  document.getElementById('mem-hit-rate').textContent = memStepIdx > 0 ? (hits / memStepIdx * 100).toFixed(1) + '%' : '—';
+
+  // Progress
+  const pct = (memStepIdx / memHistory.length * 100).toFixed(0);
+  document.getElementById('mem-step-fill').style.width = pct + '%';
+  document.getElementById('mem-step-label').textContent = `Paso ${memStepIdx} / ${memHistory.length}`;
+
+  // Table row
+  const body = document.getElementById('mem-hist-body');
+  const row = document.createElement('tr');
+  let cells = `<td class="cell-ref">${step.ref}</td>`;
+  step.frames.forEach((page, i) => {
+    if (page === -1) { cells += `<td class="cell-empty">—</td>`; return; }
+    let cls = '';
+    if (step.fault && step.loaded_at === i) cls = 'cell-loaded';
+    else if (!step.fault && step.hit_frame === i) cls = 'cell-hit';
+    cells += `<td class="${cls}">${page}</td>`;
+  });
+  cells += step.fault
+    ? `<td class="cell-fault">💥 FAULT${step.evicted != null ? ` (↑${step.evicted})` : ''}</td>`
+    : `<td class="cell-hit">✅ HIT</td>`;
+  row.innerHTML = cells;
+  body.appendChild(row);
+  body.parentElement.scrollTop = body.scrollHeight;
+
+  // Log
+  if (step.fault) log(`💥 Page Fault — Ref:${step.ref}${step.evicted!=null?' | Sale pág '+step.evicted:''}`, 'error');
+  else log(`✅ Hit — Ref:${step.ref} en frame ${step.hit_frame}`, 'success');
 }
 
-function renderDoorStations() {
-  const el = document.getElementById('door-stations-grid');
-  if (processes.length === 0) {
-    el.innerHTML = `<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:20px;font-style:italic">
-      🚪 Las puertas aparecerán cuando agregues procesos
-    </div>`;
-    return;
-  }
-
+function renderFragmentation(pageSize) {
+  const el = document.getElementById('frag-list');
+  if (!processes.length) { el.innerHTML = '<p style="font-size:12px;color:var(--text-dim)">No hay procesos para calcular fragmentación.</p>'; return; }
+  const frames = parseInt(document.getElementById('mem-frames').value) || 3;
   el.innerHTML = processes.map(p => {
-    const ds = doorProcessState[p.pid] || { progress: 0, done: 0, burstOrig: p.burstOrig };
-    const isRunning = p.pid === currentDoorPid;
-    const isDone = ds.progress >= 100;
-    const colorIdx = getPidColorIdx(p.pid);
-
-    let panelClass = 'idle';
-    if (isRunning) panelClass = 'running';
-    if (isDone) panelClass = 'complete';
-
-    const doorColorClass = isDone ? '' : `door-color-${colorIdx}`;
-
+    const pagesNeeded = p.pages;
+    const bytesNeeded = pagesNeeded * pageSize;
+    // Internal fragmentation: last page may not be fully used
+    const lastPageUsed = bytesNeeded % pageSize === 0 ? 0 : pageSize - (bytesNeeded % pageSize);
+    const internalFrag = Math.min(lastPageUsed, pageSize - 1);
+    const totalAlloc = pagesNeeded * pageSize;
+    const usedPct = totalAlloc > 0 ? Math.round(((totalAlloc - internalFrag) / totalAlloc) * 100) : 100;
+    const fragPct = 100 - usedPct;
     return `
-      <div class="door-station">
-        <div class="door-station-label">DOOR #${p.pid}</div>
-        <div class="mi-door-frame">
-          <div class="mi-door-arch"></div>
-          <div class="mi-door-panel ${panelClass} ${doorColorClass}" title="P${p.pid} | ${Math.round(ds.progress)}% complete">
-            ${isRunning ? `
-              <div class="mi-door-monster">${getMonsterEmoji(p.pid)}</div>
-              <div class="mi-door-pid">P${p.pid}</div>
-            ` : isDone ? `
-              <div style="font-size:20px">✅</div>
-              <div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700">DONE</div>
-            ` : `
-              <div style="font-size:18px;opacity:0.3">${getMonsterEmoji(p.pid)}</div>
-              <div class="mi-door-pid" style="opacity:0.5">P${p.pid}</div>
-            `}
-            <div class="mi-door-knob"></div>
-            <div class="mi-door-number">D${p.pid}</div>
-            <div class="mi-door-progress">
-              <div class="mi-door-progress-fill" style="width:${ds.progress}%"></div>
-            </div>
+      <div class="frag-bar-row" title="P${p.pid}: ${totalAlloc}KB asignados, ${internalFrag}KB frag. interna">
+        <span class="frag-pid-label" style="color:${getPidColor(p.pid)}">P${p.pid}</span>
+        <div class="frag-bar-track">
+          <div style="display:flex;height:100%">
+            <div style="width:${usedPct}%;background:${getPidColor(p.pid)};border-radius:7px 0 0 7px"></div>
+            <div style="width:${fragPct}%;background:#ffcc80;border-radius:${fragPct>0?'0 7px 7px 0':'0'}"></div>
           </div>
         </div>
-        <div class="door-status-badge ${panelClass}">
-          ${isDone ? '✓ DONE' : isRunning ? '⚡ SCARE' : 'IDLE'}
-        </div>
+        <span class="frag-info">${totalAlloc}KB / ${internalFrag}KB frag</span>
       </div>`;
   }).join('');
 }
 
-function renderScareLog() {
-  const el = document.getElementById('scream-log-entries');
-  if (doorState.scareLog.length === 0) {
-    el.innerHTML = '<div class="scream-log-empty">Los sustos aparecerán aquí...</div>';
-    return;
-  }
-  el.innerHTML = [...doorState.scareLog].reverse().slice(0, 20).map(entry => `
-    <div class="scream-log-entry">
-      <span>${entry.emoji}</span>
-      <span class="entry-pid" style="color:${getPidColor(entry.pid)}">P${entry.pid}</span>
-      <span style="color:rgba(255,255,255,0.4)">⚡ scared!</span>
-      <span class="entry-time">T=${entry.time}</span>
-    </div>`).join('');
-  el.scrollTop = 0;
+// ── PAGE REPLACEMENT ALGORITHMS ──
+
+function memFIFO(refs, n) {
+  const frames = new Array(n).fill(-1);
+  const hist = []; let ptr = 0;
+  refs.forEach(ref => {
+    if (frames.includes(ref)) {
+      hist.push({ ref, frames: [...frames], fault: false, evicted: null, loaded_at: null, hit_frame: frames.indexOf(ref) });
+    } else {
+      const evicted = frames[ptr] !== -1 ? frames[ptr] : null;
+      frames[ptr] = ref;
+      const loaded_at = ptr;
+      ptr = (ptr + 1) % n;
+      hist.push({ ref, frames: [...frames], fault: true, evicted, loaded_at, hit_frame: null });
+    }
+  });
+  return hist;
 }
 
-function renderTopMonsters() {
-  const el = document.getElementById('top-monsters-list');
-  const entries = Object.entries(doorState.topMonsters).sort((a, b) => b[1] - a[1]).slice(0, 5);
-  if (entries.length === 0) {
-    el.innerHTML = '<div style="font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;text-align:center;padding:10px">Ejecuta para ver rankings</div>';
-    return;
-  }
-  const maxVal = entries[0][1];
-  el.innerHTML = entries.map(([pid, val], i) => {
-    const barW = Math.round((val / maxVal) * 100);
-    const medals = ['🥇','🥈','🥉','🏅','🏅'];
-    return `
-      <div class="top-monster-row">
-        <span class="top-monster-rank">${medals[i]}</span>
-        <span>${getMonsterEmoji(parseInt(pid))}</span>
-        <span style="color:${getPidColor(parseInt(pid))};font-size:12px;font-weight:700">P${pid}</span>
-        <div class="top-monster-bar"><div class="top-monster-bar-fill" style="width:${barW}%"></div></div>
-        <span style="font-size:10px;color:rgba(255,255,255,0.4);min-width:24px;text-align:right">${val}u</span>
-      </div>`;
-  }).join('');
+function memLRU(refs, n) {
+  const frames = new Array(n).fill(-1);
+  const lastUsed = new Map(); const hist = [];
+  refs.forEach((ref, t) => {
+    if (frames.includes(ref)) {
+      lastUsed.set(ref, t);
+      hist.push({ ref, frames: [...frames], fault: false, evicted: null, loaded_at: null, hit_frame: frames.indexOf(ref) });
+    } else {
+      let replaceIdx;
+      if (frames.includes(-1)) { replaceIdx = frames.indexOf(-1); }
+      else {
+        let lruT = Infinity, lruI = 0;
+        frames.forEach((pg, i) => { const u = lastUsed.get(pg) ?? -1; if (u < lruT) { lruT = u; lruI = i; } });
+        replaceIdx = lruI;
+      }
+      const evicted = frames[replaceIdx] !== -1 ? frames[replaceIdx] : null;
+      frames[replaceIdx] = ref; lastUsed.set(ref, t);
+      hist.push({ ref, frames: [...frames], fault: true, evicted, loaded_at: replaceIdx, hit_frame: null });
+    }
+  });
+  return hist;
+}
+
+function memOptimal(refs, n) {
+  const frames = new Array(n).fill(-1); const hist = [];
+  refs.forEach((ref, i) => {
+    if (frames.includes(ref)) {
+      hist.push({ ref, frames: [...frames], fault: false, evicted: null, loaded_at: null, hit_frame: frames.indexOf(ref) });
+    } else {
+      let replaceIdx;
+      if (frames.includes(-1)) { replaceIdx = frames.indexOf(-1); }
+      else {
+        let farthest = -1, farIdx = 0;
+        frames.forEach((pg, fi) => {
+          const next = refs.indexOf(pg, i + 1);
+          const dist = next === -1 ? Infinity : next;
+          if (dist > farthest) { farthest = dist; farIdx = fi; }
+        });
+        replaceIdx = farIdx;
+      }
+      const evicted = frames[replaceIdx] !== -1 ? frames[replaceIdx] : null;
+      frames[replaceIdx] = ref;
+      hist.push({ ref, frames: [...frames], fault: true, evicted, loaded_at: replaceIdx, hit_frame: null });
+    }
+  });
+  return hist;
+}
+
+function memClock(refs, n) {
+  const frames = new Array(n).fill(-1);
+  const refBits = new Array(n).fill(0);
+  const hist = []; let ptr = 0;
+  refs.forEach(ref => {
+    const idx = frames.indexOf(ref);
+    if (idx !== -1) {
+      refBits[idx] = 1;
+      hist.push({ ref, frames: [...frames], fault: false, evicted: null, loaded_at: null, hit_frame: idx });
+    } else {
+      while (refBits[ptr] === 1) { refBits[ptr] = 0; ptr = (ptr + 1) % n; }
+      const evicted = frames[ptr] !== -1 ? frames[ptr] : null;
+      const loaded_at = ptr;
+      frames[ptr] = ref; refBits[ptr] = 1;
+      ptr = (ptr + 1) % n;
+      hist.push({ ref, frames: [...frames], fault: true, evicted, loaded_at, hit_frame: null });
+    }
+  });
+  return hist;
+}
+
+function memSecondChance(refs, n) {
+  // Same as Clock but maintaining explicit FIFO queue order
+  const frames = new Array(n).fill(-1);
+  const refBits = new Array(n).fill(0);
+  const order = []; // keeps insertion order
+  const hist = [];
+  refs.forEach(ref => {
+    const idx = frames.indexOf(ref);
+    if (idx !== -1) {
+      refBits[idx] = 1;
+      hist.push({ ref, frames: [...frames], fault: false, evicted: null, loaded_at: null, hit_frame: idx });
+    } else {
+      let found = false;
+      // Scan in FIFO order for ref_bit = 0
+      while (!found) {
+        const candidate = order[0];
+        if (candidate === undefined) break;
+        const ci = frames.indexOf(candidate);
+        if (refBits[ci] === 0) {
+          // Evict
+          const evicted = frames[ci];
+          const loaded_at = ci;
+          frames[ci] = ref; refBits[ci] = 0;
+          order.shift(); order.push(ref);
+          hist.push({ ref, frames: [...frames], fault: true, evicted, loaded_at, hit_frame: null });
+          found = true;
+        } else {
+          refBits[ci] = 0; order.shift(); order.push(candidate);
+        }
+      }
+      if (!found) {
+        // Empty slot
+        const emptyIdx = frames.indexOf(-1);
+        if (emptyIdx !== -1) {
+          frames[emptyIdx] = ref; refBits[emptyIdx] = 0; order.push(ref);
+          hist.push({ ref, frames: [...frames], fault: true, evicted: null, loaded_at: emptyIdx, hit_frame: null });
+        }
+      }
+    }
+  });
+  // Handle initial empty frames for FIFO-ordered insertion
+  return memSecondChanceFix(refs, n);
+}
+
+function memSecondChanceFix(refs, n) {
+  // Clean implementation of Second Chance
+  const frames = new Array(n).fill(-1);
+  const refBits = new Array(n).fill(0);
+  const hist = []; let ptr = 0;
+  refs.forEach(ref => {
+    const idx = frames.indexOf(ref);
+    if (idx !== -1) {
+      refBits[idx] = 1;
+      hist.push({ ref, frames: [...frames], fault: false, evicted: null, loaded_at: null, hit_frame: idx });
+    } else {
+      // Find empty frame first
+      const emptyIdx = frames.indexOf(-1);
+      if (emptyIdx !== -1) {
+        frames[emptyIdx] = ref; refBits[emptyIdx] = 0;
+        hist.push({ ref, frames: [...frames], fault: true, evicted: null, loaded_at: emptyIdx, hit_frame: null });
+      } else {
+        // Second chance loop
+        while (refBits[ptr] === 1) { refBits[ptr] = 0; ptr = (ptr + 1) % n; }
+        const evicted = frames[ptr]; const loaded_at = ptr;
+        frames[ptr] = ref; refBits[ptr] = 0;
+        ptr = (ptr + 1) % n;
+        hist.push({ ref, frames: [...frames], fault: true, evicted, loaded_at, hit_frame: null });
+      }
+    }
+  });
+  return hist;
 }
 
 // ══════════════════════════════════════
-// LOG
+// LOG & INIT
 // ══════════════════════════════════════
-document.getElementById('btn-clear-log').addEventListener('click',()=>{
-  document.getElementById('event-log').innerHTML='<div class="log-empty">Log limpiado...</div>';
+document.getElementById('btn-clear-log').addEventListener('click', () => {
+  document.getElementById('event-log').innerHTML = '<div class="log-empty">Log limpiado...</div>';
 });
 
-// ══════════════════════════════════════
-// INIT
-// ══════════════════════════════════════
 updateStateCounts();
 renderDoorSimulation();
 </script>
