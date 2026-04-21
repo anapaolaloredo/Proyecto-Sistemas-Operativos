@@ -606,9 +606,8 @@ body { background: var(--bg-base); color: var(--text-primary); font-family: var(
           <select id="mem-algo" class="mi-select">
             <option value="fifo">FIFO — First In First Out</option>
             <option value="lru">LRU — Least Recently Used</option>
-            <option value="optimal">Óptimo</option>
-            <option value="clock">Clock</option>
-            <option value="second">Segunda Oportunidad</option>
+      <!--      <option value="clock">Clock</option>
+            <option value="second">Segunda Oportunidad</option> -->
           </select>
         </div>
 
@@ -1338,7 +1337,7 @@ function memLRU(refs, n) {
   return hist;
 }
 
-function memOptimal(refs, n) {
+/*function memOptimal(refs, n) {
   const frames = new Array(n).fill(-1); const hist = [];
   refs.forEach((ref, i) => {
     if (frames.includes(ref)) {
@@ -1361,7 +1360,7 @@ function memOptimal(refs, n) {
     }
   });
   return hist;
-}
+}*/
 
 function memClock(refs, n) {
   const frames = new Array(n).fill(-1);
