@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monsters Inc. — OS Simulator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Boogaloo&family=Share+Tech+Mono&family=Oswald:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css"/>
+</head>
+<body>
+
+  <!-- STEAM PARTICLES BACKGROUND -->
+  <div class="factory-bg">
+    <div class="steam" id="steam-container"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- HEADER -->
+  <header class="mi-header">
+    <div class="header-bolts">
+      <span class="bolt">⬡</span><span class="bolt">⬡</span><span class="bolt">⬡</span>
+    </div>
+    <div class="header-content">
+      <div class="logo-area">
+        <span class="factory-icon">🏭</span>
+        <div>
+          <h1 class="title-main">MONSTERS INCORPORATED</h1>
+          <p class="title-sub">Operating System Process Simulator</p>
+        </div>
+        <span class="factory-icon">⚡</span>
+      </div>
+      <div class="legend-bar">
+        <span class="legend-item"><span class="door-mini new"></span> New</span>
+        <span class="legend-item"><span class="door-mini ready"></span> Ready</span>
+        <span class="legend-item"><span class="door-mini running"></span> Running</span>
+        <span class="legend-item"><span class="door-mini waiting"></span> Waiting</span>
+        <span class="legend-item"><span class="door-mini terminated"></span> Terminated</span>
+      </div>
+    </div>
+    <div class="header-bolts">
+      <span class="bolt">⬡</span><span class="bolt">⬡</span><span class="bolt">⬡</span>
+    </div>
+  </header>
+
+  <!-- NAV TABS -->
+  <nav class="mi-nav">
+    <button class="nav-btn active" data-tab="processes">👹 Monsters</button>
+    <button class="nav-btn" data-tab="scheduling">🚪 Scare Floor</button>
+    <button class="nav-btn" data-tab="memory">🏠 Door Vault</button>
+    <button class="nav-btn" data-tab="states">📊 Control Room</button>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="mi-main">
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- TAB 1: PROCESSES (Monsters)               -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="tab-content active" id="tab-processes">
+      <div class="section-header">
+        <h2>👹 Monster Registry <span class="badge">Processes</span></h2>
+        <p class="section-desc">Registra los monstruos (procesos) que entrarán a la fábrica</p>
+      </div>
+
+      <div class="panel-grid">
+
+        <!-- FORM PANEL -->
+        <div class="panel" id="panel-form">
+          <div class="panel-title">➕ Nuevo Monstruo</div>
+
+          <div class="form-group">
+            <label>PID <span class="hint">(ID del proceso)</span></label>
+            <input type="number" id="f-pid" class="mi-input" placeholder="1" min="1"/>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Arrival Time</label>
+              <input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0"/>
+            </div>
+            <div class="form-group">
+              <label>Burst Time</label>
+              <input type="number" id="f-burst" class="mi-input" placeholder="5" min="1"/>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Priority</label>
+              <input type="number" id="f-priority" class="mi-input" placeholder="1" min="1"/>
+            </div>
+            <div class="form-group">
+              <label>Páginas</label>
+              <input type="number" id="f-pages" class="mi-input" placeholder="4" min="1"/>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button class="mi-btn primary" id="btn-add-process">⚡ Agregar</button>
+            <button class="mi-btn secondary" id="btn-load-example">📂 Cargar Ejemplo</button>
+          </div>
+
+          <!-- FILE UPLOAD -->
+          <div class="divider"><span>ó</span></div>
+          <label class="file-drop" id="file-drop">
+            <span>📁 Arrastra tu archivo procesos.txt aquí</span>
+            <input type="file" id="file-input" accept=".txt,.csv" style="display:none"/>
+          </label>
+          <div class="file-format">
+            Formato: <code>PID,Arrival,Burst,Priority,Pages</code>
+          </div>
+        </div>
+
+        <!-- PROCESS TABLE -->
+        <div class="panel" id="panel-table">
+          <div class="panel-title">📋 Registro de Monstruos <span id="process-count" class="count-badge">0</span></div>
+          <div class="table-wrapper">
+            <table class="mi-table" id="process-table">
+              <thead>
+                <tr>
+                  <th>PID</th>
+                  <th>Arrival</th>
+                  <th>Burst</th>
+                  <th>Priority</th>
+                  <th>Pages</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="process-tbody">
+                <tr class="empty-row">
+                  <td colspan="7">
+                    <div class="empty-state">
+                      <span class="empty-icon">👾</span>
+                      <p>No hay monstruos registrados</p>
+                      <p class="empty-sub">Agrega procesos para comenzar</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="btn-row mt-auto">
+            <button class="mi-btn danger" id="btn-clear-all">🗑️ Limpiar Todo</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- DOOR CONVEYOR BELT (visual de procesos) -->
+      <div class="panel" id="panel-conveyor">
+        <div class="panel-title">🏭 Línea de Producción <span class="hint">— Conveyor Belt</span></div>
+        <div class="conveyor-area">
+          <div class="conveyor-belt" id="conveyor-belt">
+            <div class="belt-track"></div>
+            <div class="belt-doors" id="belt-doors">
+              <!-- Las puertas se generan dinámicamente -->
+            </div>
+          </div>
+          <div class="conveyor-labels">
+            <span>NEW →</span>
+            <span>→ READY →</span>
+            <span>→ CPU →</span>
+            <span>→ DONE</span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- TAB 2: SCHEDULING (Scare Floor)           -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="tab-content" id="tab-scheduling">
+      <div class="section-header">
+        <h2>🚪 Scare Floor <span class="badge">CPU Scheduling</span></h2>
+        <p class="section-desc">Selecciona el algoritmo y observa cómo los monstruos toman el turno</p>
+      </div>
+
+      <div class="panel-grid scheduling-grid">
+
+        <!-- CONFIG PANEL -->
+        <div class="panel">
+          <div class="panel-title">⚙️ Configuración</div>
+
+          <div class="form-group">
+            <label>Algoritmo</label>
+            <select id="sched-algo" class="mi-select">
+              <optgroup label="Non-Preemptive">
+                <option value="fcfs">FCFS — First Come First Served</option>
+                <option value="sjf">SJF — Shortest Job First</option>
+                <option value="hrrn">HRRN — Highest Response Ratio</option>
+              </optgroup>
+              <optgroup label="Preemptive">
+                <option value="rr">Round Robin</option>
+                <option value="srtf">SRTF — Shortest Remaining Time</option>
+                <option value="priority">Priority (Preemptive)</option>
+                <option value="mlq">Multilevel Queue</option>
+                <option value="mlfq">Multilevel Feedback Queue</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div class="form-group" id="quantum-group" style="display:none">
+            <label>Quantum (RR)</label>
+            <input type="number" id="sched-quantum" class="mi-input" value="2" min="1"/>
+          </div>
+
+          <div class="btn-row">
+            <button class="mi-btn primary" id="btn-run-sched">▶ Ejecutar</button>
+            <button class="mi-btn secondary" id="btn-step-sched">⏭ Paso a Paso</button>
+            <button class="mi-btn ghost" id="btn-reset-sched">↺ Reset</button>
+          </div>
+
+          <!-- SPEED CONTROL -->
+          <div class="form-group mt-16">
+            <label>Velocidad de simulación</label>
+            <div class="speed-control">
+              <span>🐢</span>
+              <input type="range" id="sched-speed" min="100" max="2000" value="800" class="mi-range"/>
+              <span>⚡</span>
+            </div>
+          </div>
+
+          <!-- METRICS PANEL -->
+          <div class="metrics-box" id="metrics-box">
+            <div class="metrics-title">📊 Métricas</div>
+            <div class="metrics-grid" id="metrics-grid">
+              <div class="metric-item">
+                <span class="metric-label">CPU Util.</span>
+                <span class="metric-val" id="m-cpu">—</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Avg Wait</span>
+                <span class="metric-val" id="m-wait">—</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Avg TAT</span>
+                <span class="metric-val" id="m-tat">—</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-label">Avg Resp</span>
+                <span class="metric-val" id="m-resp">—</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VISUALIZATION PANEL -->
+        <div class="panel sched-visual">
+
+          <!-- CPU + READY QUEUE -->
+          <div class="cpu-area">
+            <div class="cpu-box" id="cpu-box">
+              <div class="cpu-label">⚡ CPU</div>
+              <div class="cpu-door" id="cpu-door">
+                <div class="door-idle">Idle</div>
+              </div>
+            </div>
+            <div class="queue-box">
+              <div class="queue-label">📋 Cola Ready</div>
+              <div class="ready-queue" id="ready-queue">
+                <div class="queue-empty">Vacía</div>
+              </div>
+            </div>
+            <div class="queue-box">
+              <div class="queue-label">⏳ Waiting</div>
+              <div class="waiting-queue" id="waiting-queue">
+                <div class="queue-empty">Vacía</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- GANTT CHART -->
+          <div class="gantt-area">
+            <div class="gantt-title">📅 Diagrama de Gantt</div>
+            <div class="gantt-chart" id="gantt-chart">
+              <div class="gantt-empty">Ejecuta un algoritmo para ver el Gantt</div>
+            </div>
+            <div class="gantt-timeline" id="gantt-timeline"></div>
+          </div>
+
+          <!-- RESULTS TABLE -->
+          <div class="results-area" id="results-area" style="display:none">
+            <div class="gantt-title">📊 Resultados por Proceso</div>
+            <div class="table-wrapper">
+              <table class="mi-table" id="results-table">
+                <thead>
+                  <tr>
+                    <th>PID</th>
+                    <th>Arrival</th>
+                    <th>Burst</th>
+                    <th>Completion</th>
+                    <th>Turnaround</th>
+                    <th>Waiting</th>
+                    <th>Response</th>
+                  </tr>
+                </thead>
+                <tbody id="results-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- TAB 3: MEMORY (Door Vault)                -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="tab-content" id="tab-memory">
+      <div class="section-header">
+        <h2>🏠 Door Vault <span class="badge">Paginación de Memoria</span></h2>
+        <p class="section-desc">Cada marco es una ranura en la bóveda de puertas</p>
+      </div>
+
+      <div class="panel-grid">
+
+        <!-- MEMORY CONFIG -->
+        <div class="panel">
+          <div class="panel-title">⚙️ Configuración de Memoria</div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Marcos (Frames)</label>
+              <input type="number" id="mem-frames" class="mi-input" value="3" min="1" max="8"/>
+            </div>
+            <div class="form-group">
+              <label>Tamaño de Página</label>
+              <input type="number" id="mem-pagesize" class="mi-input" value="4" min="1"/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Cadena de Referencias <span class="hint">(páginas separadas por coma)</span></label>
+            <input type="text" id="mem-refs" class="mi-input" placeholder="1,2,3,4,1,2,5,1,2,3,4,5"/>
+          </div>
+
+          <div class="form-group">
+            <label>Algoritmo de Reemplazo</label>
+            <select id="mem-algo" class="mi-select">
+              <option value="fifo">FIFO</option>
+              <option value="lru">LRU — Least Recently Used</option>
+              <option value="optimal">Óptimo</option>
+              <option value="clock">Clock</option>
+              <option value="second">Segunda Oportunidad</option>
+            </select>
+          </div>
+
+          <div class="btn-row">
+            <button class="mi-btn primary" id="btn-run-mem">▶ Ejecutar</button>
+            <button class="mi-btn secondary" id="btn-step-mem">⏭ Paso</button>
+            <button class="mi-btn ghost" id="btn-reset-mem">↺ Reset</button>
+          </div>
+
+          <!-- PAGE FAULT COUNTER -->
+          <div class="fault-counter" id="fault-counter">
+            <div class="fault-label">💥 Page Faults</div>
+            <div class="fault-number" id="fault-number">0</div>
+            <div class="fault-label">Hit Rate</div>
+            <div class="fault-number hit" id="hit-rate">—</div>
+          </div>
+        </div>
+
+        <!-- MEMORY VISUALIZATION -->
+        <div class="panel mem-visual">
+          <div class="panel-title">🚪 Bóveda de Puertas <span class="hint">— Frames</span></div>
+
+          <!-- FRAMES -->
+          <div class="frames-area" id="frames-area">
+            <!-- generado dinámicamente -->
+          </div>
+
+          <!-- PAGE TABLE -->
+          <div class="page-table-area">
+            <div class="gantt-title">📋 Tabla de Páginas — Historial</div>
+            <div class="table-wrapper">
+              <table class="mi-table" id="page-table">
+                <thead>
+                  <tr id="page-table-head">
+                    <th>Ref</th>
+                    <!-- frames se agregan dinámicamente -->
+                  </tr>
+                </thead>
+                <tbody id="page-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ══════════════════════════════════════════ -->
+    <!-- TAB 4: STATES (Control Room)              -->
+    <!-- ══════════════════════════════════════════ -->
+    <section class="tab-content" id="tab-states">
+      <div class="section-header">
+        <h2>📊 Control Room <span class="badge">Diagrama de Estados</span></h2>
+        <p class="section-desc">Visualiza cómo fluyen los procesos entre estados</p>
+      </div>
+
+      <div class="panel-grid">
+        <div class="panel states-panel">
+          <div class="panel-title">🔄 Diagrama de Transición de Estados</div>
+          <div class="states-diagram" id="states-diagram">
+
+            <div class="state-node new" id="state-new">
+              <span class="state-icon">🟣</span>
+              <span class="state-name">NEW</span>
+              <span class="state-count" id="cnt-new">0</span>
+            </div>
+
+            <div class="state-arrow arr-new-ready">
+              <span class="arrow-label">admit</span>
+              <div class="arrow-line"></div>
+              <span class="arrow-head">→</span>
+            </div>
+
+            <div class="state-node ready" id="state-ready">
+              <span class="state-icon">🔵</span>
+              <span class="state-name">READY</span>
+              <span class="state-count" id="cnt-ready">0</span>
+            </div>
+
+            <div class="state-arrow arr-ready-running">
+              <span class="arrow-label">dispatch</span>
+              <div class="arrow-line"></div>
+              <span class="arrow-head">→</span>
+            </div>
+
+            <div class="state-node running" id="state-running">
+              <span class="state-icon">🟢</span>
+              <span class="state-name">RUNNING</span>
+              <span class="state-count" id="cnt-running">0</span>
+            </div>
+
+            <div class="state-arrow arr-running-waiting">
+              <span class="arrow-label">I/O wait</span>
+              <div class="arrow-line vertical"></div>
+              <span class="arrow-head down">↓</span>
+            </div>
+
+            <div class="state-node waiting" id="state-waiting">
+              <span class="state-icon">🟡</span>
+              <span class="state-name">WAITING</span>
+              <span class="state-count" id="cnt-waiting">0</span>
+            </div>
+
+            <div class="state-arrow arr-waiting-ready">
+              <span class="arrow-label">I/O done</span>
+              <div class="arrow-line return"></div>
+            </div>
+
+            <div class="state-arrow arr-running-terminated">
+              <span class="arrow-label">exit</span>
+              <div class="arrow-line"></div>
+              <span class="arrow-head">→</span>
+            </div>
+
+            <div class="state-node terminated" id="state-terminated">
+              <span class="state-icon">⚫</span>
+              <span class="state-name">TERMINATED</span>
+              <span class="state-count" id="cnt-terminated">0</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- LIVE LOG -->
+        <div class="panel">
+          <div class="panel-title">📟 Event Log <span class="hint">— Tiempo real</span></div>
+          <div class="event-log" id="event-log">
+            <div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div>
+          </div>
+          <button class="mi-btn ghost" id="btn-clear-log" style="margin-top:12px">🗑️ Limpiar Log</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- TOAST NOTIFICATIONS -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="js/main.js"></script>
+  <script src="js/scheduling.js"></script>
+  <script src="js/memory.js"></script>
+  <script src="js/states.js"></script>
+</body>
+</html>
