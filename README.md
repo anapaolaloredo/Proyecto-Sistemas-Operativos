@@ -6,10 +6,10 @@ Simulador Visual de Procesos en CPU bajo Scheduling (Non-preemptive y Preemptive
 3. Ejecutar el archivo "index.html" haciendo doble clic.
 
 Alumno y Matrícula:
-- Estefania Nájera de la Rosa – 614978
+- Estefania Nájera de la Rosa – 614978 (Creación de poster, diseño de interfaz y resumen de teoría)
   
-- Victor Hugo Gutierrez Cavazos – 612081
+- Victor Hugo Gutierrez Cavazos – 612081 (Desarrollo de backend)
 
-- Ana Paola Loredo Moreno - 613772
+- Ana Paola Loredo Moreno - 613772 (Diseño de arquitectura de sistema y frontend)
   
-- Christopher Brandon Reeker Cireno - 610220
+- Christopher Brandon Reeker Cireno - 610220 (Testing y revisión de código apegado a teoría)
