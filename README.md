@@ -2,7 +2,7 @@
 Simulador Visual de Procesos en CPU bajo Scheduling (Non-preemptive y Preemptive) junto con Algoritmos de Paginación (Reemplazo)
 
 1. Descargar y descomprimir el archivo .zip.
-2. Abrir la carpeta "Proyecto-Sistemas-Operativos".
+2. Abrir la carpeta "proyecto_final".
 3. Ejecutar el archivo "index.html" haciendo doble clic.
 
 Alumno y Matrícula:
