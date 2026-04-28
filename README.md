@@ -3,7 +3,7 @@ Simulador Visual de Procesos en CPU bajo Scheduling (Non-preemptive y Preemptive
 
 1. Descargar y descomprimir el archivo .zip.
 2. Abrir la carpeta "Proyecto-Sistemas-Operativos".
-Ejecutar el archivo "index.html" haciendo doble clic.
+3. Ejecutar el archivo "index.html" haciendo doble clic.
 
 Alumno y Matrícula:
 - Estefania Nájera de la Rosa – 614978
