@@ -44,6 +44,10 @@ let memInterval = null;
 let memPaused = false;
 let memCurrentRefs = [];
 
+// Threads
+let threadStartTime = 0;
+let threadEndTime = 0; 
+
 // ══════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════
@@ -741,6 +745,289 @@ function memSecondChanceFix(refs, n) {
     }
   });
   return hist;
+}
+
+// ══════════════════════════════════════
+// MÓDULO 4 — THREAD MANAGER (Web Workers = Cores)
+// ══════════════════════════════════════
+
+class ThreadManager {
+  constructor(numCores) {
+    this.numCores = numCores;           // Cores configurables por el usuario
+    this.workers = [];                  // Array de Web Workers
+    this.coreStatus = [];              // 'idle' | 'busy' para cada core
+    this.processQueue = [];            // Cola de procesos pendientes
+    this.runningProcesses = new Map(); // pid → workerId
+    this.completionCallbacks = new Map();
+    this.threadLog = [];               // Log de eventos de threads
+    
+    this.initWorkers();
+  }
+
+  initWorkers() {
+    // Terminar workers anteriores si existen
+    this.workers.forEach(w => w.terminate());
+    this.workers = [];
+    this.coreStatus = [];
+
+    for (let i = 0; i < this.numCores; i++) {
+      const worker = new Worker('process-worker.js');
+      
+      worker.onmessage = (e) => this.handleWorkerMessage(e, i);
+      worker.onerror   = (e) => this.handleWorkerError(e, i);
+      
+      worker.postMessage({ type: 'INIT', data: { workerId: i } });
+      
+      this.workers.push(worker);
+      this.coreStatus.push('idle');
+    }
+
+    this.renderCoresUI();
+  }
+
+  // Despachar un proceso a un core disponible
+  dispatch(processConfig) {
+    const freeCore = this.coreStatus.indexOf('idle');
+    
+    if (freeCore === -1) {
+      // Todos los cores ocupados → encolar
+      this.processQueue.push(processConfig);
+      this.logThread(`P${processConfig.pid} encolado (todos los cores ocupados)`);
+      return;
+    }
+
+    this.assignToCore(processConfig, freeCore);
+  }
+
+  assignToCore(proc, coreId) {
+    this.coreStatus[coreId] = 'busy';
+    this.runningProcesses.set(proc.pid, coreId);
+    this.workers[coreId].postMessage({ type: 'RUN_PROCESS', data: proc });
+    
+    this.logThread(`P${proc.pid} → Core ${coreId} (Thread OS #${coreId})`);
+    this.renderCoresUI();
+  }
+
+  handleWorkerMessage(e, workerId) {
+    const { type, pid, remaining, completionTime } = e.data;
+
+    if (type === 'PROCESS_DONE') {
+      this.coreStatus[workerId] = 'idle';
+      this.runningProcesses.delete(pid);
+      this.logThread(`P${pid} TERMINADO en Core ${workerId}`, 'done');
+      
+      // Callback al simulador principal
+      if (this.completionCallbacks.has(pid)) {
+        this.completionCallbacks.get(pid)(pid, completionTime);
+      }
+
+      // Despachar siguiente proceso de la cola
+      if (this.processQueue.length > 0) {
+        const next = this.processQueue.shift();
+        this.assignToCore(next, workerId);
+      }
+
+      this.renderCoresUI();
+    }
+
+    if (type === 'TICK') {
+      this.updateCoreProgress(workerId, e.data);
+    }
+
+    if (type === 'PROCESS_PREEMPTED') {
+      // Para Round Robin: devolver a la cola con tiempo restante
+      this.coreStatus[workerId] = 'idle';
+      this.runningProcesses.delete(pid);
+      
+      if (remaining > 0) {
+        const originalProc = this.processQueue.find(p => p.pid === pid) 
+          || { ...this.getProcessById(pid), burstTime: remaining };
+        originalProc.burstTime = remaining;
+        this.processQueue.push(originalProc); // Re-encolar al final (RR)
+        this.logThread(`P${pid} preemptado, restante: ${remaining}`, 'preempt');
+      }
+
+      if (this.processQueue.length > 0) {
+        const next = this.processQueue.shift();
+        this.assignToCore(next, workerId);
+      }
+
+      this.renderCoresUI();
+    }
+  }
+
+  handleWorkerError(e, workerId) {
+    console.error(`Error en Worker ${workerId}:`, e);
+    this.logThread(`ERROR en Core ${workerId}: ${e.message}`, 'error');
+  }
+
+  // Ejecutar procesos según el algoritmo seleccionado
+  runWithAlgorithm(processList, algo, quantum) {
+    // Ordenar la cola inicial según el algoritmo
+    let sorted;
+    switch(algo) {
+      case 'fcfs':
+        sorted = [...processList].sort((a,b) => a.arrival - b.arrival);
+        break;
+      case 'sjf':
+        sorted = [...processList].sort((a,b) => a.burst - b.burst);
+        break;
+      case 'priority_p':
+        sorted = [...processList].sort((a,b) => a.priority - b.priority);
+        break;
+      default: // rr, srtf, etc.
+        sorted = [...processList].sort((a,b) => a.arrival - b.arrival);
+    }
+
+    sorted.forEach(p => {
+      this.dispatch({
+        pid:       p.pid,
+        burstTime: p.burstOrig || p.burst,
+        quantum:   algo === 'rr' ? quantum : null,
+        algo,
+        priority:  p.priority
+      });
+    });
+  }
+
+  onProcessComplete(pid, callback) {
+    this.completionCallbacks.set(pid, callback);
+  }
+
+  logThread(msg, type = 'info') {
+    const entry = { msg, type, time: Date.now() };
+    this.threadLog.push(entry);
+    this.renderThreadLog();
+  }
+
+  getProcessById(pid) {
+    return processes.find(p => p.pid === pid) || {};
+  }
+
+  terminate() {
+    this.workers.forEach(w => w.terminate());
+    this.workers = [];
+  }
+
+  // ── UI RENDERING ──
+  renderCoresUI() {
+    const el = document.getElementById('cores-grid');
+    if (!el) return;
+
+    el.innerHTML = this.workers.map((_, i) => {
+      const status = this.coreStatus[i];
+      const runningPid = [...this.runningProcesses.entries()].find(([, cid]) => cid === i)?.[0];
+      const isActive = status === 'busy';
+
+      return `
+        <div class="core-card ${isActive ? 'core-active' : 'core-idle'}">
+          <div class="core-header">
+            <span class="core-icon">${isActive ? '⚡' : '💤'}</span>
+            <span class="core-name">Core ${i}</span>
+            <span class="core-badge ${isActive ? 'badge-run' : 'badge-idle'}">
+              ${isActive ? 'RUNNING' : 'IDLE'}
+            </span>
+          </div>
+          <div class="core-pid">
+            ${isActive && runningPid !== undefined
+              ? `<span style="color:${getPidColor(runningPid)};font-size:20px;font-weight:800">P${runningPid}</span>`
+              : '<span style="opacity:0.3">—</span>'}
+          </div>
+          <div class="core-thread-id">Thread OS #${i}</div>
+        </div>`;
+    }).join('');
+
+    // Actualizar contador
+    const busyCount = this.coreStatus.filter(s => s === 'busy').length;
+    const qLen = this.processQueue.length;
+    const el2 = document.getElementById('thread-stats');
+    if (el2) {
+      el2.innerHTML = `
+        <span>Cores activos: <b>${busyCount}/${this.numCores}</b></span>
+        <span>En cola: <b>${qLen}</b></span>
+        <span>Completados: <b>${this.completionCallbacks.size}</b></span>`;
+    }
+  }
+
+  updateCoreProgress(coreId, data) {
+    const pct = Math.round((data.tick / data.totalTicks) * 100);
+    const fill = document.getElementById(`core-progress-${coreId}`);
+    if (fill) fill.style.width = pct + '%';
+  }
+
+  renderThreadLog() {
+    const el = document.getElementById('thread-log');
+    if (!el) return;
+    const recent = this.threadLog.slice(-20).reverse();
+    el.innerHTML = recent.map(e => {
+      const cls = { done:'success', error:'error', preempt:'warn' }[e.type] || 'info';
+      return `<div class="log-line ${cls}">${e.msg}</div>`;
+    }).join('');
+  }
+}
+
+// ── Instancia global del ThreadManager ──
+let threadManager = null;
+
+function initThreadManager() {
+  const cores = parseInt(document.getElementById('num-cores').value) || 2;
+  if (threadManager) threadManager.terminate();
+  threadManager = new ThreadManager(cores);
+  toast(`ThreadManager iniciado — ${cores} cores (Web Workers)`, 'success');
+}
+
+function runThreadSimulation() {
+  if (!threadManager) { toast('Inicia el ThreadManager primero', 'warn'); return; }
+  if (processes.length === 0) { toast('Agrega procesos primero', 'warn'); return; }
+
+  const algo    = document.getElementById('thread-algo').value;
+  const quantum = parseInt(document.getElementById('thread-quantum').value) || 2;
+
+  let completedThreads = 0;
+
+  // Registrar callbacks de completado para cada proceso
+  processes.forEach(p => {
+    threadManager.onProcessComplete(p.pid, (pid, time) => {
+      setProcessState(pid, 'terminated');
+      log(`P${pid} terminado por Thread (Core ${threadManager.runningProcesses.get(pid) ?? '?'})`, 'success');
+      completedThreads++;
+        
+      if (completedThreads === processes.length) {
+
+            threadEndTime = performance.now();
+
+            const totalTime =
+                (threadEndTime - threadStartTime).toFixed(2);
+
+            toast(
+                `Todos los threads terminaron en ${totalTime} ms`,
+                'success'
+            );
+
+            document.getElementById('thread-total-time')
+                .textContent = totalTime + ' ms';
+        }
+
+        log(
+          `P${pid} terminado por Thread`,
+          'success'
+        );
+    });
+});
+
+  threadStartTime = performance.now();
+
+  // Despachar todos los procesos — el manager los distribuye entre Workers
+  threadManager.runWithAlgorithm(processes, algo, quantum);
+  toast(`▶ ${processes.length} procesos despachados a ${threadManager.numCores} threads`, 'success');
+}
+
+function stopThreadSimulation() {
+  if (threadManager) {
+    threadManager.terminate();
+    threadManager = null;
+    toast('Workers terminados', 'warn');
+  }
 }
 
 // ══════════════════════════════════════
