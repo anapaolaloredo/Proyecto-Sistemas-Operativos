@@ -375,3 +375,26 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
   .frame-page-num{font-size:17px;}
   .scream-sidebar{display:none;} /* hide sidebar on very small screens */
 }
+
+/* ══════════════════════════════════════
+   THREADS & CORE
+══════════════════════════════════════ */
+.core-card {
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  text-align: center;
+  transition: all 0.3s;
+}
+.core-active {
+  border-color: var(--mi-green);
+  background: linear-gradient(135deg, #e8f5e9, #f1f8e9);
+  box-shadow: 0 0 12px rgba(67,160,71,0.25);
+}
+.core-idle { background: var(--bg-panel2); opacity: 0.7; }
+.core-header { display:flex; align-items:center; gap:6px; margin-bottom:8px; justify-content:center; }
+.core-name { font-weight:700; font-size:13px; }
+.badge-run { background:#e8f5e9; color:var(--mi-green); font-size:10px; padding:2px 8px; border-radius:20px; font-weight:700; }
+.badge-idle { background:#eceff1; color:var(--text-muted); font-size:10px; padding:2px 8px; border-radius:20px; }
+.core-pid { font-size:24px; min-height:34px; display:flex; align-items:center; justify-content:center; }
+.core-thread-id { font-size:10px; color:var(--text-dim); font-family:var(--font-mono); }
