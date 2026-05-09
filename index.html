@@ -34,6 +34,7 @@
   <button class="nav-btn" data-tab="scheduling"><span class="nav-icon"></span> Módulo 2 — CPU Scheduling</button>
   <button class="nav-btn" data-tab="memory"><span class="nav-icon"></span> Módulo 3 — Paginación</button>
   <button class="nav-btn" data-tab="states"><span class="nav-icon"></span> Diagrama de Estados</button>
+  <button class="nav-btn" data-tab="threads">Módulo 4 — Threads & Cores</button>
 </nav>
 
 <main class="mi-main">
@@ -341,6 +342,67 @@
       </div>
     </div>
   </section>
+
+    <!-- ══════════ TAB 5: THREADS ══════════ -->
+
+  <section class="tab-content" id="tab-threads">
+    <div class="section-header">
+      <h2>Scare Floor Multi-Core <span class="badge">Threads & Paralelismo</span></h2>
+      <p class="section-desc">Cada proceso se ejecuta en un Web Worker real (thread OS). Configura el número de cores y observa ejecución paralela verdadera</p>
+    </div>
+
+  <div class="panel-grid">
+    <div class="panel">
+      <div class="panel-title">⚙️ Configuración de Cores</div>
+      <div class="form-group">
+        <label>Número de CPU Cores</label>
+        <input type="number" id="num-cores" class="mi-input" value="2" min="1" max="8"/>
+        <small style="color:var(--text-dim);font-size:11px">
+          Cada core = 1 Web Worker = 1 thread del sistema operativo
+        </small>
+      </div>
+      <div class="form-group">
+        <label>Algoritmo</label>
+        <select id="thread-algo" class="mi-select">
+          <option value="fcfs">FCFS</option>
+          <option value="rr">Round Robin</option>
+          <option value="sjf">SJF</option>
+          <option value="priority_p">Priority</option>
+        </select>
+      </div>
+      <div class="form-group" id="thread-quantum-group">
+        <label>Quantum (para RR)</label>
+        <input type="number" id="thread-quantum" class="mi-input" value="2" min="1"/>
+      </div>
+      <div class="btn-row">
+        <button class="mi-btn primary" onclick="initThreadManager()">🧵 Iniciar Workers</button>
+        <button class="mi-btn secondary" onclick="runThreadSimulation()">▶ Ejecutar en paralelo</button>
+        <button class="mi-btn ghost" onclick="stopThreadSimulation()">⏹ Stop</button>
+      </div>
+
+      <!-- Stats -->
+      <div id="thread-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--text-muted)">
+        <span>Cores activos: <b>0</b></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">🖥️ Estado de Cores en Tiempo Real</div>
+      <div id="cores-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
+        <div style="color:var(--text-dim);font-size:13px;padding:20px">
+          Inicia el ThreadManager para ver los cores
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title">📟 Thread Event Log</div>
+    <div id="thread-log" class="event-log" style="height:200px">
+      <div class="log-empty">Los eventos de threads aparecerán aquí...</div>
+    </div>
+  </div>
+</section>
 
 </main>
 
