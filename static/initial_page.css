@@ -1,0 +1,263 @@
+:root{
+    --mi-blue:#1565c0;
+    --mi-dark:#0d47a1;
+    --mi-purple:#7b1fa2;
+    --mi-teal:#00838f;
+    --mi-green:#43a047;
+    --mi-orange:#ef6c00;
+    --text:#ffffff;
+}
+
+/* ===== BASE ===== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    font-family:'Quicksand', sans-serif;
+    background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.08), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(255,255,255,0.06), transparent 30%),
+        linear-gradient(160deg,#0d47a1 0%, #1565c0 40%, #283593 100%);
+    min-height:100vh;
+    overflow:hidden;
+    position:relative;
+}
+
+/* ===== FONDO ===== */
+
+.background-glow{
+    position:absolute;
+    inset:0;
+    background-image:
+        radial-gradient(circle, rgba(255,255,255,0.04) 1px, transparent 1px);
+    background-size:30px 30px;
+    opacity:0.5;
+}
+
+/* ===== CONTENIDO ===== */
+
+.hero{
+    position:relative;
+    z-index:5;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    min-height:100vh;
+    padding:30px;
+}
+
+.logo{
+    font-size:70px;
+    margin-bottom:10px;
+    animation:floatLogo 4s ease-in-out infinite;
+}
+
+h1{
+    font-family:'Luckiest Guy', cursive;
+    font-size:clamp(2.5rem, 5vw, 4.5rem);
+    color:white;
+    letter-spacing:2px;
+    text-shadow:
+        0 4px 15px rgba(0,0,0,0.4);
+    margin-bottom:20px;
+}
+
+.subtitle{
+    max-width:850px;
+    color:rgba(255,255,255,0.9);
+    font-size:1.15rem;
+    line-height:1.7;
+    margin-bottom:15px;
+}
+
+.hint{
+    margin-top:10px;
+    color:#ffecb3;
+    font-weight:700;
+    font-size:0.95rem;
+    background:rgba(0,0,0,0.2);
+    padding:10px 18px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,0.15);
+}
+
+/* ===== BOTON PLAY ===== */
+
+.play-btn{
+    margin-top:40px;
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    border:none;
+    cursor:pointer;
+
+    background:
+        linear-gradient(135deg,#43a047,#2e7d32);
+
+    color:white;
+    font-size:50px;
+
+    box-shadow:
+        0 0 25px rgba(67,160,71,0.45),
+        0 10px 30px rgba(0,0,0,0.35);
+
+    transition:0.3s;
+}
+
+.play-btn:hover{
+    transform:scale(1.12);
+    box-shadow:
+        0 0 35px rgba(67,160,71,0.7),
+        0 10px 35px rgba(0,0,0,0.45);
+}
+
+/* ===== PUERTAS ===== */
+
+.door{
+    position:absolute;
+    width:120px;
+    height:180px;
+    border-radius:14px 14px 5px 5px;
+    animation:floatDoor 5s ease-in-out infinite;
+    box-shadow:
+        0 12px 30px rgba(0,0,0,0.35);
+
+    opacity:0.95;
+}
+
+/* marco */
+.door::before{
+    content:"";
+    position:absolute;
+    inset:7px;
+    border-radius:10px 10px 4px 4px;
+}
+
+/* perilla */
+.door::after{
+    content:"";
+    position:absolute;
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    background:gold;
+    right:14px;
+    top:50%;
+}
+
+/* ===== COLORES ===== */
+
+.door1{
+    left:6%;
+    top:12%;
+    background:linear-gradient(160deg,#0d47a1,#1565c0);
+}
+
+.door1::before{
+    background:linear-gradient(160deg,#1976d2,#42a5f5);
+}
+
+.door2{
+    right:7%;
+    top:18%;
+    animation-delay:1s;
+    background:linear-gradient(160deg,#4a148c,#7b1fa2);
+}
+
+.door2::before{
+    background:linear-gradient(160deg,#8e24aa,#ba68c8);
+}
+
+.door3{
+    left:10%;
+    bottom:8%;
+    width:95px;
+    height:145px;
+    animation-delay:2s;
+    background:linear-gradient(160deg,#006064,#00838f);
+}
+
+.door3::before{
+    background:linear-gradient(160deg,#00acc1,#4dd0e1);
+}
+
+.door4{
+    right:12%;
+    bottom:10%;
+    width:90px;
+    height:135px;
+    animation-delay:3s;
+    background:linear-gradient(160deg,#1b5e20,#43a047);
+}
+
+.door4::before{
+    background:linear-gradient(160deg,#66bb6a,#a5d6a7);
+}
+
+/* ===== MIKE Y SULLY ===== */
+
+.monsters{
+    position:absolute;
+    bottom:10px;
+    right:20px;
+    width:220px;
+    z-index:4;
+    opacity:0.95;
+}
+
+/* ===== ANIMACIONES ===== */
+
+@keyframes floatDoor{
+    0%{
+        transform:translateY(0px) rotate(-2deg);
+    }
+
+    50%{
+        transform:translateY(-20px) rotate(2deg);
+    }
+
+    100%{
+        transform:translateY(0px) rotate(-2deg);
+    }
+}
+
+@keyframes floatLogo{
+    0%{
+        transform:translateY(0px);
+    }
+
+    50%{
+        transform:translateY(-8px);
+    }
+
+    100%{
+        transform:translateY(0px);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media(max-width:768px){
+
+    .door{
+        opacity:0.35;
+        transform:scale(0.8);
+    }
+
+    .monsters{
+        width:160px;
+        opacity:0.5;
+    }
+
+    .play-btn{
+        width:90px;
+        height:90px;
+        font-size:42px;
+    }
+}
