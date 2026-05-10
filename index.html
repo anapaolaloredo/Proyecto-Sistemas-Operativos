@@ -1,415 +1,53 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Monsters Inc. — OS Process Simulator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Monsters Inc - Simulación</title>
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Quicksand:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="static/styles.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Luckiest+Guy&family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/initial_page.css">
+
 </head>
+
 <body>
 
-<div class="factory-bg"></div>
 
-<header class="mi-header">
-  <div class="header-logo">
-    <span class="header-icon"></span>
-    <div>
-      <h1 class="title-main">MONSTERS INCORPORATED</h1>
-      <p class="title-sub">Operating System Process Simulator</p>
-    </div>
-  </div>
-  <div class="header-legend">
-    <span class="legend-item"><span class="legend-dot new"></span>New</span>
-    <span class="legend-item"><span class="legend-dot ready"></span>Ready</span>
-    <span class="legend-item"><span class="legend-dot running"></span>Running</span>
-    <span class="legend-item"><span class="legend-dot waiting"></span>Waiting</span>
-    <span class="legend-item"><span class="legend-dot terminated"></span>Terminated</span>
-  </div>
-</header>
+<div class="background-glow"></div>
 
-<nav class="mi-nav">
-  <button class="nav-btn active" data-tab="processes"><span class="nav-icon"></span> Módulo 1 — Procesos</button>
-  <button class="nav-btn" data-tab="scheduling"><span class="nav-icon"></span> Módulo 2 — CPU Scheduling</button>
-  <button class="nav-btn" data-tab="memory"><span class="nav-icon"></span> Módulo 3 — Paginación</button>
-  <button class="nav-btn" data-tab="states"><span class="nav-icon"></span> Diagrama de Estados</button>
-  <button class="nav-btn" data-tab="threads">Módulo 4 — Threads & Cores</button>
-</nav>
+<!-- PUERTAS -->
+<div class="door door1"></div>
+<div class="door door2"></div>
+<div class="door door3"></div>
+<div class="door door4"></div>
 
-<main class="mi-main">
+<!-- CONTENIDO -->
+<section class="hero">
 
-  <!-- ══════════ TAB 1: PROCESOS ══════════ -->
-  <section class="tab-content active" id="tab-processes">
-    <div class="section-header">
-      <h2>Monster Registry <span class="badge">Procesos</span></h2>
-      <p class="section-desc">Registra procesos con PID, Arrival Time, Burst Time, Priority y número de páginas</p>
-    </div>
-    <div class="panel-grid">
-      <div class="panel">
-        <div class="panel-title">➕ Nuevo Proceso</div>
-        <div class="form-group"><label>PID <span class="hint">(ID único)</span></label><input type="number" id="f-pid" class="mi-input" placeholder="1" min="1" value="1"/></div>
-        <div class="form-row">
-          <div class="form-group"><label>Arrival Time</label><input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0" value="0"/></div>
-          <div class="form-group"><label>Burst Time</label><input type="number" id="f-burst" class="mi-input" placeholder="5" min="1" value="5"/></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Priority <span class="hint">(menor=mayor)</span></label><input type="number" id="f-priority" class="mi-input" placeholder="1" min="1" value="1"/></div>
-          <div class="form-group"><label>Páginas</label><input type="number" id="f-pages" class="mi-input" placeholder="4" min="1" value="4"/></div>
-        </div>
-        <div class="btn-row">
-          <button class="mi-btn primary" id="btn-add-process"> Agregar</button>
-          <button class="mi-btn secondary" id="btn-load-example"> Ejemplo</button>
-        </div>
-        <div class="divider"><span>ó</span></div>
-        <label class="file-drop" id="file-drop"><span>📁 Arrastra archivo .txt/.csv aquí</span><input type="file" id="file-input" accept=".txt,.csv" style="display:none"/></label>
-        <div class="file-format">Formato: <code>PID,Arrival,Burst,Priority,Pages</code></div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">Procesos Registrados <span id="process-count" class="count-badge">0</span></div>
-        <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Haz clic en un valor para editarlo en línea.</p>
-        <div class="table-wrapper">
-          <table class="mi-table" id="process-table">
-            <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>Priority</th><th>Páginas</th><th>Estado</th><th></th></tr></thead>
-            <tbody id="process-tbody"><tr class="empty-row"><td colspan="7"><div class="empty-state"><span class="empty-icon"></span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr></tbody>
-          </table>
-        </div>
-        <div class="btn-row" style="margin-top:12px">
-          <button class="mi-btn danger" id="btn-clear-all">Limpiar Todo</button>
-          <button class="mi-btn ghost" id="btn-go-sched">▶ Ir a Scheduling</button>
-        </div>
-      </div>
-    </div>
-    <div class="panel">
-      <div class="panel-title">Línea de Producción <span class="hint">— Vista de Estados</span></div>
-      <div class="conveyor-area">
-        <div class="conveyor-belt"><div class="belt-track"></div><div class="belt-doors" id="belt-doors"></div></div>
-        <div class="conveyor-labels"><span>🟣 NEW</span><span>🔵 READY</span><span>🟢 RUNNING</span><span>🟡 WAITING</span><span>⚫ DONE</span></div>
-      </div>
-    </div>
-  </section>
+    <div class="logo">🚪</div>
 
-  <!-- ══════════ TAB 2: SCHEDULING ══════════ -->
-  <section class="tab-content" id="tab-scheduling">
-    <div class="section-header">
-      <h2>Scare Floor <span class="badge">CPU Scheduling</span></h2>
-      <p class="section-desc">Selecciona el algoritmo, configura parámetros y observa la simulación en tiempo real</p>
-    </div>
-    <div class="panel-grid scheduling-grid">
-      <div class="panel">
-        <div class="panel-title">Configuración</div>
-        <div class="form-group"><label>Algoritmo</label>
-          <select id="sched-algo" class="mi-select">
-            <optgroup label="── Non-Preemptive ──">
-              <option value="fcfs">FCFS — First Come First Served</option>
-              <option value="sjf">SJF — Shortest Job First</option>
-              <option value="hrrn">HRRN — Highest Response Ratio Next</option>
-            </optgroup>
-            <optgroup label="── Preemptive ──">
-              <option value="rr">Round Robin</option>
-              <option value="srtf">SRTF — Shortest Remaining Time</option>
-              <option value="priority_p">Priority (Preemptive)</option>
-              <option value="mlq">Multilevel Queue</option>
-              <option value="mlfq">Multilevel Feedback Queue</option>
-            </optgroup>
-          </select>
-        </div>
-        <div id="quantum-group" style="display:none" class="form-group"><label>Quantum (time slice)</label><input type="number" id="sched-quantum" class="mi-input" value="2" min="1"/></div>
-        <div id="mlq-config" style="display:none">
-          <div class="form-group"><label>Niveles MLQ / MLFQ</label>
-            <div class="mlq-level"><div class="mlq-level-header"><span class="mlq-bar" style="background:#1565c0"></span>Nivel 0 — Round Robin (Q=<input type="number" id="mlq-q0" value="2" min="1" style="width:40px;padding:1px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px">)</div></div>
-            <div class="mlq-level"><div class="mlq-level-header"><span class="mlq-bar" style="background:#00838f"></span>Nivel 1 — Round Robin (Q=<input type="number" id="mlq-q1" value="4" min="1" style="width:40px;padding:1px 4px;font-size:11px;border:1px solid var(--border);border-radius:4px">)</div></div>
-            <div class="mlq-level"><div class="mlq-level-header"><span class="mlq-bar" style="background:#2e7d32"></span>Nivel 2 — FCFS</div></div>
-          </div>
-        </div>
-        <div class="btn-row">
-          <button class="mi-btn primary" id="btn-run-sched">▶ Ejecutar</button>
-          <button class="mi-btn secondary" id="btn-step-sched">⏭ Paso a Paso</button>
-          <button class="mi-btn ghost" id="btn-reset-sched">↺ Reset</button>
-        </div>
-        <div class="form-group mt-16"><label>Velocidad de Animación</label><div class="speed-control"><span>🐢</span><input type="range" id="sched-speed" min="100" max="2000" value="700" class="mi-range"/><span>⚡</span></div></div>
-        <div class="metrics-box" id="metrics-box">
-          <div class="metrics-title">Métricas Globales</div>
-          <div class="metrics-grid">
-            <div class="metric-item"><span class="metric-label">CPU Util.</span><span class="metric-val" id="m-cpu">—</span></div>
-            <div class="metric-item"><span class="metric-label">Avg Wait</span><span class="metric-val" id="m-wait">—</span></div>
-            <div class="metric-item"><span class="metric-label">Avg TAT</span><span class="metric-val" id="m-tat">—</span></div>
-            <div class="metric-item"><span class="metric-label">Avg Resp</span><span class="metric-val" id="m-resp">—</span></div>
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="sim-info-bar" id="sim-info-bar">
-          <span>Tiempo: <span class="sim-time" id="sim-time-display">0</span></span>
-          <span class="sim-status idle" id="sim-status-badge">Inactivo</span>
-          <span class="ctx-counter">Context Switches: <span id="ctx-switch-count">0</span></span>
-        </div>
-        <div class="cpu-area">
-          <div class="cpu-box"><div class="cpu-label">CPU</div><div class="cpu-box-inner" id="cpu-box-inner"><span class="cpu-idle">💤</span></div></div>
-          <div class="queue-box"><div class="queue-label">Cola Ready</div><div class="ready-queue-inner" id="ready-queue"><span class="queue-empty-msg">Vacía</span></div></div>
-          <div class="queue-box"><div class="queue-label">Waiting / Blocked</div><div class="waiting-queue-inner" id="waiting-queue"><span class="queue-empty-msg">Vacía</span></div></div>
-        </div>
-        <div class="gantt-area">
-          <div class="gantt-title">Diagrama de Gantt</div>
-          <div class="gantt-chart-wrapper"><div class="gantt-chart" id="gantt-chart"><div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div></div></div>
-          <div class="gantt-timeline" id="gantt-timeline"></div>
-        </div>
-        <div class="results-area" id="results-area" style="display:none">
-          <div class="gantt-title">Resultados por Proceso</div>
-          <div class="table-wrapper">
-            <table class="mi-table" id="results-table">
-              <thead><tr><th>PID</th><th>Arrival</th><th>Burst</th><th>Completion</th><th>Turnaround</th><th>Waiting</th><th>Response</th></tr></thead>
-              <tbody id="results-tbody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <h1>Simulación de Procesos</h1>
 
-    <!-- MONSTERS INC. SCARE FLOOR -->
-    <div class="mi-doors-panel">
-      <div class="doors-header">
-        <div class="doors-header-title">SCARE FLOOR — DOOR STATIONS <span class="doors-header-badge">SIMULACIÓN ACTIVA</span></div>
-        <div class="doors-scream-energy">
-          <div class="scream-stat"><span class="scream-stat-val" id="door-completed">0</span><span class="scream-stat-lbl">Completados</span></div>
-          <div class="scream-stat"><span class="scream-stat-val" id="door-running-count">0</span><span class="scream-stat-lbl">Working</span></div>
-          <div class="scream-stat" style="min-width:90px"><span class="scream-stat-val" id="door-total">0</span><span class="scream-stat-lbl">Total PIDs</span></div>
-        </div>
-      </div>
-      <div class="scream-meter-wrap">
-        <span class="scream-meter-label">SCREAM ENERGY</span>
-        <div class="scream-bar-track"><div class="scream-bar-fill" id="scream-bar-fill"></div></div>
-        <span class="scream-pct" id="scream-pct">0%</span>
-      </div>
-      <div class="doors-body">
-        <div>
-          <div class="waiting-room">
-            <div class="waiting-room-title">WAITING ROOM — Monsters in Queue<span class="waiting-room-count" id="waiting-room-count">0 waiting</span></div>
-            <div class="theater-seats" id="theater-seats"></div>
-          </div>
-          <div class="door-stations-title">DOOR STATIONS — Active Scare Portals</div>
-          <div class="door-stations-grid" id="door-stations-grid"></div>
-        </div>
-        <div class="scream-sidebar">
-          <div class="scream-log-panel">
-            <div class="scream-log-title">SCARE LOG</div>
-            <div class="scream-log-entries" id="scream-log-entries"><div class="scream-log-empty">Los sustos aparecerán aquí...</div></div>
-          </div>
-          <div class="top-monsters">
-            <div class="top-monsters-title">TOP MONSTERS</div>
-            <div id="top-monsters-list"><div style="font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;text-align:center;padding:10px">Ejecuta para ver rankings</div></div>
-          </div>
-        </div>
-      </div>
-      <div class="doors-status-bar">
-        <span><span class="status-dot new"></span> New Process</span>
-        <span><span class="status-dot ready"></span> Ready Queue</span>
-        <span><span class="status-dot running"></span> Running (Scaring)</span>
-        <span><span class="status-dot waiting"></span> Waiting (Problem)</span>
-        <span><span class="status-dot terminated"></span> Terminated (Complete)</span>
-      </div>
-    </div>
-  </section>
+    <p class="subtitle">
+        Explora cómo los procesos son gestionados en un sistema operativo.
+        Experimenta con algoritmos de planificación, memoria y estados
+        mientras las puertas representan procesos moviéndose por el sistema.
+    </p>
 
-  <!-- ══════════ TAB 3: MEMORIA ══════════ -->
-  <section class="tab-content" id="tab-memory">
-    <div class="section-header">
-      <h2>Door Vault <span class="badge">Paginación de Memoria</span></h2>
-      <p class="section-desc">Configura los marcos, la cadena de referencias y observa el reemplazo de páginas paso a paso</p>
-    </div>
+    <p class="hint">
+        💡 Las puertas flotantes representan procesos dentro de la cola del sistema.
+    </p>
 
-    <div class="panel-grid memory-grid">
+    <button class="play-btn"
+        onclick="window.location.href='os_simulator.html'">
+        ▶
+    </button>
 
-      <!-- CONFIG PANEL -->
-      <div class="panel">
-        <div class="panel-title">Configuración de Memoria</div>
-
-        <div class="form-row">
-          <div class="form-group"><label>Marcos (Frames)</label><input type="number" id="mem-frames" class="mi-input" value="3" min="1" max="10" onchange="initMemFramesUI()"/></div>
-          <div class="form-group"><label>Tamaño de Página (KB)</label><input type="number" id="mem-pagesize" class="mi-input" value="4" min="1"/></div>
-        </div>
-        <div class="form-row">
-          <div class="form-group"><label>Tamaño de Memoria (KB)</label><input type="number" id="mem-total" class="mi-input" value="32" min="1"/></div>
-          <div class="form-group"><label>Páginas por proceso</label><input type="number" id="mem-pages-proc" class="mi-input" value="4" min="1" readonly style="background:var(--bg-panel2)" title="Se toma de los procesos registrados"/></div>
-        </div>
-
-        <div class="form-group">
-          <label>Cadena de Referencias <span class="hint">(separadas por coma)</span></label>
-          <input type="text" id="mem-refs" class="mi-input" placeholder="1,2,3,4,1,2,5,1,2,3,4,5"/>
-        </div>
-
-        <div class="form-group">
-          <label>Algoritmo de Reemplazo</label>
-          <select id="mem-algo" class="mi-select">
-            <option value="fifo">FIFO — First In First Out</option>
-            <option value="lru">LRU — Least Recently Used</option>
-            <option value="optimal">Óptimo</option>
-            <option value="clock">Clock</option>
-            <option value="second">Segunda Oportunidad</option>
-          </select>
-        </div>
-
-        <div class="btn-row">
-          <button class="mi-btn primary" id="btn-run-mem">▶ Ejecutar</button>
-          <button class="mi-btn secondary" id="btn-step-mem" disabled>⏭ Paso</button>
-          <button class="mi-btn ghost" id="btn-reset-mem">↺ Reset</button>
-        </div>
-
-        <div class="form-group mt-16"><label>Velocidad</label>
-          <div class="speed-control"><span>🐢</span><input type="range" id="mem-speed" min="100" max="2000" value="700" class="mi-range"/><span>⚡</span></div>
-        </div>
-
-        <!-- Counters -->
-        <div class="mem-counters">
-          <div class="mem-counter-card"><span class="mem-counter-label">Page Faults</span><span class="mem-counter-val faults" id="mem-fault-count">0</span></div>
-          <div class="mem-counter-card"><span class="mem-counter-label">Page Hits</span><span class="mem-counter-val hits" id="mem-hit-count">0</span></div>
-          <div class="mem-counter-card"><span class="mem-counter-label">Hit Rate</span><span class="mem-counter-val rate" id="mem-hit-rate">—</span></div>
-          <div class="mem-counter-card"><span class="mem-counter-label">Total Refs</span><span class="mem-counter-val total" id="mem-total-refs">0</span></div>
-        </div>
-
-        <!-- Fragmentation -->
-        <div class="frag-panel panel" style="margin-top:14px;padding:14px">
-          <div class="panel-title" style="font-size:13px;margin-bottom:10px"> Fragmentación Interna</div>
-          <div id="frag-list"><p style="font-size:12px;color:var(--text-dim)">Ejecuta la simulación para ver fragmentación.</p></div>
-          <div style="display:flex;gap:14px;font-size:10px;color:var(--text-muted);margin-top:8px">
-            <span><span style="display:inline-block;width:10px;height:10px;background:var(--mi-blue);border-radius:2px;margin-right:4px"></span>Usado</span>
-            <span><span style="display:inline-block;width:10px;height:10px;background:#ffcc80;border-radius:2px;margin-right:4px"></span>Frag. interna</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- VISUALIZATION PANEL -->
-      <div class="panel">
-
-        <!-- Step progress bar -->
-        <div class="step-bar" id="mem-step-bar" style="display:none">
-          <span class="step-bar-info" id="mem-step-label">Paso 0 / 0</span>
-          <div class="step-progress-wrap"><div class="step-progress-fill" id="mem-step-fill" style="width:0%"></div></div>
-          <button class="mi-btn ghost" style="padding:5px 12px;font-size:12px" id="btn-mem-playpause" onclick="toggleMemPlay()">⏸ Pausar</button>
-        </div>
-
-        <!-- Reference string chips -->
-        <div class="panel-title" style="font-size:13px;margin-bottom:6px">Cadena de Referencias</div>
-        <div class="ref-string-display" id="ref-chips"></div>
-
-        <!-- Frames vault -->
-        <div class="panel-title" style="font-size:13px;margin-bottom:6px">Memoria Principal — Frames</div>
-        <div class="frames-vault" id="frames-vault"></div>
-
-        <!-- Page history table -->
-        <div class="panel-title" style="font-size:13px;margin-bottom:6px">Historial de Referencias</div>
-        <div class="mem-table-wrap">
-          <table class="mem-table" id="mem-hist-table">
-            <thead><tr id="mem-hist-head"><th>Ref</th><th>Resultado</th></tr></thead>
-            <tbody id="mem-hist-body"></tbody>
-          </table>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════ TAB 4: ESTADOS ══════════ -->
-  <section class="tab-content" id="tab-states">
-    <div class="section-header">
-      <h2>Control Room <span class="badge">Diagrama de Estados</span></h2>
-      <p class="section-desc">Visualización en tiempo real del flujo de procesos entre estados</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div class="panel">
-        <div class="panel-title"> Diagrama de Transición de Estados</div>
-        <div class="states-flow">
-          <div class="state-node-box new" id="state-box-new"><span class="sn-icon">🟣</span><span class="sn-name">NEW</span><span class="sn-count new" id="cnt-new">0</span></div>
-          <div class="arrow-wrap"><span class="arrow-label">admit</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box ready" id="state-box-ready"><span class="sn-icon">🔵</span><span class="sn-name">READY</span><span class="sn-count ready" id="cnt-ready">0</span></div>
-          <div class="arrow-wrap"><span class="arrow-label">dispatch</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box running" id="state-box-running"><span class="sn-icon">🟢</span><span class="sn-name">RUNNING</span><span class="sn-count running" id="cnt-running">0</span></div>
-          <div class="arrow-wrap"><span class="arrow-label">exit</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box terminated" id="state-box-terminated"><span class="sn-icon">⚫</span><span class="sn-name">TERMINATED</span><span class="sn-count terminated" id="cnt-terminated">0</span></div>
-        </div>
-        <div class="states-secondary">
-          <div class="state-node-box waiting" id="state-box-waiting" style="display:inline-flex"><span class="sn-icon">🟡</span><span class="sn-name">WAITING</span><span class="sn-count waiting" id="cnt-waiting">0</span></div>
-          <div style="font-size:12px;color:var(--text-muted);padding:10px;display:flex;flex-direction:column;gap:4px;justify-content:center">
-            <div>← I/O wait (Running → Waiting)</div>
-            <div>→ I/O done (Waiting → Ready)</div>
-            <div>← Preempt (Running → Ready)</div>
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">📟 Event Log <span class="hint">— Tiempo real</span></div>
-        <div class="event-log" id="event-log"><div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div></div>
-        <div class="btn-row" style="margin-top:10px"><button class="mi-btn ghost" id="btn-clear-log">🗑️ Limpiar Log</button></div>
-      </div>
-    </div>
-  </section>
-
-    <!-- ══════════ TAB 5: THREADS ══════════ -->
-
-  <section class="tab-content" id="tab-threads">
-    <div class="section-header">
-      <h2>Scare Floor Multi-Core <span class="badge">Threads & Paralelismo</span></h2>
-      <p class="section-desc">Cada proceso se ejecuta en un Web Worker real (thread OS). Configura el número de cores y observa ejecución paralela verdadera</p>
-    </div>
-
-  <div class="panel-grid">
-    <div class="panel">
-      <div class="panel-title">⚙️ Configuración de Cores</div>
-      <div class="form-group">
-        <label>Número de CPU Cores</label>
-        <input type="number" id="num-cores" class="mi-input" value="2" min="1" max="8"/>
-        <small style="color:var(--text-dim);font-size:11px">
-          Cada core = 1 Web Worker = 1 thread del sistema operativo
-        </small>
-      </div>
-      <div class="form-group">
-        <label>Algoritmo</label>
-        <select id="thread-algo" class="mi-select">
-          <option value="fcfs">FCFS</option>
-          <option value="rr">Round Robin</option>
-          <option value="sjf">SJF</option>
-          <option value="priority_p">Priority</option>
-        </select>
-      </div>
-      <div class="form-group" id="thread-quantum-group">
-        <label>Quantum (para RR)</label>
-        <input type="number" id="thread-quantum" class="mi-input" value="2" min="1"/>
-      </div>
-      <div class="btn-row">
-        <button class="mi-btn primary" onclick="initThreadManager()">🧵 Iniciar Workers</button>
-        <button class="mi-btn secondary" onclick="runThreadSimulation()">▶ Ejecutar en paralelo</button>
-        <button class="mi-btn ghost" onclick="stopThreadSimulation()">⏹ Stop</button>
-      </div>
-
-      <!-- Stats -->
-      <div id="thread-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--text-muted)">
-        <span>Cores activos: <b>0</b></span>
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-title">🖥️ Estado de Cores en Tiempo Real</div>
-      <div id="cores-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;">
-        <div style="color:var(--text-dim);font-size:13px;padding:20px">
-          Inicia el ThreadManager para ver los cores
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="panel">
-    <div class="panel-title">📟 Thread Event Log</div>
-    <div id="thread-log" class="event-log" style="height:200px">
-      <div class="log-empty">Los eventos de threads aparecerán aquí...</div>
-    </div>
-  </div>
 </section>
 
-</main>
-
-<div class="toast-container" id="toast-container"></div>
-
-<script src="static/script.js"></script>
+<!-- IMAGEN -->
+<img src="../ms.png" class="monsters" alt="Monsters Inc">
 
 </body>
 </html>
