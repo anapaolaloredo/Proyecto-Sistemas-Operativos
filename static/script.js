@@ -454,8 +454,9 @@ window.unhighlightResRow = function(pid) {
   if (row) row.classList.remove('highlight-row');
 };
 
-function renderResults(){
-  if(!schedResult) return;
+/*function renderResults(){
+  
+if(!schedResult) return;
   const procs=schedResult.procs;
   const tbody=document.getElementById('results-tbody');
   let totalWait=0,totalTAT=0,totalResp=0,totalBurst=0;
@@ -485,7 +486,141 @@ function renderResults(){
   document.getElementById('m-wait').textContent=(totalWait/procs.length).toFixed(2);
   document.getElementById('m-tat').textContent=(totalTAT/procs.length).toFixed(2);
   document.getElementById('m-resp').textContent=(totalResp/procs.length).toFixed(2);
+}*/
+function renderResults(){
+  if(!schedResult) return;
+  const procs = schedResult.procs;
+  const tbody  = document.getElementById('results-tbody');
+  let totalWait=0, totalTAT=0, totalResp=0, totalBurst=0;
+  const totalTime = Math.max(...procs.map(p => p.completionTime));
+ 
+  tbody.innerHTML = procs.map(p => {
+    const tat  = p.completionTime - p.arrival;
+    const wait = Math.max(0, tat - p.burstOrig);
+    const resp = Math.max(0, p.responseTime);
+    totalWait += wait; totalTAT += tat; totalResp += resp; totalBurst += p.burstOrig;
+ 
+    // ── Tooltips con fórmula + números reales ──
+    const tatTip  = `Turnaround Time = Completion − Arrival\n= ${p.completionTime} − ${p.arrival} = ${tat}`;
+    const waitTip = `Waiting Time = Turnaround − Burst\n= ${tat} − ${p.burstOrig} = ${wait}`;
+    const respTip = `Response Time = First CPU − Arrival\n= ${p.firstRun >= 0 ? p.firstRun : p.arrival} − ${p.arrival} = ${resp}`;
+    const ctTip   = `Completion Time: tiempo en que P${p.pid} terminó\n(último instante en el Gantt = ${p.completionTime})`;
+ 
+    return `<tr data-res-pid="${p.pid}" style="transition:all 0.2s;">
+      <td><span style="font-weight:800;color:${getPidColor(p.pid)}">P${p.pid}</span></td>
+      <td>${p.arrival}</td>
+      <td>${p.burstOrig}</td>
+      <td class="has-tip" data-tip="${ctTip}">${p.completionTime}<span class="tip-dot">?</span></td>
+      <td class="has-tip" data-tip="${tatTip}">${tat}<span class="tip-dot">?</span></td>
+      <td class="has-tip" data-tip="${waitTip}">${wait}<span class="tip-dot">?</span></td>
+      <td class="has-tip" data-tip="${respTip}">${resp}<span class="tip-dot">?</span></td>
+    </tr>`;
+  }).join('');
+ 
+  // ── Fila de promedios ──
+  const n       = procs.length;
+  const avgWait = (totalWait / n).toFixed(2);
+  const avgTAT  = (totalTAT  / n).toFixed(2);
+  const avgResp = (totalResp / n).toFixed(2);
+ 
+  const avgWaitTip = `Avg Wait = Σ Waiting / N\n= ${totalWait.toFixed(2)} / ${n} = ${avgWait}`;
+  const avgTATTip  = `Avg TAT  = Σ Turnaround / N\n= ${totalTAT.toFixed(2)} / ${n} = ${avgTAT}`;
+  const avgRespTip = `Avg Resp = Σ Response / N\n= ${totalResp.toFixed(2)} / ${n} = ${avgResp}`;
+ 
+  tbody.innerHTML += `<tr class="avg-row">
+    <td colspan="3">Promedio (N=${n})</td>
+    <td>—</td>
+    <td class="has-tip" data-tip="${avgTATTip}">${avgTAT}<span class="tip-dot">?</span></td>
+    <td class="has-tip" data-tip="${avgWaitTip}">${avgWait}<span class="tip-dot">?</span></td>
+    <td class="has-tip" data-tip="${avgRespTip}">${avgResp}<span class="tip-dot">?</span></td>
+  </tr>`;
+ 
+  document.getElementById('results-area').style.display = 'block';
+ 
+  // ── CPU Utilization ──
+  const cpu = (totalBurst / totalTime * 100).toFixed(1);
+  const cpuEl = document.getElementById('m-cpu');
+  cpuEl.textContent = cpu + '%';
+  cpuEl.className   = 'metric-val ' + (parseFloat(cpu) > 70 ? 'good' : 'warn');
+  cpuEl.title       = `CPU Util = Σ Burst / Total Time\n= ${totalBurst} / ${totalTime} = ${cpu}%`;
+ 
+  document.getElementById('m-wait').textContent = avgWait;
+  document.getElementById('m-wait').title = avgWaitTip;
+  document.getElementById('m-tat').textContent  = avgTAT;
+  document.getElementById('m-tat').title  = avgTATTip;
+  document.getElementById('m-resp').textContent = avgResp;
+  document.getElementById('m-resp').title = avgRespTip;
+ 
+  // ── Activar tooltips (delega en el tbody para que funcione con filas dinámicas) ──
+  activateResultTooltips();
 }
+ 
+// ── Tooltip engine (se llama una vez; usa delegación) ──
+let _tooltipEl = null;
+ 
+function activateResultTooltips() {
+  // Crea el elemento tooltip solo una vez
+  if (!_tooltipEl) {
+    _tooltipEl = document.createElement('div');
+    _tooltipEl.id = 'formula-tooltip';
+    _tooltipEl.style.cssText = `
+      position:fixed; z-index:9999; pointer-events:none;
+      background:#1a1a2e; color:#e0e0e0;
+      border:1.5px solid rgba(100,160,255,0.4);
+      border-radius:10px; padding:10px 14px;
+      font-size:12px; font-family:monospace; line-height:1.7;
+      box-shadow:0 8px 32px rgba(0,0,0,0.6);
+      white-space:pre; max-width:320px;
+      opacity:0; transition:opacity 0.15s;
+    `;
+    document.body.appendChild(_tooltipEl);
+  }
+ 
+  // Delegación en results-tbody (funciona aunque se re-renderice)
+  const tbody = document.getElementById('results-tbody');
+  if (tbody._tipBound) return;   // no duplicar listeners
+  tbody._tipBound = true;
+ 
+  tbody.addEventListener('mouseover', e => {
+    const cell = e.target.closest('.has-tip');
+    if (!cell) return;
+    _tooltipEl.textContent = cell.dataset.tip;
+    _tooltipEl.style.opacity = '1';
+  });
+ 
+  tbody.addEventListener('mousemove', e => {
+    if (!_tooltipEl.style.opacity || _tooltipEl.style.opacity === '0') return;
+    const x = e.clientX + 16, y = e.clientY - 10;
+    const tw = _tooltipEl.offsetWidth, th = _tooltipEl.offsetHeight;
+    _tooltipEl.style.left = (x + tw > window.innerWidth  ? x - tw - 24 : x) + 'px';
+    _tooltipEl.style.top  = (y + th > window.innerHeight ? y - th :  y) + 'px';
+  });
+ 
+  tbody.addEventListener('mouseout', e => {
+    if (!e.target.closest('.has-tip')) return;
+    _tooltipEl.style.opacity = '0';
+  });
+ 
+  // También en las métricas globales
+  ['m-cpu','m-wait','m-tat','m-resp'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el || el._tipBound) return;
+    el._tipBound = true;
+    el.style.cursor = 'help';
+    el.addEventListener('mouseenter', e => {
+      _tooltipEl.textContent = el.title;
+      _tooltipEl.style.opacity = '1';
+    });
+    el.addEventListener('mousemove', e => {
+      const x = e.clientX+16, y = e.clientY-10;
+      const tw = _tooltipEl.offsetWidth, th = _tooltipEl.offsetHeight;
+      _tooltipEl.style.left = (x+tw>window.innerWidth  ? x-tw-24 : x)+'px';
+      _tooltipEl.style.top  = (y+th>window.innerHeight ? y-th   : y)+'px';
+    });
+    el.addEventListener('mouseleave', () => { _tooltipEl.style.opacity='0'; });
+  });
+}
+
 
 // ══════════════════════════════════════
 // DOOR SIMULATION (unchanged from friend)
@@ -1187,10 +1322,21 @@ updateStateCounts();
 renderDoorSimulation();
 
 // ══════════════════════════════════════
-// MÓDULO 5 — COMPARACIÓN DE ALGORITMOS
+// MÓDULO 5 — COMPARACIÓN TODOS LOS ALGORITMOS
 // ══════════════════════════════════════
  
-const CMP_PRESETS = {
+const ALL_ALGOS = [
+  { key: 'fcfs',       label: 'FCFS',       type: 'Non-Preemptive', color: '#1565c0' },
+  { key: 'sjf',        label: 'SJF',        type: 'Non-Preemptive', color: '#00838f' },
+  { key: 'hrrn',       label: 'HRRN',       type: 'Non-Preemptive', color: '#2e7d32' },
+  { key: 'rr',         label: 'Round Robin',type: 'Preemptive',     color: '#e65100' },
+  { key: 'srtf',       label: 'SRTF',       type: 'Preemptive',     color: '#ad1457' },
+  { key: 'priority_p', label: 'Priority-P', type: 'Preemptive',     color: '#4527a0' },
+  { key: 'mlq',        label: 'MLQ',        type: 'Preemptive',     color: '#00695c' },
+  { key: 'mlfq',       label: 'MLFQ',       type: 'Preemptive',     color: '#c62828' },
+];
+ 
+const CMP_ALL_PRESETS = {
   example: [
     {pid:1,arrival:0,burst:8,priority:3,pages:4},
     {pid:2,arrival:1,burst:4,priority:1,pages:2},
@@ -1211,51 +1357,58 @@ const CMP_PRESETS = {
   ]
 };
  
-const CMP_ALGO_LABELS = {
-  fcfs:'FCFS', sjf:'SJF', hrrn:'HRRN', rr:'Round Robin',
-  srtf:'SRTF', priority_p:'Priority-P', mlq:'MLQ', mlfq:'MLFQ'
-};
- 
-function syncBadge(side) {
-  const val = document.getElementById('cmp-algo-'+side).value;
-  document.getElementById('cmp-badge-'+side).textContent = CMP_ALGO_LABELS[val] || val.toUpperCase();
-}
- 
-function getCmpProcesses() {
+function getCmpAllProcesses() {
   const src = document.getElementById('cmp-proc-source').value;
   if (src === 'current') {
     if (!processes.length) { toast('No hay procesos. Usa un preset.', 'warn'); return null; }
-    return processes.map(p => ({...p, firstRun:-1, ct:0, remaining:p.burstOrig}));
+    return processes.filter(p => !p.isFork).map(p => ({
+      ...p, burstOrig: p.burstOrig || p.burst, firstRun: -1, ct: 0, remaining: p.burstOrig || p.burst
+    }));
   }
-  return CMP_PRESETS[src].map(p => ({...p, burstOrig:p.burst, firstRun:-1, ct:0, remaining:p.burst}));
+  return CMP_ALL_PRESETS[src].map(p => ({
+    ...p, burstOrig: p.burst, firstRun: -1, ct: 0, remaining: p.burst
+  }));
 }
  
-function runCmpAlgo(algoKey, procs, q) {
-  const clone = procs.map(p => ({...p, firstRun:-1, ct:0, remaining:p.burst||p.burstOrig}));
+function runCmpAlgoAll(algoKey, procs, q) {
+  // Establecer quantum temporalmente para los algoritmos que lo usan
+  const origQ  = document.getElementById('sched-quantum').value;
+  const origQ0 = document.getElementById('mlq-q0').value;
+  const origQ1 = document.getElementById('mlq-q1').value;
+  document.getElementById('sched-quantum').value = q;
+  document.getElementById('mlq-q0').value = q;
+  document.getElementById('mlq-q1').value = q * 2;
+ 
+  window.isComparing = true;
+  const clone = procs.map(p => ({...p, firstRun:-1, ct:0, remaining: p.burstOrig||p.burst}));
+  let result;
   switch(algoKey) {
-    case 'fcfs':       return fcfs(clone);
-    case 'sjf':        return sjf(clone);
-    case 'hrrn':       return hrrn(clone);
-    case 'rr':         return roundRobin(clone, q);
-    case 'srtf':       return srtf(clone);
-    case 'priority_p': return priorityPreemptive(clone);
-    case 'mlq':        return multilevelQueue(clone);
-    case 'mlfq':       return mlfq(clone);
-    default:           return fcfs(clone);
+    case 'fcfs':       result = fcfs(clone); break;
+    case 'sjf':        result = sjf(clone); break;
+    case 'hrrn':       result = hrrn(clone); break;
+    case 'rr':         result = roundRobin(clone, q); break;
+    case 'srtf':       result = srtf(clone); break;
+    case 'priority_p': result = priorityPreemptive(clone); break;
+    case 'mlq':        result = multilevelQueue(clone); break;
+    case 'mlfq':       result = mlfq(clone); break;
+    default:           result = fcfs(clone);
   }
+  window.isComparing = false;
+ 
+  document.getElementById('sched-quantum').value = origQ;
+  document.getElementById('mlq-q0').value = origQ0;
+  document.getElementById('mlq-q1').value = origQ1;
+  return result;
 }
  
-function calcCmpMetrics(result) {
+function calcCmpAllMetrics(result) {
   const procs = result.procs;
   let tW=0, tT=0, tR=0, tB=0, sw=0;
-  const maxCT = Math.max(...procs.map(p => p.completionTime||p.ct||0));
- 
-  // Count context switches from gantt
+  const maxCT = Math.max(...procs.map(p => p.completionTime || p.ct || 0));
   const g = result.gantt;
   for (let i=1; i<g.length; i++) {
     if (g[i].pid !== null && g[i-1].pid !== null && g[i].pid !== g[i-1].pid) sw++;
   }
- 
   procs.forEach(p => {
     const ct = p.completionTime || p.ct || 0;
     const tat = ct - p.arrival;
@@ -1265,7 +1418,6 @@ function calcCmpMetrics(result) {
     tR += Math.max(0, (p.firstRun >= 0 ? p.firstRun : p.arrival) - p.arrival);
     tB += burst;
   });
- 
   const n = procs.length;
   return {
     wait: +(tW/n).toFixed(2),
@@ -1276,7 +1428,7 @@ function calcCmpMetrics(result) {
   };
 }
  
-function mergeCmpGantt(gantt) {
+function mergeCmpAllGantt(gantt) {
   const m = [];
   gantt.forEach(s => {
     if (m.length && m[m.length-1].pid === s.pid && m[m.length-1].end === s.start)
@@ -1286,369 +1438,166 @@ function mergeCmpGantt(gantt) {
   return m;
 }
  
-function renderCmpGantt(ganttId, tlId, gantt) {
-  const merged = mergeCmpGantt(gantt);
-  const ganttEl = document.getElementById(ganttId);
-  const tlEl    = document.getElementById(tlId);
-  if (!merged.length) { ganttEl.innerHTML='<div class="cmp-gantt-empty">Sin datos</div>'; return; }
- 
-  ganttEl.innerHTML = merged.map(s => {
-    const bg    = s.pid === null ? '' : `background:${getPidColor(s.pid)};`;
+function renderCmpAllGantt(gantt) {
+  const merged = mergeCmpAllGantt(gantt);
+  if (!merged.length) return '<div style="font-size:11px;color:var(--text-dim);padding:8px">Sin datos</div>';
+  const segs = merged.map(s => {
+    const bg = s.pid === null ? '' : `background:${getPidColor(s.pid)};`;
     const label = s.pid === null ? 'IDLE' : `P${s.pid}`;
-    return `<div class="cmp-gantt-seg${s.pid===null?' cmp-idle':''}" style="${bg}flex:${s.end-s.start}" title="${label} T:${s.start}-${s.end}">
-      <span>${label}</span><span style="opacity:0.75;font-size:8px">${s.start}-${s.end}</span>
+    return `<div class="cmp-all-gantt-seg${s.pid===null?' cmp-idle':''}" style="${bg}flex:${s.end-s.start}" title="${label} T:${s.start}-${s.end}">
+      <span>${label}</span><span style="opacity:0.7;font-size:7px">${s.start}-${s.end}</span>
     </div>`;
   }).join('');
- 
-  tlEl.innerHTML = merged.map(s =>
-    `<div class="cmp-gantt-tick" style="flex:${s.end-s.start}">${s.start}</div>`
-  ).join('') + `<div class="cmp-gantt-tick">${merged[merged.length-1].end}</div>`;
+  const tl = merged.map(s =>
+    `<div class="cmp-all-gantt-tick" style="flex:${s.end-s.start}">${s.start}</div>`
+  ).join('') + `<div class="cmp-all-gantt-tick">${merged[merged.length-1].end}</div>`;
+  return `<div class="cmp-all-gantt-wrap"><div class="cmp-all-gantt-row">${segs}</div></div>
+          <div class="cmp-all-gantt-tl">${tl}</div>`;
 }
  
-function renderCmpDoors(doorsId, screamId, screamPctId, gantt, procs) {
-  const el = document.getElementById(doorsId);
+function renderCmpAllDoors(gantt, procs, color) {
   const progress = {};
-  procs.forEach(p => {
-    progress[p.pid] = { done:0, total: p.burstOrig||p.burst };
-  });
-  gantt.forEach(s => {
-    if (s.pid !== null && progress[s.pid]) progress[s.pid].done += s.end - s.start;
-  });
- 
+  procs.forEach(p => { progress[p.pid] = { done:0, total: p.burstOrig||p.burst }; });
+  gantt.forEach(s => { if (s.pid !== null && progress[s.pid]) progress[s.pid].done += s.end - s.start; });
   const totalBurst = procs.reduce((s,p)=>s+(p.burstOrig||p.burst),0) || 1;
   const totalDone  = Object.values(progress).reduce((s,v)=>s+v.done,0);
   const pct = Math.min(100, Math.round(totalDone/totalBurst*100));
  
-  el.innerHTML = procs.map(p => {
-    const pr  = progress[p.pid];
+  const doors = procs.map(p => {
+    const pr   = progress[p.pid];
     const ppct = pr ? Math.min(100, Math.round(pr.done/pr.total*100)) : 0;
-    const isDone = ppct >= 100;
-    const emoji  = getMonsterEmoji(p.pid);
-    return `<div class="cmp-door-item">
-      <div class="cmp-door-frame ${isDone?'done':''}">
+    const emoji = getMonsterEmoji(p.pid);
+    return `<div class="cmp-all-door-item">
+      <div class="cmp-all-door-frame ${ppct>=100?'done':''}">
         <span>${emoji}</span>
-        <div class="cmp-door-prog" style="width:${ppct}%"></div>
+        <div class="cmp-all-door-prog" style="width:${ppct}%"></div>
       </div>
-      <div class="cmp-door-lbl" style="color:${getPidColor(p.pid)}">P${p.pid} ${ppct}%</div>
+      <div class="cmp-all-door-lbl" style="color:${getPidColor(p.pid)}">P${p.pid}</div>
     </div>`;
   }).join('');
  
-  document.getElementById(screamId).style.width = pct + '%';
-  document.getElementById(screamPctId).textContent = pct + '%';
+  return `<div class="cmp-all-doors">${doors}</div>
+          <div class="cmp-all-scream"><div class="cmp-all-scream-fill" style="width:${pct}%;background:${color}"></div></div>
+          <div style="font-size:9px;color:var(--text-muted);margin-top:2px">Scream Energy: ${pct}%</div>`;
 }
  
-function renderCmpMetrics(suffix, m, mOther) {
-  const waitEl = document.getElementById('cmp-wait-'+suffix);
-  const tatEl  = document.getElementById('cmp-tat-'+suffix);
-  const cpuEl  = document.getElementById('cmp-cpu-'+suffix);
-  const respEl = document.getElementById('cmp-resp-'+suffix);
-  const ctxEl  = document.getElementById('cmp-ctx-'+suffix);
- 
-  waitEl.textContent = m.wait.toFixed(2);
-  tatEl.textContent  = m.tat.toFixed(2);
-  cpuEl.textContent  = m.cpu.toFixed(1) + '%';
-  respEl.textContent = m.resp.toFixed(2);
-  ctxEl.textContent  = m.sw;
- 
-  waitEl.className = 'cmp-mc-val' + (m.wait <= mOther.wait ? ' best' : ' worst');
-  tatEl.className  = 'cmp-mc-val' + (m.tat  <= mOther.tat  ? ' best' : ' worst');
-  cpuEl.className  = 'cmp-mc-val' + (m.cpu  >= mOther.cpu  ? ' best' : ' worst');
-  respEl.className = 'cmp-mc-val' + (m.resp <= mOther.resp ? ' best' : ' worst');
-}
- 
-function renderCmpSummary(labelA, labelB, mA, mB) {
-  const panel = document.getElementById('cmp-summary-panel');
-  panel.style.display = 'block';
-  document.getElementById('cmp-th-a').textContent = labelA;
-  document.getElementById('cmp-th-b').textContent = labelB;
- 
-  const rows = [
-    { label:'Avg Waiting Time', a:mA.wait, b:mB.wait, lower:true,  unit:'' },
-    { label:'Avg Turnaround Time', a:mA.tat, b:mB.tat, lower:true, unit:'' },
-    { label:'Avg Response Time', a:mA.resp, b:mB.resp, lower:true, unit:'' },
-    { label:'CPU Utilization',   a:mA.cpu,  b:mB.cpu,  lower:false, unit:'%' },
-    { label:'Context Switches',  a:mA.sw,   b:mB.sw,   lower:true, unit:'' },
-  ];
- 
-  document.getElementById('cmp-summary-tbody').innerHTML = rows.map(r => {
-    const aBetter = r.lower ? r.a <= r.b : r.a >= r.b;
-    const bBetter = r.lower ? r.b <= r.a : r.b >= r.a;
-    const winner  = aBetter && !bBetter ? labelA : bBetter && !aBetter ? labelB : 'Empate';
-    const winnerColor = winner === labelA ? '#1565c0' : winner === labelB ? '#7b1fa2' : '#546e7a';
-    return `<tr>
-      <td style="font-weight:700">${r.label}</td>
-      <td class="${aBetter?'':'avg-row'}" style="${aBetter?'color:var(--mi-green);font-weight:700':'color:var(--mi-red)'}">${r.a}${r.unit}</td>
-      <td class="${bBetter?'':'avg-row'}" style="${bBetter?'color:var(--mi-green);font-weight:700':'color:var(--mi-red)'}">${r.b}${r.unit}</td>
-      <td style="font-weight:700;color:${winnerColor}">${winner === 'Empate' ? '🤝 '+winner : '🏆 '+winner}</td>
-    </tr>`;
-  }).join('');
- 
-  let scoreA = 0, scoreB = 0;
-  rows.forEach(r => {
-    const aBetter = r.lower ? r.a < r.b : r.a > r.b;
-    const bBetter = r.lower ? r.b < r.a : r.b > r.a;
-    if (aBetter) scoreA++; else if (bBetter) scoreB++;
-  });
-  document.getElementById('cmp-winner-a').style.display = scoreA > scoreB ? 'inline-flex' : 'none';
-  document.getElementById('cmp-winner-b').style.display = scoreB > scoreA ? 'inline-flex' : 'none';
-}
-
-function runComparison() {
-  const procs = getCmpProcesses();
+function runAllComparison() {
+  const procs = getCmpAllProcesses();
   if (!procs || !procs.length) return;
  
+  // Asegurar colores
   procs.forEach(p => getPidColor(p.pid));
  
-  const q       = parseInt(document.getElementById('cmp-quantum').value) || 2;
-  const algoA   = document.getElementById('cmp-algo-a').value;
-  const algoB   = document.getElementById('cmp-algo-b').value;
-  const labelA  = CMP_ALGO_LABELS[algoA] || algoA;
-  const labelB  = CMP_ALGO_LABELS[algoB] || algoB;
+  const q = parseInt(document.getElementById('cmp-quantum').value) || 2;
  
-  const origQuantum = document.getElementById('sched-quantum').value;
-  document.getElementById('sched-quantum').value = q;
-  document.getElementById('mlq-q0').value = q;
-  document.getElementById('mlq-q1').value = q * 2;
- 
-  window.isComparing = true;
-  const resA = runCmpAlgo(algoA, procs, q);
-  const resB = runCmpAlgo(algoB, procs, q);
-  window.isComparing = false;
- 
-  document.getElementById('sched-quantum').value = origQuantum;
- 
-  const mA = calcCmpMetrics(resA);
-  const mB = calcCmpMetrics(resB);
- 
-  renderCmpGantt('cmp-gantt-a', 'cmp-tl-a', resA.gantt);
-  renderCmpGantt('cmp-gantt-b', 'cmp-tl-b', resB.gantt);
-  renderCmpDoors('cmp-doors-a','cmp-scream-a','cmp-scream-pct-a', resA.gantt, resA.procs);
-  renderCmpDoors('cmp-doors-b','cmp-scream-b','cmp-scream-pct-b', resB.gantt, resB.procs);
-  renderCmpMetrics('a', mA, mB);
-  renderCmpMetrics('b', mB, mA);
-  renderCmpSummary(labelA, labelB, mA, mB);
- 
-  document.getElementById('cmp-badge-a').textContent = labelA;
-  document.getElementById('cmp-badge-b').textContent = labelB;
- 
-  toast(`⚔️ ${labelA} vs ${labelB} — completado`, 'success');
-  log(`Comparación: ${labelA} vs ${labelB} con ${procs.length} procesos base`, 'info');
-}
- 
-function resetComparison() {
-  ['a','b'].forEach(s => {
-    document.getElementById('cmp-gantt-'+s).innerHTML = '<div class="cmp-gantt-empty">Ejecuta la comparación</div>';
-    document.getElementById('cmp-tl-'+s).innerHTML = '';
-    document.getElementById('cmp-doors-'+s).innerHTML = '<div style="font-size:11px;color:var(--text-dim);padding:8px">Las puertas aparecerán aquí...</div>';
-    document.getElementById('cmp-scream-'+s).style.width = '0%';
-    document.getElementById('cmp-scream-pct-'+s).textContent = '0%';
-    ['wait','tat','cpu','resp','ctx'].forEach(m => {
-      const el = document.getElementById(`cmp-${m}-${s}`);
-      if (el) { el.textContent = '—'; el.className = 'cmp-mc-val'; }
-    });
-    document.getElementById('cmp-winner-'+s).style.display = 'none';
+  // Ejecutar todos los algoritmos
+  const results = ALL_ALGOS.map(algo => {
+    const res = runCmpAlgoAll(algo.key, procs, q);
+    const m   = calcCmpAllMetrics(res);
+    return { algo, res, m };
   });
-  document.getElementById('cmp-summary-panel').style.display = 'none';
-  toast('Comparación reiniciada', 'info');
-}
-
-// ══════════════════════════════════════════════════════════════
-// DEMO DE PARALELISMO REAL — agregar al FINAL de script.js
-// (antes del último updateStateCounts() y renderDoorSimulation())
-// ══════════════════════════════════════════════════════════════
-
-// ── Colores de la app para los cores de la demo ──
-const DEMO_COLORS = [
-  '#1565c0','#7b1fa2','#00838f','#2e7d32',
-  '#e65100','#ad1457','#4527a0','#c62828'
-];
-
-// ── Construir las barras de progreso de la demo ──
-function buildDemoCores() {
-  const n = parseInt(document.getElementById('demo-cores').value) || 4;
-  const area = document.getElementById('demo-cores-area');
-  if (!area) return;
-
-  area.innerHTML = Array.from({ length: n }, (_, i) => `
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-      <span style="font-size:12px;color:var(--text-muted);width:70px;flex-shrink:0">
-        Worker ${i}
-      </span>
-      <div style="flex:1;height:28px;background:var(--bg-panel2);border-radius:6px;
-                  border:1px solid var(--border);overflow:hidden">
-        <div id="dpbar-${i}"
-             style="height:100%;width:0%;border-radius:6px;
-                    background:${DEMO_COLORS[i % DEMO_COLORS.length]};
-                    transition:width 0.08s linear;
-                    display:flex;align-items:center;padding-left:8px;
-                    font-size:11px;font-weight:700;color:#fff">
+ 
+  // Calcular mejores/peores por métrica
+  const allWait = results.map(r => r.m.wait);
+  const allTAT  = results.map(r => r.m.tat);
+  const allCPU  = results.map(r => r.m.cpu);
+  const allResp = results.map(r => r.m.resp);
+  const allSW   = results.map(r => r.m.sw);
+ 
+  const minWait = Math.min(...allWait);
+  const minTAT  = Math.min(...allTAT);
+  const maxCPU  = Math.max(...allCPU);
+  const minResp = Math.min(...allResp);
+  const minSW   = Math.min(...allSW);
+ 
+  // Puntuación: 1 punto por cada métrica donde es el mejor
+  const scores = results.map(r => {
+    let s = 0;
+    if (r.m.wait === minWait) s++;
+    if (r.m.tat  === minTAT)  s++;
+    if (r.m.cpu  === maxCPU)  s++;
+    if (r.m.resp === minResp) s++;
+    if (r.m.sw   === minSW)   s++;
+    return s;
+  });
+  const maxScore = Math.max(...scores);
+ 
+  // Renderizar ranking
+  const rankingSorted = results
+    .map((r, i) => ({ ...r, score: scores[i] }))
+    .sort((a, b) => b.score - a.score || a.m.wait - b.m.wait);
+ 
+  const medals = ['🥇','🥈','🥉','4','5','6','7','8'];
+  document.getElementById('cmp-all-ranking-tbody').innerHTML = rankingSorted.map((r, i) => {
+    const medalClass = i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
+    const isWinnerRow = i === 0;
+    return `<tr style="${isWinnerRow?'background:rgba(46,125,50,0.06)':''}">
+      <td>
+        <span class="${medalClass}" style="margin-right:6px">${medals[i]}</span>
+        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${r.algo.color};margin-right:6px;vertical-align:middle"></span>
+        <b style="color:${r.algo.color}">${r.algo.label}</b>
+        <span style="font-size:9px;color:var(--text-dim);margin-left:4px">${r.algo.type}</span>
+      </td>
+      <td style="${r.m.wait===minWait?'color:var(--mi-green);font-weight:700':''}">${r.m.wait}</td>
+      <td style="${r.m.tat===minTAT?'color:var(--mi-green);font-weight:700':''}">${r.m.tat}</td>
+      <td style="${r.m.cpu===maxCPU?'color:var(--mi-green);font-weight:700':''}">${r.m.cpu}%</td>
+      <td style="${r.m.resp===minResp?'color:var(--mi-green);font-weight:700':''}">${r.m.resp}</td>
+      <td style="${r.m.sw===minSW?'color:var(--mi-green);font-weight:700':''}">${r.m.sw}</td>
+      <td><b style="color:${r.algo.color}">${r.score}/5</b> ${r.score===maxScore?'🏆':''}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('cmp-all-summary').style.display = 'block';
+ 
+  // Renderizar tarjetas
+  const grid = document.getElementById('cmp-all-grid');
+  grid.innerHTML = results.map((r, i) => {
+    const isWinner = scores[i] === maxScore;
+    const mc = (val, best, worst) =>
+      `<div class="cmp-all-mc-val ${val===best?'best':val===worst?'worst':''}">${val}</div>`;
+ 
+    return `<div class="cmp-all-card ${isWinner?'winner-card':''}">
+      <div class="cmp-all-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="cmp-all-algo-badge" style="background:${r.algo.color}">${r.algo.label}</span>
+          <span class="cmp-all-type-tag">${r.algo.type}</span>
         </div>
+        ${isWinner ? '<span class="cmp-all-winner-tag">🏆 Mejor</span>' : `<span style="font-size:11px;color:var(--text-dim)">${scores[i]}/5 pts</span>`}
       </div>
-      <span id="dptime-${i}"
-            style="font-size:12px;color:var(--text-muted);width:72px;text-align:right">
-        —
-      </span>
-    </div>`).join('');
-}
-
-// ── Runner de la demo ──
-function runParallelDemo() {
-  const numCores = parseInt(document.getElementById('demo-cores').value) || 4;
-  const load     = parseInt(document.getElementById('demo-load').value)  || 4;
-  const iters    = load * 800000;
-
-  // Reset UI
-  buildDemoCores();
-  for (let i = 0; i < numCores; i++) {
-    const bar  = document.getElementById(`dpbar-${i}`);
-    const time = document.getElementById(`dptime-${i}`);
-    if (bar)  { bar.style.width = '0%'; bar.textContent = ''; }
-    if (time) { time.textContent = '...'; time.style.color = 'var(--text-muted)'; }
-  }
-  document.getElementById('demo-parallel-time').textContent = '...';
-  document.getElementById('demo-seq-time').textContent      = '...';
-  document.getElementById('demo-speedup').textContent       = '...';
-  document.getElementById('demo-verdict').style.display     = 'none';
-  document.getElementById('demo-gantt').innerHTML           = '';
-
-  // Worker en Blob — igual que el patrón que ya usa tu app
-  const demoWorkerCode = `
-    self.onmessage = function(e) {
-      if (e.data.type !== 'RUN') return;
-      const { id, iterations } = e.data;
-      const t0 = performance.now();
-      let dummy = 0;
-      for (let i = 0; i < iterations; i++) { dummy += Math.sqrt(i); }
-      const elapsed = performance.now() - t0;
-      self.postMessage({ id, elapsed, dummy });
-    };`;
-
-  const blob      = new Blob([demoWorkerCode], { type: 'application/javascript' });
-  const blobUrl   = URL.createObjectURL(blob);
-
-  const workers   = [];
-  const wallTimes = new Array(numCores);
-  const startTs   = new Array(numCores);
-  const globalT0  = performance.now();
-
-  for (let i = 0; i < numCores; i++) {
-    startTs[i] = performance.now();
-    const w = new Worker(blobUrl);
-
-    w.onmessage = (e) => {
-      const { id, elapsed } = e.data;
-      const wall = performance.now() - startTs[id];
-      wallTimes[id] = wall;
-
-      // Barra al 100 %
-      const bar  = document.getElementById(`dpbar-${id}`);
-      const time = document.getElementById(`dptime-${id}`);
-      if (bar) {
-        bar.style.width   = '100%';
-        bar.textContent   = Math.round(wall) + ' ms';
-      }
-      if (time) {
-        time.textContent  = Math.round(wall) + ' ms';
-        time.style.color  = 'var(--mi-green)';
-      }
-
-      w.terminate();
-      workers[id] = null;
-
-      // ¿Todos terminaron?
-      const done = wallTimes.filter(v => v !== undefined).length;
-      if (done === numCores) {
-        URL.revokeObjectURL(blobUrl);
-        _showDemoResults(wallTimes, performance.now() - globalT0, numCores);
-      }
-    };
-
-    w.onerror = (err) => {
-      console.error('Demo worker error:', err);
-    };
-
-    workers.push(w);
-    w.postMessage({ type: 'RUN', id: i, iterations: iters });
-  }
-
-  // Animar barras en tiempo real (polling ligero)
-  const anim = setInterval(() => {
-    const elapsed = performance.now() - globalT0;
-    const estTotal = (load * 800000) / 2e6 * 1000; // estimado burdo
-    for (let i = 0; i < numCores; i++) {
-      if (wallTimes[i] !== undefined) continue; // ya terminó
-      const bar = document.getElementById(`dpbar-${i}`);
-      if (bar) {
-        const pct = Math.min(95, (elapsed / Math.max(estTotal, 100)) * 100);
-        bar.style.width = pct + '%';
-        bar.textContent  = Math.round(elapsed) + ' ms…';
-      }
-    }
-    if (wallTimes.filter(v => v !== undefined).length === numCores) clearInterval(anim);
-  }, 60);
-}
-
-// ── Mostrar resultados y gantt ──
-function _showDemoResults(wallTimes, parallelMs, numCores) {
-  const parallel  = Math.round(parallelMs);
-  const seqEst    = Math.round(wallTimes.reduce((a, b) => a + b, 0));
-  const speedup   = (seqEst / Math.max(parallel, 1)).toFixed(2);
-
-  document.getElementById('demo-parallel-time').textContent = parallel + ' ms';
-  document.getElementById('demo-seq-time').textContent      = seqEst  + ' ms';
-  document.getElementById('demo-speedup').textContent       = speedup + 'x';
-
-  // Veredicto
-  const vEl = document.getElementById('demo-verdict');
-  vEl.style.display = 'block';
-  const isParallel  = parseFloat(speedup) >= 1.3;
-  vEl.style.background  = isParallel ? 'rgba(46,125,50,0.12)' : 'rgba(230,81,0,0.10)';
-  vEl.style.borderColor = isParallel ? 'var(--mi-green)'       : '#e65100';
-  vEl.style.color       = isParallel ? 'var(--mi-green)'       : '#e65100';
-  vEl.innerHTML = isParallel
-    ? `✅ Paralelismo confirmado: ${numCores} workers corrieron simultáneamente. Tiempo paralelo: <b>${parallel} ms</b> vs estimado secuencial: <b>${seqEst} ms</b> → Speedup de <b>${speedup}x</b>.`
-    : `⚠️ Speedup de ${speedup}x — con 1 core el paralelismo no aplica. Sube a 2 o más cores para ver la diferencia real.`;
-
-  // Mini Gantt — cada fila = 1 worker, ancho proporcional a su wall-time
-  const maxT   = Math.max(...wallTimes);
-  const ganttEl = document.getElementById('demo-gantt');
-  ganttEl.innerHTML = wallTimes.map((t, i) => {
-    const pct   = ((t / maxT) * 100).toFixed(1);
-    const color = DEMO_COLORS[i % DEMO_COLORS.length];
-    return `
-      <div style="display:flex;align-items:center;gap:8px">
-        <span style="font-size:11px;color:var(--text-muted);width:64px;flex-shrink:0">
-          Worker ${i}
-        </span>
-        <div style="flex:1;height:22px;background:var(--bg-panel2);border-radius:4px;overflow:hidden">
-          <div style="height:100%;width:${pct}%;background:${color};border-radius:4px;
-                      display:flex;align-items:center;padding-left:8px">
-            <span style="font-size:10px;font-weight:700;color:#fff;white-space:nowrap">
-              T=0 → ${Math.round(t)}ms
-            </span>
+      <div class="cmp-all-body">
+        <div class="cmp-all-metrics">
+          <div class="cmp-all-mc">
+            <span class="cmp-all-mc-lbl">Avg Wait</span>
+            ${mc(r.m.wait, minWait, Math.max(...allWait))}
+          </div>
+          <div class="cmp-all-mc">
+            <span class="cmp-all-mc-lbl">Avg TAT</span>
+            ${mc(r.m.tat, minTAT, Math.max(...allTAT))}
+          </div>
+          <div class="cmp-all-mc">
+            <span class="cmp-all-mc-lbl">CPU Util.</span>
+            ${mc(r.m.cpu+'%', maxCPU+'%', Math.min(...allCPU)+'%')}
+          </div>
+          <div class="cmp-all-mc">
+            <span class="cmp-all-mc-lbl">Avg Resp.</span>
+            ${mc(r.m.resp, minResp, Math.max(...allResp))}
           </div>
         </div>
-        <span style="font-size:11px;color:${color};font-weight:700;width:64px;text-align:right">
-          ${Math.round(t)} ms
-        </span>
-      </div>`;
-  }).join('');
-
-  // Fila de referencia secuencial
-  ganttEl.innerHTML += `
-    <div style="margin-top:8px;padding:8px 10px;background:var(--bg-panel2);border-radius:6px;
-                font-size:11px;color:var(--text-muted);display:flex;gap:16px">
-      <span>▶ Si fuera secuencial: <b style="color:var(--text-dim)">${seqEst} ms</b></span>
-      <span>⚡ En paralelo real: <b style="color:var(--mi-green)">${parallel} ms</b></span>
-      <span>🚀 Speedup: <b style="color:var(--mi-green)">${speedup}x</b></span>
+        <div class="cmp-all-ctx">🔄 Context Switches: <b>${r.m.sw}</b></div>
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px">Diagrama de Gantt</div>
+        ${renderCmpAllGantt(r.res.gantt)}
+        <div style="font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin:8px 0 6px">🚪 Door Simulation</div>
+        ${renderCmpAllDoors(r.res.gantt, r.res.procs, r.algo.color)}
+      </div>
     </div>`;
+  }).join('');
+ 
+  toast(`⚔️ ${ALL_ALGOS.length} algoritmos comparados con ${procs.length} procesos`, 'success');
+  log(`Comparación total: ${ALL_ALGOS.map(a=>a.label).join(', ')}`, 'info');
 }
-
-// ── Inicializar barras al cargar y al cambiar el slider ──
-document.addEventListener('DOMContentLoaded', () => {
-  buildDemoCores();
-});
-// Fallback por si DOMContentLoaded ya pasó
-if (document.readyState === 'complete' || document.readyState === 'interactive') {
-  buildDemoCores();
+ 
+function resetAllComparison() {
+  document.getElementById('cmp-all-grid').innerHTML =
+    '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);font-size:13px;">Haz clic en "Comparar TODOS los algoritmos" para ver los resultados</div>';
+  document.getElementById('cmp-all-summary').style.display = 'none';
+  toast('Comparación reiniciada', 'info');
 }

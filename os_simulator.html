@@ -279,7 +279,7 @@
       </div>
     </div>
 
-        <div class="section-header">
+    <div class="section-header">
       <h2>Control Room <span class="badge">Diagrama de Estados</span></h2>
       <p class="section-desc">Visualización en tiempo real del flujo de procesos entre estados</p>
     </div>
@@ -413,6 +413,38 @@
 
   <!-- ══════════ TAB 4: ESTADOS ══════════ -->
   <section class="tab-content" id="tab-states">
+        <div class="section-header">
+      <h2>Control Room <span class="badge">Diagrama de Estados</span></h2>
+      <p class="section-desc">Visualización en tiempo real del flujo de procesos entre estados</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="panel">
+        <div class="panel-title"> Diagrama de Transición de Estados</div>
+        <div class="states-flow">
+          <div class="state-node-box new" id="state-box-new"><span class="sn-icon">🟣</span><span class="sn-name">NEW</span><span class="sn-count new" id="cnt-new">0</span></div>
+          <div class="arrow-wrap"><span class="arrow-label">admit</span><span class="arrow-line">→</span></div>
+          <div class="state-node-box ready" id="state-box-ready"><span class="sn-icon">🔵</span><span class="sn-name">READY</span><span class="sn-count ready" id="cnt-ready">0</span></div>
+          <div class="arrow-wrap"><span class="arrow-label">dispatch</span><span class="arrow-line">→</span></div>
+          <div class="state-node-box running" id="state-box-running"><span class="sn-icon">🟢</span><span class="sn-name">RUNNING</span><span class="sn-count running" id="cnt-running">0</span></div>
+          <div class="arrow-wrap"><span class="arrow-label">exit</span><span class="arrow-line">→</span></div>
+          <div class="state-node-box terminated" id="state-box-terminated"><span class="sn-icon">⚫</span><span class="sn-name">TERMINATED</span><span class="sn-count terminated" id="cnt-terminated">0</span></div>
+        </div>
+        <div class="states-secondary">
+          <div class="state-node-box waiting" id="state-box-waiting" style="display:inline-flex"><span class="sn-icon">🟡</span><span class="sn-name">WAITING</span><span class="sn-count waiting" id="cnt-waiting">0</span></div>
+          <div style="font-size:12px;color:var(--text-muted);padding:10px;display:flex;flex-direction:column;gap:4px;justify-content:center">
+            <div>← I/O wait (Running → Waiting)</div>
+            <div>→ I/O done (Waiting → Ready)</div>
+            <div>← Preempt (Running → Ready)</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">📟 Event Log <span class="hint">— Tiempo real</span></div>
+        <div class="event-log" id="event-log"><div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div></div>
+        <div class="btn-row" style="margin-top:10px"><button class="mi-btn ghost" id="btn-clear-log">🗑️ Limpiar Log</button></div>
+      </div>
+    </div>
+
   </section>
 
     <!-- ══════════ TAB 5: THREADS ══════════ -->
@@ -550,12 +582,14 @@
 <!-- ══════════ TAB 5: COMPARACIÓN DE ALGORITMOS ══════════ -->
   <section class="tab-content" id="tab-comparison">
     <div class="section-header">
-      <h2>⚔️ Scare Floor Dual <span class="badge">Comparación de Algoritmos</span></h2>
-      <p class="section-desc">Ejecuta dos algoritmos lado a lado con los mismos procesos y compara Gantt, Door Simulation y métricas en tiempo real</p>
+      <h2>⚔️ Scare Floor — Todos los Algoritmos <span class="badge">Comparación Total</span></h2>
+      <p class="section-desc">Ejecuta los 8 algoritmos simultáneamente con los mismos procesos y compara sus Gantt, Door Simulations y métricas lado a lado</p>
     </div>
-    <div class="panel" style="margin-bottom:14px">
-      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
-        <div class="form-group" style="margin:0;min-width:160px">
+ 
+    <!-- Config bar -->
+    <div class="panel" style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+        <div class="form-group" style="margin:0;min-width:200px">
           <label>Procesos a usar</label>
           <select id="cmp-proc-source" class="mi-select">
             <option value="current">Procesos actuales del simulador</option>
@@ -564,103 +598,34 @@
           </select>
         </div>
         <div class="form-group" style="margin:0;min-width:120px">
-          <label>Quantum (RR / MLFQ)</label>
+          <label>Quantum (RR/MLFQ/MLQ)</label>
           <input type="number" id="cmp-quantum" class="mi-input" value="2" min="1"/>
         </div>
-        <div style="margin-top:16px">
-          <button class="mi-btn primary" onclick="runComparison()">⚔️ Comparar ahora</button>
-          <button class="mi-btn ghost" onclick="resetComparison()" style="margin-left:6px">↺ Reset</button>
+        <div style="margin-top:16px;display:flex;gap:8px">
+          <button class="mi-btn primary" onclick="runAllComparison()">⚔️ Comparar TODOS los algoritmos</button>
+          <button class="mi-btn ghost" onclick="resetAllComparison()">↺ Reset</button>
         </div>
       </div>
     </div>
-    <div class="cmp-dual-grid">
-      <!-- SLOT A -->
-      <div class="cmp-slot cmp-slot-a">
-        <div class="cmp-slot-header">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="cmp-badge-a" id="cmp-badge-a">FCFS</span>
-            <select id="cmp-algo-a" class="mi-select" style="font-size:12px;padding:4px 8px;width:auto" onchange="syncBadge('a')">
-              <option value="fcfs">FCFS</option>
-              <option value="sjf">SJF</option>
-              <option value="hrrn">HRRN</option>
-              <option value="rr">Round Robin</option>
-              <option value="srtf">SRTF</option>
-              <option value="priority_p">Priority-P</option>
-              <option value="mlq">MLQ</option>
-              <option value="mlfq">MLFQ</option>
-            </select>
-          </div>
-          <span class="cmp-winner-tag" id="cmp-winner-a" style="display:none">🏆 Ganador</span>
-        </div>
-        <div class="cmp-slot-body">
-          <div class="cmp-section-lbl">Diagrama de Gantt</div>
-          <div class="cmp-gantt-wrap"><div class="cmp-gantt-row" id="cmp-gantt-a"><div class="cmp-gantt-empty">Ejecuta la comparación</div></div></div>
-          <div class="cmp-gantt-tl" id="cmp-tl-a"></div>
-          <div class="cmp-metrics-grid">
-            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Wait</div><div class="cmp-mc-val" id="cmp-wait-a">—</div></div>
-            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg TAT</div><div class="cmp-mc-val" id="cmp-tat-a">—</div></div>
-            <div class="cmp-mc"><div class="cmp-mc-lbl">CPU Util.</div><div class="cmp-mc-val" id="cmp-cpu-a">—</div></div>
-            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Resp.</div><div class="cmp-mc-val" id="cmp-resp-a">—</div></div>
-          </div>
-          <div class="cmp-ctx-badge">🔄 Context Switches: <b id="cmp-ctx-a">—</b></div>
-          <div class="cmp-section-lbl" style="margin-top:12px">🚪 Door Simulation</div>
-          <div class="cmp-doors-row" id="cmp-doors-a"><div style="font-size:11px;color:var(--text-dim);padding:8px">Las puertas aparecerán aquí...</div></div>
-          <div class="cmp-scream-track"><div class="cmp-scream-fill-a" id="cmp-scream-a" style="width:0%"></div></div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Scream Energy: <span id="cmp-scream-pct-a">0%</span></div>
-        </div>
-      </div>
-      <!-- VS -->
-      <div class="cmp-vs-col">
-        <div class="cmp-vs-badge">VS</div>
-        <div class="cmp-vs-line"></div>
-      </div>
-      <!-- SLOT B -->
-      <div class="cmp-slot cmp-slot-b">
-        <div class="cmp-slot-header">
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="cmp-badge-b" id="cmp-badge-b">Round Robin</span>
-            <select id="cmp-algo-b" class="mi-select" style="font-size:12px;padding:4px 8px;width:auto" onchange="syncBadge('b')">
-              <option value="fcfs">FCFS</option>
-              <option value="sjf">SJF</option>
-              <option value="hrrn">HRRN</option>
-              <option value="rr" selected>Round Robin</option>
-              <option value="srtf">SRTF</option>
-              <option value="priority_p">Priority-P</option>
-              <option value="mlq">MLQ</option>
-              <option value="mlfq">MLFQ</option>
-            </select>
-          </div>
-          <span class="cmp-winner-tag" id="cmp-winner-b" style="display:none">🏆 Ganador</span>
-        </div>
-        <div class="cmp-slot-body">
-          <div class="cmp-section-lbl">Diagrama de Gantt</div>
-          <div class="cmp-gantt-wrap"><div class="cmp-gantt-row" id="cmp-gantt-b"><div class="cmp-gantt-empty">Ejecuta la comparación</div></div></div>
-          <div class="cmp-gantt-tl" id="cmp-tl-b"></div>
-          <div class="cmp-metrics-grid">
-            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Wait</div><div class="cmp-mc-val" id="cmp-wait-b">—</div></div>
-            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg TAT</div><div class="cmp-mc-val" id="cmp-tat-b">—</div></div>
-            <div class="cmp-mc"><div class="cmp-mc-lbl">CPU Util.</div><div class="cmp-mc-val" id="cmp-cpu-b">—</div></div>
-            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Resp.</div><div class="cmp-mc-val" id="cmp-resp-b">—</div></div>
-          </div>
-          <div class="cmp-ctx-badge">🔄 Context Switches: <b id="cmp-ctx-b">—</b></div>
-          <div class="cmp-section-lbl" style="margin-top:12px">🚪 Door Simulation</div>
-          <div class="cmp-doors-row" id="cmp-doors-b"><div style="font-size:11px;color:var(--text-dim);padding:8px">Las puertas aparecerán aquí...</div></div>
-          <div class="cmp-scream-track"><div class="cmp-scream-fill-b" id="cmp-scream-b" style="width:0%"></div></div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Scream Energy: <span id="cmp-scream-pct-b">0%</span></div>
-        </div>
-      </div>
-    </div>
-    <div class="panel" id="cmp-summary-panel" style="display:none;margin-top:14px">
-      <div class="panel-title">📊 Resumen Comparativo</div>
+ 
+    <!-- Tabla resumen ranking — aparece arriba para referencia rápida -->
+    <div class="panel" id="cmp-all-summary" style="display:none;margin-bottom:16px">
+      <div class="panel-title">🏆 Ranking Global — Mejor algoritmo por métrica</div>
       <div class="table-wrapper">
         <table class="mi-table">
-          <thead><tr><th>Métrica</th><th id="cmp-th-a">—</th><th id="cmp-th-b">—</th><th>Ganador</th></tr></thead>
-          <tbody id="cmp-summary-tbody"></tbody>
+          <thead><tr><th>Algoritmo</th><th>Avg Wait</th><th>Avg TAT</th><th>CPU Util.</th><th>Avg Resp.</th><th>Ctx Switches</th><th>Puntuación</th></tr></thead>
+          <tbody id="cmp-all-ranking-tbody"></tbody>
         </table>
       </div>
     </div>
+ 
+    <!-- Grid de tarjetas — una por algoritmo -->
+    <div id="cmp-all-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;">
+      <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--text-dim);font-size:13px;">
+        Haz clic en "Comparar TODOS los algoritmos" para ver los resultados
+      </div>
+    </div>
   </section>
-
 
 </main>
 
