@@ -35,36 +35,88 @@
   <button class="nav-btn" data-tab="memory"><span class="nav-icon"></span> Módulo 3 — Paginación</button>
   <button class="nav-btn" data-tab="states"><span class="nav-icon"></span> Diagrama de Estados</button>
   <button class="nav-btn" data-tab="threads">Módulo 4 — Threads & Cores</button>
+    <button class="nav-btn" data-tab="comparison">⚔️ Módulo 5 — Comparación</button>
+
 </nav>
 
 <main class="mi-main">
-
-  <!-- ══════════ TAB 1: PROCESOS ══════════ -->
-  <section class="tab-content active" id="tab-processes">
+    <section class="tab-content active" id="tab-processes">
     <div class="section-header">
       <h2>Monster Registry <span class="badge">Procesos</span></h2>
       <p class="section-desc">Registra procesos con PID, Arrival Time, Burst Time, Priority y número de páginas</p>
     </div>
-    <div class="panel-grid">
+
       <div class="panel">
-        <div class="panel-title">➕ Nuevo Proceso</div>
-        <div class="form-group"><label>PID <span class="hint">(ID único)</span></label><input type="number" id="f-pid" class="mi-input" placeholder="1" min="1" value="1"/></div>
+        <div class="panel-title">➕ Añade Nuevo Proceso A Tu Lista</div>
+        <div class ="form-row">
+        <div class="form-group"><label>PID <span class="hint">(Identificador único del proceso)</span></label><input type="number" id="f-pid" class="mi-input" placeholder="1" min="1" value="1"/></div>
+        <div class="form-group"><label>Forks <span class="hint">(Número de copias del proceso padre)</span></label><input type="text" id="f-name" class="mi-input" placeholder="0" value=""/></div>
+      </div>
+
         <div class="form-row">
-          <div class="form-group"><label>Arrival Time</label><input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0" value="0"/></div>
-          <div class="form-group"><label>Burst Time</label><input type="number" id="f-burst" class="mi-input" placeholder="5" min="1" value="5"/></div>
+          <div class="form-group"><label>Arrival Time <span class="hint">(Tiempo de llegada del proceso)</span></label><input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0" value="0"/></div>
+          <div class="form-group"><label>Burst Time <span class="hint">(Tiempo de ejecución del proceso)</span></label><input type="number" id="f-burst" class="mi-input" placeholder="5" min="1" value="5"/></div>
         </div>
+
         <div class="form-row">
-          <div class="form-group"><label>Priority <span class="hint">(menor=mayor)</span></label><input type="number" id="f-priority" class="mi-input" placeholder="1" min="1" value="1"/></div>
-          <div class="form-group"><label>Páginas</label><input type="number" id="f-pages" class="mi-input" placeholder="4" min="1" value="4"/></div>
+          <div class="form-group"><label>Priority <span class="hint">(Importancia de proceso, menor=mayor)</span></label><input type="number" id="f-priority" class="mi-input" placeholder="1" min="1" value="1"/></div>
+          <div class="form-group"><label>Páginas <span class="hint">(Número de páginas de memoria)</span></label><input type="number" id="f-pages" class="mi-input" placeholder="4" min="1" value="4"/></div>
         </div>
+
         <div class="btn-row">
           <button class="mi-btn primary" id="btn-add-process"> Agregar</button>
           <button class="mi-btn secondary" id="btn-load-example"> Ejemplo</button>
         </div>
+
         <div class="divider"><span>ó</span></div>
         <label class="file-drop" id="file-drop"><span>📁 Arrastra archivo .txt/.csv aquí</span><input type="file" id="file-input" accept=".txt,.csv" style="display:none"/></label>
         <div class="file-format">Formato: <code>PID,Arrival,Burst,Priority,Pages</code></div>
       </div>
+      
+
+   <!-- <div class="panel">
+        <div class="panel-title"> Definiciones</div>
+        <p>Procesos: Un proceso es una entidad activa que requiere recursos como memoria, tiempo de CPU y acceso a archivos para funcionar</p>
+        <p>PID: Identificador único númerico del proceso</p>
+        <p>Forks: Copias de un proceso padre (proceso hijo)</p>
+        <p>Arrival Time: Tiempo en que el proceso llega al sistema</p>
+        <p>Burst Time: Tiempo que el proceso necesita para completarse</p>
+        <p>Priority: Prioridad del proceso (menor = mayor prioridad)</p>
+        <p>Páginas: Número de páginas de memoria que utiliza el proceso</p>
+      </div>-->
+
+  <!-- ══════════ TAB 1: PROCESOS ══════════ -->
+
+   <!-- <div class="panel-grid">--> 
+
+     <!-- <div class="panel">
+        <div class="panel-title">➕ Nuevo Proceso</div>
+        <div class ="form-row">
+        <div class="form-group"><label>PID <span class="hint">(ID único)</span></label><input type="number" id="f-pid" class="mi-input" placeholder="1" min="1" value="1"/></div>
+        <div class="form-group"><label>Forks</label><input type="text" id="f-name" class="mi-input" placeholder="0" value=""/></div>
+      </div>
+
+        <div class="form-row">
+          <div class="form-group"><label>Arrival Time</label><input type="number" id="f-arrival" class="mi-input" placeholder="0" min="0" value="0"/></div>
+          <div class="form-group"><label>Burst Time</label><input type="number" id="f-burst" class="mi-input" placeholder="5" min="1" value="5"/></div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group"><label>Priority <span class="hint">(menor=mayor)</span></label><input type="number" id="f-priority" class="mi-input" placeholder="1" min="1" value="1"/></div>
+          <div class="form-group"><label>Páginas</label><input type="number" id="f-pages" class="mi-input" placeholder="4" min="1" value="4"/></div>
+        </div>
+
+        <div class="btn-row">
+          <button class="mi-btn primary" id="btn-add-process"> Agregar</button>
+          <button class="mi-btn secondary" id="btn-load-example"> Ejemplo</button>
+        </div>
+
+        <div class="divider"><span>ó</span></div>
+        <label class="file-drop" id="file-drop"><span>📁 Arrastra archivo .txt/.csv aquí</span><input type="file" id="file-input" accept=".txt,.csv" style="display:none"/></label>
+        <div class="file-format">Formato: <code>PID,Arrival,Burst,Priority,Pages</code></div>
+      </div>
+-->
+
       <div class="panel">
         <div class="panel-title">Procesos Registrados <span id="process-count" class="count-badge">0</span></div>
         <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;">Haz clic en un valor para editarlo en línea.</p>
@@ -74,6 +126,7 @@
             <tbody id="process-tbody"><tr class="empty-row"><td colspan="7"><div class="empty-state"><span class="empty-icon"></span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr></tbody>
           </table>
         </div>
+
         <div class="btn-row" style="margin-top:12px">
           <button class="mi-btn danger" id="btn-clear-all">Limpiar Todo</button>
           <button class="mi-btn ghost" id="btn-go-sched">▶ Ir a Scheduling</button>
@@ -91,11 +144,24 @@
 
   <!-- ══════════ TAB 2: SCHEDULING ══════════ -->
   <section class="tab-content" id="tab-scheduling">
+    <!--<div class="panel">
+        <div class="panel-title"> Anotaciones</div>
+          <p>Algoritmos de Planificación:</p>
+          <p>FCFS: Atiende procesos en orden de llegada</p>
+          <p>SJF: Atiende el proceso con menor tiempo de ráfaga</p>
+          <p>HRRN: Atiende el proceso con mayor ratio de respuesta</p>
+          <p>Round Robin: Atiende cada proceso por un quantum fijo</p>
+          <p>SRTF: Atiende el proceso con menor tiempo restante</p>
+          <p>Priority: Atiende el proceso con mayor prioridad (preemptivo o no)</p>
+          <p>Multilevel Queue: Varias colas con diferentes prioridades y algoritmos</p>
+          <p>Multilevel Feedback Queue: Similar a MLQ pero los procesos pueden moverse entre colas según su comportamiento</p>
+    </div> -->
+
     <div class="section-header">
       <h2>Scare Floor <span class="badge">CPU Scheduling</span></h2>
       <p class="section-desc">Selecciona el algoritmo, configura parámetros y observa la simulación en tiempo real</p>
     </div>
-    <div class="panel-grid scheduling-grid">
+    <div class="panel">
       <div class="panel">
         <div class="panel-title">Configuración</div>
         <div class="form-group"><label>Algoritmo</label>
@@ -127,6 +193,7 @@
           <button class="mi-btn secondary" id="btn-step-sched">⏭ Paso a Paso</button>
           <button class="mi-btn ghost" id="btn-reset-sched">↺ Reset</button>
         </div>
+
         <div class="form-group mt-16"><label>Velocidad de Animación</label><div class="speed-control"><span>🐢</span><input type="range" id="sched-speed" min="100" max="2000" value="700" class="mi-range"/><span>⚡</span></div></div>
         <div class="metrics-box" id="metrics-box">
           <div class="metrics-title">Métricas Globales</div>
@@ -138,6 +205,8 @@
           </div>
         </div>
       </div>
+
+
       <div class="panel">
         <div class="sim-info-bar" id="sim-info-bar">
           <span>Tiempo: <span class="sim-time" id="sim-time-display">0</span></span>
@@ -404,6 +473,121 @@
     </div>
   </div>
 </section>
+
+  <!-- ══════════ TAB 5: COMPARACIÓN DE ALGORITMOS ══════════ -->
+  <section class="tab-content" id="tab-comparison">
+    <div class="section-header">
+      <h2>⚔️ Scare Floor Dual <span class="badge">Comparación de Algoritmos</span></h2>
+      <p class="section-desc">Ejecuta dos algoritmos lado a lado con los mismos procesos y compara Gantt, Door Simulation y métricas en tiempo real</p>
+    </div>
+    <div class="panel" style="margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div class="form-group" style="margin:0;min-width:160px">
+          <label>Procesos a usar</label>
+          <select id="cmp-proc-source" class="mi-select">
+            <option value="current">Procesos actuales del simulador</option>
+            <option value="example">Ejemplo estándar (6 procesos)</option>
+            <option value="heavy">Alta carga (8 procesos)</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0;min-width:120px">
+          <label>Quantum (RR / MLFQ)</label>
+          <input type="number" id="cmp-quantum" class="mi-input" value="2" min="1"/>
+        </div>
+        <div style="margin-top:16px">
+          <button class="mi-btn primary" onclick="runComparison()">⚔️ Comparar ahora</button>
+          <button class="mi-btn ghost" onclick="resetComparison()" style="margin-left:6px">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+    <div class="cmp-dual-grid">
+      <!-- SLOT A -->
+      <div class="cmp-slot cmp-slot-a">
+        <div class="cmp-slot-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="cmp-badge-a" id="cmp-badge-a">FCFS</span>
+            <select id="cmp-algo-a" class="mi-select" style="font-size:12px;padding:4px 8px;width:auto" onchange="syncBadge('a')">
+              <option value="fcfs">FCFS</option>
+              <option value="sjf">SJF</option>
+              <option value="hrrn">HRRN</option>
+              <option value="rr">Round Robin</option>
+              <option value="srtf">SRTF</option>
+              <option value="priority_p">Priority-P</option>
+              <option value="mlq">MLQ</option>
+              <option value="mlfq">MLFQ</option>
+            </select>
+          </div>
+          <span class="cmp-winner-tag" id="cmp-winner-a" style="display:none">🏆 Ganador</span>
+        </div>
+        <div class="cmp-slot-body">
+          <div class="cmp-section-lbl">Diagrama de Gantt</div>
+          <div class="cmp-gantt-wrap"><div class="cmp-gantt-row" id="cmp-gantt-a"><div class="cmp-gantt-empty">Ejecuta la comparación</div></div></div>
+          <div class="cmp-gantt-tl" id="cmp-tl-a"></div>
+          <div class="cmp-metrics-grid">
+            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Wait</div><div class="cmp-mc-val" id="cmp-wait-a">—</div></div>
+            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg TAT</div><div class="cmp-mc-val" id="cmp-tat-a">—</div></div>
+            <div class="cmp-mc"><div class="cmp-mc-lbl">CPU Util.</div><div class="cmp-mc-val" id="cmp-cpu-a">—</div></div>
+            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Resp.</div><div class="cmp-mc-val" id="cmp-resp-a">—</div></div>
+          </div>
+          <div class="cmp-ctx-badge">🔄 Context Switches: <b id="cmp-ctx-a">—</b></div>
+          <div class="cmp-section-lbl" style="margin-top:12px">🚪 Door Simulation</div>
+          <div class="cmp-doors-row" id="cmp-doors-a"><div style="font-size:11px;color:var(--text-dim);padding:8px">Las puertas aparecerán aquí...</div></div>
+          <div class="cmp-scream-track"><div class="cmp-scream-fill-a" id="cmp-scream-a" style="width:0%"></div></div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Scream Energy: <span id="cmp-scream-pct-a">0%</span></div>
+        </div>
+      </div>
+      <!-- VS -->
+      <div class="cmp-vs-col">
+        <div class="cmp-vs-badge">VS</div>
+        <div class="cmp-vs-line"></div>
+      </div>
+      <!-- SLOT B -->
+      <div class="cmp-slot cmp-slot-b">
+        <div class="cmp-slot-header">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="cmp-badge-b" id="cmp-badge-b">Round Robin</span>
+            <select id="cmp-algo-b" class="mi-select" style="font-size:12px;padding:4px 8px;width:auto" onchange="syncBadge('b')">
+              <option value="fcfs">FCFS</option>
+              <option value="sjf">SJF</option>
+              <option value="hrrn">HRRN</option>
+              <option value="rr" selected>Round Robin</option>
+              <option value="srtf">SRTF</option>
+              <option value="priority_p">Priority-P</option>
+              <option value="mlq">MLQ</option>
+              <option value="mlfq">MLFQ</option>
+            </select>
+          </div>
+          <span class="cmp-winner-tag" id="cmp-winner-b" style="display:none">🏆 Ganador</span>
+        </div>
+        <div class="cmp-slot-body">
+          <div class="cmp-section-lbl">Diagrama de Gantt</div>
+          <div class="cmp-gantt-wrap"><div class="cmp-gantt-row" id="cmp-gantt-b"><div class="cmp-gantt-empty">Ejecuta la comparación</div></div></div>
+          <div class="cmp-gantt-tl" id="cmp-tl-b"></div>
+          <div class="cmp-metrics-grid">
+            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Wait</div><div class="cmp-mc-val" id="cmp-wait-b">—</div></div>
+            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg TAT</div><div class="cmp-mc-val" id="cmp-tat-b">—</div></div>
+            <div class="cmp-mc"><div class="cmp-mc-lbl">CPU Util.</div><div class="cmp-mc-val" id="cmp-cpu-b">—</div></div>
+            <div class="cmp-mc"><div class="cmp-mc-lbl">Avg Resp.</div><div class="cmp-mc-val" id="cmp-resp-b">—</div></div>
+          </div>
+          <div class="cmp-ctx-badge">🔄 Context Switches: <b id="cmp-ctx-b">—</b></div>
+          <div class="cmp-section-lbl" style="margin-top:12px">🚪 Door Simulation</div>
+          <div class="cmp-doors-row" id="cmp-doors-b"><div style="font-size:11px;color:var(--text-dim);padding:8px">Las puertas aparecerán aquí...</div></div>
+          <div class="cmp-scream-track"><div class="cmp-scream-fill-b" id="cmp-scream-b" style="width:0%"></div></div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:3px">Scream Energy: <span id="cmp-scream-pct-b">0%</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel" id="cmp-summary-panel" style="display:none;margin-top:14px">
+      <div class="panel-title">📊 Resumen Comparativo</div>
+      <div class="table-wrapper">
+        <table class="mi-table">
+          <thead><tr><th>Métrica</th><th id="cmp-th-a">—</th><th id="cmp-th-b">—</th><th>Ganador</th></tr></thead>
+          <tbody id="cmp-summary-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
 
 </main>
 

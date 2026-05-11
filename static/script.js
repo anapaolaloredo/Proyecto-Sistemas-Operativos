@@ -628,7 +628,7 @@ function memLRU(refs, n) {
   return hist;
 }
 
-/*function memOptimal(refs, n) {
+function memOptimal(refs, n) {
   const frames = new Array(n).fill(-1); const hist = [];
   refs.forEach((ref, i) => {
     if (frames.includes(ref)) {
@@ -651,7 +651,7 @@ function memLRU(refs, n) {
     }
   });
   return hist;
-}*/
+}
 
 function memClock(refs, n) {
   const frames = new Array(n).fill(-1);
@@ -1039,3 +1039,271 @@ document.getElementById('btn-clear-log').addEventListener('click', () => {
 
 updateStateCounts();
 renderDoorSimulation();
+
+// ══════════════════════════════════════
+// MÓDULO 5 — COMPARACIÓN DE ALGORITMOS
+// ══════════════════════════════════════
+ 
+const CMP_PRESETS = {
+  example: [
+    {pid:1,arrival:0,burst:8,priority:3,pages:4},
+    {pid:2,arrival:1,burst:4,priority:1,pages:2},
+    {pid:3,arrival:2,burst:9,priority:4,pages:5},
+    {pid:4,arrival:3,burst:5,priority:2,pages:3},
+    {pid:5,arrival:4,burst:2,priority:1,pages:2},
+    {pid:6,arrival:5,burst:6,priority:3,pages:3}
+  ],
+  heavy: [
+    {pid:1,arrival:0,burst:10,priority:2,pages:4},
+    {pid:2,arrival:1,burst:6,priority:1,pages:3},
+    {pid:3,arrival:2,burst:8,priority:3,pages:5},
+    {pid:4,arrival:2,burst:3,priority:1,pages:2},
+    {pid:5,arrival:3,burst:7,priority:4,pages:4},
+    {pid:6,arrival:4,burst:5,priority:2,pages:3},
+    {pid:7,arrival:5,burst:4,priority:1,pages:2},
+    {pid:8,arrival:6,burst:9,priority:3,pages:5}
+  ]
+};
+ 
+const CMP_ALGO_LABELS = {
+  fcfs:'FCFS', sjf:'SJF', hrrn:'HRRN', rr:'Round Robin',
+  srtf:'SRTF', priority_p:'Priority-P', mlq:'MLQ', mlfq:'MLFQ'
+};
+ 
+function syncBadge(side) {
+  const val = document.getElementById('cmp-algo-'+side).value;
+  document.getElementById('cmp-badge-'+side).textContent = CMP_ALGO_LABELS[val] || val.toUpperCase();
+}
+ 
+function getCmpProcesses() {
+  const src = document.getElementById('cmp-proc-source').value;
+  if (src === 'current') {
+    if (!processes.length) { toast('No hay procesos. Usa un preset.', 'warn'); return null; }
+    return processes.map(p => ({...p, firstRun:-1, ct:0, remaining:p.burstOrig}));
+  }
+  return CMP_PRESETS[src].map(p => ({...p, burstOrig:p.burst, firstRun:-1, ct:0, remaining:p.burst}));
+}
+ 
+function runCmpAlgo(algoKey, procs, q) {
+  const clone = procs.map(p => ({...p, firstRun:-1, ct:0, remaining:p.burst||p.burstOrig}));
+  switch(algoKey) {
+    case 'fcfs':       return fcfs(clone);
+    case 'sjf':        return sjf(clone);
+    case 'hrrn':       return hrrn(clone);
+    case 'rr':         return roundRobin(clone, q);
+    case 'srtf':       return srtf(clone);
+    case 'priority_p': return priorityPreemptive(clone);
+    case 'mlq':        return multilevelQueue(clone);
+    case 'mlfq':       return mlfq(clone);
+    default:           return fcfs(clone);
+  }
+}
+ 
+function calcCmpMetrics(result) {
+  const procs = result.procs;
+  let tW=0, tT=0, tR=0, tB=0, sw=0;
+  const maxCT = Math.max(...procs.map(p => p.completionTime||p.ct||0));
+ 
+  // Count context switches from gantt
+  const g = result.gantt;
+  for (let i=1; i<g.length; i++) {
+    if (g[i].pid !== null && g[i-1].pid !== null && g[i].pid !== g[i-1].pid) sw++;
+  }
+ 
+  procs.forEach(p => {
+    const ct = p.completionTime || p.ct || 0;
+    const tat = ct - p.arrival;
+    const burst = p.burstOrig || p.burst;
+    tW += Math.max(0, tat - burst);
+    tT += tat;
+    tR += Math.max(0, (p.firstRun >= 0 ? p.firstRun : p.arrival) - p.arrival);
+    tB += burst;
+  });
+ 
+  const n = procs.length;
+  return {
+    wait: +(tW/n).toFixed(2),
+    tat:  +(tT/n).toFixed(2),
+    resp: +(tR/n).toFixed(2),
+    cpu:  +(tB / Math.max(maxCT,1) * 100).toFixed(1),
+    sw
+  };
+}
+ 
+function mergeCmpGantt(gantt) {
+  const m = [];
+  gantt.forEach(s => {
+    if (m.length && m[m.length-1].pid === s.pid && m[m.length-1].end === s.start)
+      m[m.length-1].end = s.end;
+    else m.push({...s});
+  });
+  return m;
+}
+ 
+function renderCmpGantt(ganttId, tlId, gantt) {
+  const merged = mergeCmpGantt(gantt);
+  const ganttEl = document.getElementById(ganttId);
+  const tlEl    = document.getElementById(tlId);
+  if (!merged.length) { ganttEl.innerHTML='<div class="cmp-gantt-empty">Sin datos</div>'; return; }
+ 
+  ganttEl.innerHTML = merged.map(s => {
+    const bg    = s.pid === null ? '' : `background:${getPidColor(s.pid)};`;
+    const label = s.pid === null ? 'IDLE' : `P${s.pid}`;
+    return `<div class="cmp-gantt-seg${s.pid===null?' cmp-idle':''}" style="${bg}flex:${s.end-s.start}" title="${label} T:${s.start}-${s.end}">
+      <span>${label}</span><span style="opacity:0.75;font-size:8px">${s.start}-${s.end}</span>
+    </div>`;
+  }).join('');
+ 
+  tlEl.innerHTML = merged.map(s =>
+    `<div class="cmp-gantt-tick" style="flex:${s.end-s.start}">${s.start}</div>`
+  ).join('') + `<div class="cmp-gantt-tick">${merged[merged.length-1].end}</div>`;
+}
+ 
+function renderCmpDoors(doorsId, screamId, screamPctId, gantt, procs) {
+  const el = document.getElementById(doorsId);
+  const progress = {};
+  procs.forEach(p => {
+    progress[p.pid] = { done:0, total: p.burstOrig||p.burst };
+  });
+  gantt.forEach(s => {
+    if (s.pid !== null && progress[s.pid]) progress[s.pid].done += s.end - s.start;
+  });
+ 
+  const totalBurst = procs.reduce((s,p)=>s+(p.burstOrig||p.burst),0) || 1;
+  const totalDone  = Object.values(progress).reduce((s,v)=>s+v.done,0);
+  const pct = Math.min(100, Math.round(totalDone/totalBurst*100));
+ 
+  el.innerHTML = procs.map(p => {
+    const pr  = progress[p.pid];
+    const ppct = pr ? Math.min(100, Math.round(pr.done/pr.total*100)) : 0;
+    const isDone = ppct >= 100;
+    const emoji  = getMonsterEmoji(p.pid);
+    return `<div class="cmp-door-item">
+      <div class="cmp-door-frame ${isDone?'done':''}">
+        <span>${emoji}</span>
+        <div class="cmp-door-prog" style="width:${ppct}%"></div>
+      </div>
+      <div class="cmp-door-lbl" style="color:${getPidColor(p.pid)}">P${p.pid} ${ppct}%</div>
+    </div>`;
+  }).join('');
+ 
+  document.getElementById(screamId).style.width = pct + '%';
+  document.getElementById(screamPctId).textContent = pct + '%';
+}
+ 
+function renderCmpMetrics(suffix, m, mOther) {
+  const waitEl = document.getElementById('cmp-wait-'+suffix);
+  const tatEl  = document.getElementById('cmp-tat-'+suffix);
+  const cpuEl  = document.getElementById('cmp-cpu-'+suffix);
+  const respEl = document.getElementById('cmp-resp-'+suffix);
+  const ctxEl  = document.getElementById('cmp-ctx-'+suffix);
+ 
+  waitEl.textContent = m.wait.toFixed(2);
+  tatEl.textContent  = m.tat.toFixed(2);
+  cpuEl.textContent  = m.cpu.toFixed(1) + '%';
+  respEl.textContent = m.resp.toFixed(2);
+  ctxEl.textContent  = m.sw;
+ 
+  // Color: green = mejor, red = peor
+  waitEl.className = 'cmp-mc-val' + (m.wait <= mOther.wait ? ' best' : ' worst');
+  tatEl.className  = 'cmp-mc-val' + (m.tat  <= mOther.tat  ? ' best' : ' worst');
+  cpuEl.className  = 'cmp-mc-val' + (m.cpu  >= mOther.cpu  ? ' best' : ' worst');
+  respEl.className = 'cmp-mc-val' + (m.resp <= mOther.resp ? ' best' : ' worst');
+}
+ 
+function renderCmpSummary(labelA, labelB, mA, mB) {
+  const panel = document.getElementById('cmp-summary-panel');
+  panel.style.display = 'block';
+  document.getElementById('cmp-th-a').textContent = labelA;
+  document.getElementById('cmp-th-b').textContent = labelB;
+ 
+  const rows = [
+    { label:'Avg Waiting Time', a:mA.wait, b:mB.wait, lower:true,  unit:'' },
+    { label:'Avg Turnaround Time', a:mA.tat, b:mB.tat, lower:true, unit:'' },
+    { label:'Avg Response Time', a:mA.resp, b:mB.resp, lower:true, unit:'' },
+    { label:'CPU Utilization',   a:mA.cpu,  b:mB.cpu,  lower:false, unit:'%' },
+    { label:'Context Switches',  a:mA.sw,   b:mB.sw,   lower:true, unit:'' },
+  ];
+ 
+  document.getElementById('cmp-summary-tbody').innerHTML = rows.map(r => {
+    const aBetter = r.lower ? r.a <= r.b : r.a >= r.b;
+    const bBetter = r.lower ? r.b <= r.a : r.b >= r.a;
+    const winner  = aBetter && !bBetter ? labelA : bBetter && !aBetter ? labelB : 'Empate';
+    const winnerColor = winner === labelA ? '#1565c0' : winner === labelB ? '#7b1fa2' : '#546e7a';
+    return `<tr>
+      <td style="font-weight:700">${r.label}</td>
+      <td class="${aBetter?'':'avg-row'}" style="${aBetter?'color:var(--mi-green);font-weight:700':'color:var(--mi-red)'}">${r.a}${r.unit}</td>
+      <td class="${bBetter?'':'avg-row'}" style="${bBetter?'color:var(--mi-green);font-weight:700':'color:var(--mi-red)'}">${r.b}${r.unit}</td>
+      <td style="font-weight:700;color:${winnerColor}">${winner === 'Empate' ? '🤝 '+winner : '🏆 '+winner}</td>
+    </tr>`;
+  }).join('');
+ 
+  // Determinar ganador global
+  let scoreA = 0, scoreB = 0;
+  rows.forEach(r => {
+    const aBetter = r.lower ? r.a < r.b : r.a > r.b;
+    const bBetter = r.lower ? r.b < r.a : r.b > r.a;
+    if (aBetter) scoreA++; else if (bBetter) scoreB++;
+  });
+  document.getElementById('cmp-winner-a').style.display = scoreA > scoreB ? 'inline-flex' : 'none';
+  document.getElementById('cmp-winner-b').style.display = scoreB > scoreA ? 'inline-flex' : 'none';
+}
+ 
+function runComparison() {
+  const procs = getCmpProcesses();
+  if (!procs || !procs.length) return;
+ 
+  // Asegurar colores para los pids de los presets
+  procs.forEach(p => getPidColor(p.pid));
+ 
+  const q       = parseInt(document.getElementById('cmp-quantum').value) || 2;
+  const algoA   = document.getElementById('cmp-algo-a').value;
+  const algoB   = document.getElementById('cmp-algo-b').value;
+  const labelA  = CMP_ALGO_LABELS[algoA] || algoA;
+  const labelB  = CMP_ALGO_LABELS[algoB] || algoB;
+ 
+  // Temporalmente sustituir quantum global para MLQ
+  const origQuantum = document.getElementById('sched-quantum').value;
+  document.getElementById('sched-quantum').value = q;
+  document.getElementById('mlq-q0').value = q;
+  document.getElementById('mlq-q1').value = q * 2;
+ 
+  const resA = runCmpAlgo(algoA, procs, q);
+  const resB = runCmpAlgo(algoB, procs, q);
+ 
+  document.getElementById('sched-quantum').value = origQuantum;
+ 
+  const mA = calcCmpMetrics(resA);
+  const mB = calcCmpMetrics(resB);
+ 
+  renderCmpGantt('cmp-gantt-a', 'cmp-tl-a', resA.gantt);
+  renderCmpGantt('cmp-gantt-b', 'cmp-tl-b', resB.gantt);
+  renderCmpDoors('cmp-doors-a','cmp-scream-a','cmp-scream-pct-a', resA.gantt, resA.procs);
+  renderCmpDoors('cmp-doors-b','cmp-scream-b','cmp-scream-pct-b', resB.gantt, resB.procs);
+  renderCmpMetrics('a', mA, mB);
+  renderCmpMetrics('b', mB, mA);
+  renderCmpSummary(labelA, labelB, mA, mB);
+ 
+  document.getElementById('cmp-badge-a').textContent = labelA;
+  document.getElementById('cmp-badge-b').textContent = labelB;
+ 
+  toast(`⚔️ ${labelA} vs ${labelB} — completado`, 'success');
+  log(`Comparación: ${labelA} vs ${labelB} con ${procs.length} procesos`, 'info');
+}
+ 
+function resetComparison() {
+  ['a','b'].forEach(s => {
+    document.getElementById('cmp-gantt-'+s).innerHTML = '<div class="cmp-gantt-empty">Ejecuta la comparación</div>';
+    document.getElementById('cmp-tl-'+s).innerHTML = '';
+    document.getElementById('cmp-doors-'+s).innerHTML = '<div style="font-size:11px;color:var(--text-dim);padding:8px">Las puertas aparecerán aquí...</div>';
+    document.getElementById('cmp-scream-'+s).style.width = '0%';
+    document.getElementById('cmp-scream-pct-'+s).textContent = '0%';
+    ['wait','tat','cpu','resp','ctx'].forEach(m => {
+      const el = document.getElementById(`cmp-${m}-${s}`);
+      if (el) { el.textContent = '—'; el.className = 'cmp-mc-val'; }
+    });
+    document.getElementById('cmp-winner-'+s).style.display = 'none';
+  });
+  document.getElementById('cmp-summary-panel').style.display = 'none';
+  toast('Comparación reiniciada', 'info');
+}
