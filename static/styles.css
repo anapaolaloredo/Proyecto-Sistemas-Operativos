@@ -95,7 +95,8 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
 .mi-table{width:100%;border-collapse:collapse;font-size:12px;}
 .mi-table thead th{background:var(--bg-panel2);font-size:10px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;padding:9px 10px;white-space:nowrap;border-bottom:2px solid var(--border);}
 .mi-table tbody tr{transition:background 0.15s;} .mi-table tbody tr:hover{background:var(--bg-panel2);}
-.mi-table td{padding:9px 10px;border-bottom:1px solid var(--border);font-weight:600;vertical-align:middle;}
+.mi-table th,
+.mi-table td {padding: 9px 10px; border-bottom: 1px solid var(--border); font-weight: 600; vertical-align: middle; text-align: center;}
 .mi-table .avg-row td{background:rgba(21,101,192,0.06);font-weight:700;color:var(--mi-blue);}
  
 /* STATE BADGE */
@@ -457,3 +458,30 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
 .cmp-scream-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-top:4px;}
 .cmp-scream-fill-a{height:100%;background:linear-gradient(90deg,#1565c0,#42a5f5);border-radius:4px;transition:width 0.4s ease;}
 .cmp-scream-fill-b{height:100%;background:linear-gradient(90deg,#7b1fa2,#ce93d8);border-radius:4px;transition:width 0.4s ease;}
+
+/* ══════════════════════════════════════
+   MEJORAS MÓVILES ADICIONALES
+══════════════════════════════════════ */
+/* Evitar que las celdas de la tabla colapsen el texto en vertical en móviles */
+.mi-table th, 
+.mi-table td {white-space: nowrap;}
+/* Scroll súper suave en iOS para tablas */
+.table-wrapper {-webkit-overflow-scrolling: touch; scrollbar-width: thin;}
+@media(max-width:768px){
+   /* Espaciar los inputs de memoria para evitar que se aplasten */
+  .memory-grid .form-row {grid-template-columns: 1fr;}
+  /* Modulo 5: Que los Gantt comparativos no se achiquen demasiado */
+  .cmp-gantt-seg {min-width: 35px;font-size: 9px;}
+  /* Hacer los botones táctiles un poco más altos para los dedos */
+  .mi-btn {padding: 10px 14px;font-size: 12px;}
+  /* Adaptar la cuadrícula de métricas en la comparación */
+  .cmp-metrics-grid {grid-template-columns: 1fr 1fr;}
+}
+/* Efecto de resaltado para la tabla de resultados (Hover desde Gantt) */
+.mi-table tbody tr.highlight-row {
+  background-color: #e3f2fd !important;
+  box-shadow: inset 0 0 0 2px var(--mi-blue);
+  transform: scale(1.01);
+  z-index: 10;
+  position: relative;
+}

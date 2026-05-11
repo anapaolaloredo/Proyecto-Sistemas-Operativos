@@ -105,20 +105,28 @@ document.getElementById('f-pid').addEventListener('keydown', e => { if(e.key==='
 
 function addProcess() {
   const pid      = parseInt(document.getElementById('f-pid').value);
-  const arrival  = parseInt(document.getElementById('f-arrival').value)||0;
+  const forks    = parseInt(document.getElementById('f-forks').value) || 0;
+  const arrival  = parseInt(document.getElementById('f-arrival').value) || 0;
   const burst    = parseInt(document.getElementById('f-burst').value);
-  const priority = parseInt(document.getElementById('f-priority').value)||1;
-  const pages    = parseInt(document.getElementById('f-pages').value)||4;
-  if (!pid||pid<1) { toast('PID inválido','error'); return; }
-  if (!burst||burst<1) { toast('Burst Time debe ser ≥ 1','error'); return; }
-  if (processes.find(p=>p.pid===pid)) { toast(`PID ${pid} ya existe`,'warn'); return; }
-  processes.push({pid, arrival, burst, burstOrig:burst, priority, pages, state:'new', remaining:burst});
+  const priority = parseInt(document.getElementById('f-priority').value) || 1;
+  const pages    = parseInt(document.getElementById('f-pages').value) || 4;
+
+  if (!pid || pid < 1) { toast('PID inválido','error'); return; }
+  if (!burst || burst < 1) { toast('Burst Time debe ser ≥ 1','error'); return; }
+  if (processes.find(p => p.pid === pid)) { toast(`PID ${pid} ya existe`,'warn'); return; }
+
+  processes.push({
+    pid, arrival, burst, burstOrig: burst, priority, pages, forks,
+    isFork: false, parentPid: null, state: 'new', remaining: burst, forksSpawned: false
+  });
   getPidColor(pid);
+
   renderProcessTable(); renderConveyor(); updateStateCounts();
   syncMemPagesFromProcesses();
-  document.getElementById('f-pid').value = pid+1;
+  document.getElementById('f-pid').value = pid + 1;
+  document.getElementById('f-forks').value = "";
   toast(`P${pid} agregado ✓`,'success');
-  log(`P${pid} creado — Arrival:${arrival}, Burst:${burst}, Priority:${priority}, Pages:${pages}`,'info');
+  log(`P${pid} creado — Arrival:${arrival}, Burst:${burst}, Priority:${priority}, Forks:${forks}`,'info');
   updateDoorSimulation();
 }
 
@@ -127,7 +135,7 @@ document.getElementById('btn-load-example').addEventListener('click', () => {
   const ex = [{pid:1,arrival:0,burst:8,priority:3,pages:4},{pid:2,arrival:1,burst:4,priority:1,pages:2},
     {pid:3,arrival:2,burst:9,priority:4,pages:5},{pid:4,arrival:3,burst:5,priority:2,pages:3},
     {pid:5,arrival:4,burst:2,priority:1,pages:2},{pid:6,arrival:5,burst:6,priority:3,pages:3}];
-  ex.forEach(p => { processes.push({...p, burstOrig:p.burst, state:'new', remaining:p.burst}); getPidColor(p.pid); });
+  ex.forEach(p => { processes.push({...p, burstOrig:p.burst, state:'new', remaining:p.burst, forks:0, isFork:false}); getPidColor(p.pid); });
   renderProcessTable(); renderConveyor(); updateStateCounts();
   syncMemPagesFromProcesses();
   updateDoorSimulation();
@@ -166,7 +174,7 @@ document.getElementById('file-input').addEventListener('change', e=>{
       if(parts.length<4) return;
       const pid=parseInt(parts[0]),arrival=parseInt(parts[1])||0,burst=parseInt(parts[2]),priority=parseInt(parts[3])||1,pages=parseInt(parts[4])||4;
       if(!pid||!burst||processes.find(p=>p.pid===pid)) return;
-      processes.push({pid,arrival,burst,burstOrig:burst,priority,pages,state:'new',remaining:burst});
+      processes.push({pid,arrival,burst,burstOrig:burst,priority,pages,state:'new',remaining:burst, forks:0, isFork:false});
       getPidColor(pid); added++;
     });
     renderProcessTable(); renderConveyor(); updateStateCounts(); syncMemPagesFromProcesses(); updateDoorSimulation();
@@ -177,8 +185,24 @@ document.getElementById('file-input').addEventListener('change', e=>{
 
 function syncMemPagesFromProcesses() {
   if (processes.length > 0) {
-    const avgPages = Math.round(processes.reduce((s,p)=>s+p.pages,0)/processes.length);
-    document.getElementById('mem-pages-proc').value = avgPages;
+    let totalPages = 0; 
+    let count = 0;
+    processes.forEach(p => {
+        if(!p.isFork) {
+            totalPages += p.pages; 
+            count++;
+            if(p.forks > 0) { 
+                totalPages += (p.pages * p.forks);
+                count += p.forks; 
+            }
+        } else {
+           totalPages += p.pages; 
+           count++;
+        }
+    });
+    const avgPages = count > 0 ? Math.round(totalPages / count) : 0;
+    const el = document.getElementById('mem-pages-proc');
+    if(el) el.value = avgPages;
   }
 }
 
@@ -186,7 +210,7 @@ function renderProcessTable() {
   const tbody=document.getElementById('process-tbody');
   document.getElementById('process-count').textContent=processes.length;
   if(!processes.length){
-    tbody.innerHTML=`<tr class="empty-row"><td colspan="7"><div class="empty-state"><span class="empty-icon"></span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr>`;
+    tbody.innerHTML=`<tr class="empty-row"><td colspan="8"><div class="empty-state"><span class="empty-icon"></span><p>No hay procesos registrados</p><p class="empty-sub">Agrega procesos para comenzar</p></div></td></tr>`;
     return;
   }
   tbody.innerHTML=processes.map(p=>`
@@ -196,9 +220,11 @@ function renderProcessTable() {
       <td class="editable" data-field="burst">${p.burstOrig}</td>
       <td class="editable" data-field="priority">${p.priority}</td>
       <td class="editable" data-field="pages">${p.pages}</td>
+      <td><span style="font-size:11px;font-weight:600;color:var(--text-muted);">${p.isFork ? '↳ Hijo P'+p.parentPid : p.forks}</span></td>
       <td><span class="state-badge ${p.state}">${p.state}</span></td>
       <td><button class="mi-btn danger" style="padding:4px 8px;font-size:11px" onclick="removeProcess(${p.pid})">✕</button></td>
     </tr>`).join('');
+    
   tbody.querySelectorAll('.editable').forEach(td=>{
     td.style.cursor='pointer';
     td.addEventListener('dblclick',()=>{
@@ -240,7 +266,10 @@ document.getElementById('btn-reset-sched').addEventListener('click',resetSchedul
 
 function resetScheduling(){
   clearInterval(simInterval); simRunning=false; simStep=0; stepPointer=0; ctxSwitches=0; ganttFull=[];
-  processes.forEach(p=>{p.state='new';p.remaining=p.burstOrig;});
+  
+  processes = processes.filter(p => !p.isFork);
+  processes.forEach(p => { p.state='new'; p.remaining=p.burstOrig; p.forksSpawned=false; });
+  
   renderProcessTable(); renderConveyor(); updateStateCounts();
   document.getElementById('gantt-chart').innerHTML='<div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div>';
   document.getElementById('gantt-timeline').innerHTML='';
@@ -312,7 +341,47 @@ function finishSimulation(){
   toast('Simulación completada ✓','success');
 }
 
-// ── ALGORITHMS (same as friend's version) ──
+// ── ALGORITHMS ──
+
+function spawnForks(p, t, clone, queueArray = null, arrivedSet = null, isMultiLevel = false) {
+    if (p.forks > 0 && !p.forksSpawned) {
+        p.forksSpawned = true;
+        for (let i = 0; i < p.forks; i++) {
+            let childPid = Math.max(...processes.map(x=>x.pid), ...clone.map(x=>x.pid), 0) + 1;
+            
+            let child = {
+                pid: childPid, arrival: t, burst: p.remaining, burstOrig: p.remaining, 
+                priority: p.priority, pages: p.pages, forks: 0, isFork: true, 
+                parentPid: p.pid, state: 'new', remaining: p.remaining, 
+                firstRun: -1, ct: 0, responseTime: 0
+            };
+            
+            if (p.level !== undefined) child.level = p.level;
+            if (p.mLevel !== undefined) child.mLevel = 0;
+
+            getPidColor(childPid);
+            clone.push(child);
+
+            if (!window.isComparing) {
+                processes.push(child);
+                log(`⚡ P${p.pid} ejecutó fork() -> P${childPid} creado en T=${t}`, 'ctx');
+                updateStateCounts();
+                renderProcessTable();
+            }
+
+            if (queueArray && arrivedSet) {
+                if (isMultiLevel) {
+                    let lvl = child.level !== undefined ? child.level : 0;
+                    queueArray[lvl].push(child);
+                } else {
+                    queueArray.push(child);
+                }
+                arrivedSet.add(child.pid);
+            }
+        }
+    }
+}
+
 function computeSchedule(){
   const algo=document.getElementById('sched-algo').value;
   const quantum=parseInt(document.getElementById('sched-quantum').value)||2;
@@ -326,26 +395,64 @@ function computeSchedule(){
     default: result=fcfs(procs);
   }
   ganttFull=result.gantt; schedResult=result; stepPointer=0;
-  log(`Algoritmo: ${algo.toUpperCase()} | Procesos: ${procs.length}`,'info');
+  log(`Algoritmo: ${algo.toUpperCase()} | Procesos base: ${procs.length}`,'info');
 }
 
-function fcfs(procs){const sorted=[...procs].sort((a,b)=>a.arrival-b.arrival);const gantt=[];let t=0;const done=new Set();sorted.forEach(p=>{if(t<p.arrival){gantt.push({pid:null,start:t,end:p.arrival,ready:[]});t=p.arrival;}p.firstRun=t;const ready=sorted.filter(x=>x.pid!==p.pid&&x.arrival<=t&&!done.has(x.pid)).map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);});return{gantt,procs:sorted};}
-function sjf(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);if(!avail.length){const next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}const p=avail.sort((a,b)=>a.burstOrig-b.burstOrig)[0];if(p.firstRun<0)p.firstRun=t;const ready=avail.filter(x=>x.pid!==p.pid).map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}return{gantt,procs:clone};}
-function hrrn(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);if(!avail.length){const next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}const p=avail.map(x=>({...x,ratio:(t-x.arrival+x.burstOrig)/x.burstOrig})).sort((a,b)=>b.ratio-a.ratio)[0];const orig=clone.find(x=>x.pid===p.pid);if(orig.firstRun<0)orig.firstRun=t;const ready=avail.filter(x=>x.pid!==orig.pid).map(x=>x.pid);gantt.push({pid:orig.pid,start:t,end:t+orig.burstOrig,ready});t+=orig.burstOrig;orig.completionTime=t;orig.responseTime=orig.firstRun-orig.arrival;done.add(orig.pid);}return{gantt,procs:clone};}
-function roundRobin(procs,q){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const queue=[];const done=new Set();const arrived=new Set();let i=0;clone.sort((a,b)=>a.arrival-b.arrival);function check(){while(i<clone.length&&clone[i].arrival<=t){if(!arrived.has(clone[i].pid)){queue.push(clone[i]);arrived.add(clone[i].pid);}i++;}}check();while(done.size<clone.length){if(!queue.length){const next=clone.find(p=>!done.has(p.pid)&&p.arrival>t);if(!next)break;gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;check();continue;}const p=queue.shift();if(p.firstRun<0)p.firstRun=t;const run=Math.min(q,p.remaining);const ready=queue.map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0)queue.push(p);else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
-function srtf(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();let current=null;let segStart=0;const maxT=Math.max(...clone.map(p=>p.arrival))+clone.reduce((s,p)=>s+p.burstOrig,0)+10;while(done.size<clone.length&&t<=maxT){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);const best=avail.sort((a,b)=>a.remaining-b.remaining)[0]||null;if(!best){t++;continue;}if(best.firstRun<0)best.firstRun=t;if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}best.remaining--;t++;if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}}return{gantt,procs:clone};}
-function priorityPreemptive(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();let current=null;let segStart=0;const maxT=Math.max(...clone.map(p=>p.arrival))+clone.reduce((s,p)=>s+p.burstOrig,0)+10;while(done.size<clone.length&&t<=maxT){const avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);const best=avail.sort((a,b)=>a.priority-b.priority)[0]||null;if(!best){t++;continue;}if(best.firstRun<0)best.firstRun=t;if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}best.remaining--;t++;if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}}return{gantt,procs:clone};}
-function multilevelQueue(procs){const q0=parseInt(document.getElementById('mlq-q0').value)||2;const q1=parseInt(document.getElementById('mlq-q1').value)||4;const clone=procs.map(p=>({...p,level:p.priority<=2?0:p.priority<=4?1:2}));const gantt=[];let t=0;const done=new Set();const arrived=new Set();const queues=[[],[],[]];clone.sort((a,b)=>a.arrival-b.arrival);let ai=0;function check(){while(ai<clone.length&&clone[ai].arrival<=t){if(!arrived.has(clone[ai].pid)){queues[clone[ai].level].push(clone[ai]);arrived.add(clone[ai].pid);}ai++;}}check();const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1].arrival+10;while(done.size<clone.length&&t<=maxT){check();let q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;if(!q||!q.length){t++;continue;}const p=q.shift();if(p.firstRun<0)p.firstRun=t;const quantum=p.level===0?q0:p.level===1?q1:p.burstOrig;const run=Math.min(quantum,p.remaining);const ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0)q.push(p);else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
-function mlfq(procs){const q0=parseInt(document.getElementById('mlq-q0').value)||2;const q1=parseInt(document.getElementById('mlq-q1').value)||4;const clone=procs.map(p=>({...p,mLevel:0}));const gantt=[];let t=0;const done=new Set();const arrived=new Set();const queues=[[],[],[]];clone.sort((a,b)=>a.arrival-b.arrival);let ai=0;function check(){while(ai<clone.length&&clone[ai].arrival<=t){if(!arrived.has(clone[ai].pid)){queues[0].push(clone[ai]);arrived.add(clone[ai].pid);}ai++;}}check();const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+clone[clone.length-1].arrival+10;while(done.size<clone.length&&t<=maxT){check();const q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;if(!q||!q.length){t++;continue;}const p=q.shift();if(p.firstRun<0)p.firstRun=t;const quantum=p.mLevel===0?q0:p.mLevel===1?q1:p.remaining;const run=Math.min(quantum,p.remaining);const ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0){if(p.mLevel<2)p.mLevel++;queues[p.mLevel].push(p);}else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
+function fcfs(procs){const clone=[...procs].sort((a,b)=>a.arrival-b.arrival);const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){let avail=clone.filter(x=>!done.has(x.pid)&&x.arrival<=t).sort((a,b)=>a.arrival-b.arrival);if(!avail.length){let next=clone.filter(x=>!done.has(x.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}let p=avail[0];if(p.firstRun<0){p.firstRun=t;spawnForks(p,t,clone);}let ready=clone.filter(x=>!done.has(x.pid)&&x.arrival<=t&&x.pid!==p.pid).map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}return{gantt,procs:clone};}
+function sjf(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){let avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);if(!avail.length){let next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}let p=avail.sort((a,b)=>a.burstOrig-b.burstOrig)[0];if(p.firstRun<0){p.firstRun=t;spawnForks(p,t,clone);}let ready=clone.filter(x=>!done.has(x.pid)&&x.arrival<=t&&x.pid!==p.pid).map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+p.burstOrig,ready});t+=p.burstOrig;p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}return{gantt,procs:clone};}
+function hrrn(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();while(done.size<clone.length){let avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);if(!avail.length){let next=clone.filter(p=>!done.has(p.pid)).sort((a,b)=>a.arrival-b.arrival)[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;continue;}let p=avail.map(x=>({...x,ratio:(t-x.arrival+x.burstOrig)/x.burstOrig})).sort((a,b)=>b.ratio-a.ratio)[0];let orig=clone.find(x=>x.pid===p.pid);if(orig.firstRun<0){orig.firstRun=t;spawnForks(orig,t,clone);}let ready=clone.filter(x=>!done.has(x.pid)&&x.arrival<=t&&x.pid!==orig.pid).map(x=>x.pid);gantt.push({pid:orig.pid,start:t,end:t+orig.burstOrig,ready});t+=orig.burstOrig;orig.completionTime=t;orig.responseTime=orig.firstRun-orig.arrival;done.add(orig.pid);}return{gantt,procs:clone};}
+function roundRobin(procs,q){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const queue=[];const done=new Set();const arrived=new Set();clone.sort((a,b)=>a.arrival-b.arrival);function check(){clone.forEach(x=>{if(x.arrival<=t&&!arrived.has(x.pid)){queue.push(x);arrived.add(x.pid);}});}check();while(done.size<clone.length){if(!queue.length){let unarrived=clone.filter(x=>!arrived.has(x.pid)).sort((a,b)=>a.arrival-b.arrival);if(!unarrived.length)break;let next=unarrived[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;check();continue;}let p=queue.shift();if(p.firstRun<0){p.firstRun=t;spawnForks(p,t,clone,queue,arrived);}let run=Math.min(q,p.remaining);let ready=queue.map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0)queue.push(p);else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
+function srtf(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();let current=null;let segStart=0;const maxT=Math.max(...clone.map(p=>p.arrival))+clone.reduce((s,p)=>s+p.burstOrig,0)+10;while(done.size<clone.length&&t<=maxT){let avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);let best=avail.sort((a,b)=>a.remaining-b.remaining)[0]||null;if(!best){t++;continue;}if(best.firstRun<0){best.firstRun=t;spawnForks(best,t,clone);avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);}if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}best.remaining--;t++;if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}}return{gantt,procs:clone};}
+function priorityPreemptive(procs){const clone=procs.map(p=>({...p}));const gantt=[];let t=0;const done=new Set();let current=null;let segStart=0;const maxT=Math.max(...clone.map(p=>p.arrival))+clone.reduce((s,p)=>s+p.burstOrig,0)+10;while(done.size<clone.length&&t<=maxT){let avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);let best=avail.sort((a,b)=>a.priority-b.priority)[0]||null;if(!best){t++;continue;}if(best.firstRun<0){best.firstRun=t;spawnForks(best,t,clone);avail=clone.filter(p=>!done.has(p.pid)&&p.arrival<=t);}if(current!==best){if(current&&segStart<t)gantt.push({pid:current.pid,start:segStart,end:t,ready:avail.filter(x=>x!==current).map(x=>x.pid)});current=best;segStart=t;}best.remaining--;t++;if(best.remaining===0){gantt.push({pid:best.pid,start:segStart,end:t,ready:clone.filter(p=>!done.has(p.pid)&&p.pid!==best.pid&&p.arrival<=t).map(x=>x.pid)});best.completionTime=t;best.responseTime=best.firstRun-best.arrival;done.add(best.pid);current=null;}}return{gantt,procs:clone};}
+function multilevelQueue(procs){const q0=parseInt(document.getElementById('mlq-q0').value)||2;const q1=parseInt(document.getElementById('mlq-q1').value)||4;const clone=procs.map(p=>({...p,level:p.priority<=2?0:p.priority<=4?1:2}));const gantt=[];let t=0;const done=new Set();const arrived=new Set();const queues=[[],[],[]];clone.sort((a,b)=>a.arrival-b.arrival);function check(){clone.forEach(x=>{if(x.arrival<=t&&!arrived.has(x.pid)){queues[x.level].push(x);arrived.add(x.pid);}});}check();const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+Math.max(...clone.map(p=>p.arrival))+10;while(done.size<clone.length&&t<=maxT){check();let q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;if(!q||!q.length){let unarrived=clone.filter(x=>!arrived.has(x.pid)).sort((a,b)=>a.arrival-b.arrival);if(!unarrived.length)break;let next=unarrived[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;check();continue;}let p=q.shift();if(p.firstRun<0){p.firstRun=t;spawnForks(p,t,clone,queues,arrived,true);}let quantum=p.level===0?q0:p.level===1?q1:p.burstOrig;let run=Math.min(quantum,p.remaining);let ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0)q.push(p);else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
+function mlfq(procs){const q0=parseInt(document.getElementById('mlq-q0').value)||2;const q1=parseInt(document.getElementById('mlq-q1').value)||4;const clone=procs.map(p=>({...p,mLevel:0}));const gantt=[];let t=0;const done=new Set();const arrived=new Set();const queues=[[],[],[]];clone.sort((a,b)=>a.arrival-b.arrival);function check(){clone.forEach(x=>{if(x.arrival<=t&&!arrived.has(x.pid)){queues[0].push(x);arrived.add(x.pid);}});}check();const maxT=clone.reduce((s,p)=>s+p.burstOrig,0)+Math.max(...clone.map(p=>p.arrival))+10;while(done.size<clone.length&&t<=maxT){check();const q=queues[0].length>0?queues[0]:queues[1].length>0?queues[1]:queues[2].length>0?queues[2]:null;if(!q||!q.length){let unarrived=clone.filter(x=>!arrived.has(x.pid)).sort((a,b)=>a.arrival-b.arrival);if(!unarrived.length)break;let next=unarrived[0];gantt.push({pid:null,start:t,end:next.arrival,ready:[]});t=next.arrival;check();continue;}let p=q.shift();if(p.firstRun<0){p.firstRun=t;spawnForks(p,t,clone,queues,arrived,true);}let quantum=p.mLevel===0?q0:p.mLevel===1?q1:p.remaining;let run=Math.min(quantum,p.remaining);let ready=[...queues[0],...queues[1],...queues[2]].map(x=>x.pid);gantt.push({pid:p.pid,start:t,end:t+run,ready,remaining:p.remaining-run});t+=run;p.remaining-=run;check();if(p.remaining>0){if(p.mLevel<2)p.mLevel++;queues[p.mLevel].push(p);}else{p.completionTime=t;p.responseTime=p.firstRun-p.arrival;done.add(p.pid);}}return{gantt,procs:clone};}
 
 function renderGanttPartial(upTo){
   const chart=document.getElementById('gantt-chart'), tl=document.getElementById('gantt-timeline');
   const segs=ganttFull.slice(0,upTo);
   if(!segs.length){chart.innerHTML='<div class="gantt-empty">Ejecuta un algoritmo para ver el diagrama de Gantt</div>';return;}
-  const merged=[];segs.forEach(s=>{if(merged.length>0&&merged[merged.length-1].pid===s.pid&&merged[merged.length-1].end===s.start)merged[merged.length-1].end=s.end;else merged.push({...s});});
-  chart.innerHTML=merged.map(s=>{const bg=s.pid===null?'#b0bec5':getPidColor(s.pid);const label=s.pid===null?'IDLE':`P${s.pid}`;return`<div class="gantt-block${s.pid===null?' gantt-idle':''}" style="background:${bg};flex:${s.end-s.start}" title="P${s.pid}|T:${s.start}-${s.end}"><span class="gantt-pid">${label}</span><span class="gantt-time">${s.start}-${s.end}</span></div>`;}).join('');
+  
+  const merged=[];
+  segs.forEach(s=>{
+    if(merged.length>0 && merged[merged.length-1].pid===s.pid && merged[merged.length-1].end===s.start)
+      merged[merged.length-1].end=s.end;
+    else 
+      merged.push({...s});
+  });
+  
+  chart.innerHTML=merged.map(s=>{
+    const bg=s.pid===null?'#b0bec5':getPidColor(s.pid);
+    const label=s.pid===null?'IDLE':`P${s.pid}`;
+    
+    // Armar el texto con información al pasar el mouse (Tooltip)
+    let tooltip = s.pid === null ? `Inactivo | T: ${s.start} - ${s.end}` : '';
+    if (s.pid !== null) {
+        const p = processes.find(x => x.pid === s.pid);
+        tooltip = `Proceso: P${s.pid}&#10;Bloque ejecutado: ${s.start} a ${s.end}&#10;Llegada original: ${p?.arrival}&#10;Burst Total: ${p?.burstOrig}`;
+    }
+    
+    // Inyectar eventos onmouseenter y onmouseleave
+    const hoverEvents = s.pid !== null ? `onmouseenter="highlightResRow(${s.pid})" onmouseleave="unhighlightResRow(${s.pid})"` : '';
+
+    return `<div class="gantt-block${s.pid===null?' gantt-idle':''}" style="background:${bg};flex:${s.end-s.start};cursor:pointer;" title="${tooltip}" ${hoverEvents}>
+      <span class="gantt-pid">${label}</span>
+      <span class="gantt-time">${s.start}-${s.end}</span>
+    </div>`;
+  }).join('');
+  
   tl.innerHTML=merged.map(s=>`<div class="gantt-tick" style="flex:${s.end-s.start}">${s.start}</div>`).join('')+`<div class="gantt-tick">${merged[merged.length-1].end}</div>`;
 }
+
+// ── FUNCIONES GLOBALES DE RESALTADO ──
+window.highlightResRow = function(pid) {
+  const row = document.querySelector(`tr[data-res-pid="${pid}"]`);
+  if (row) row.classList.add('highlight-row');
+};
+
+window.unhighlightResRow = function(pid) {
+  const row = document.querySelector(`tr[data-res-pid="${pid}"]`);
+  if (row) row.classList.remove('highlight-row');
+};
 
 function renderResults(){
   if(!schedResult) return;
@@ -353,7 +460,24 @@ function renderResults(){
   const tbody=document.getElementById('results-tbody');
   let totalWait=0,totalTAT=0,totalResp=0,totalBurst=0;
   const totalTime=Math.max(...procs.map(p=>p.completionTime));
-  tbody.innerHTML=procs.map(p=>{const tat=p.completionTime-p.arrival;const wait=Math.max(0,tat-p.burstOrig);const resp=Math.max(0,p.responseTime);totalWait+=wait;totalTAT+=tat;totalResp+=resp;totalBurst+=p.burstOrig;return`<tr><td><span style="font-weight:800;color:${getPidColor(p.pid)}">P${p.pid}</span></td><td>${p.arrival}</td><td>${p.burstOrig}</td><td>${p.completionTime}</td><td>${tat}</td><td>${Math.max(0,wait)}</td><td>${resp}</td></tr>`;}).join('')+`<tr class="avg-row"><td colspan="3">Promedio</td><td>—</td><td>${(totalTAT/procs.length).toFixed(2)}</td><td>${(totalWait/procs.length).toFixed(2)}</td><td>${(totalResp/procs.length).toFixed(2)}</td></tr>`;
+  
+  tbody.innerHTML=procs.map(p=>{
+    const tat=p.completionTime-p.arrival;
+    const wait=Math.max(0,tat-p.burstOrig);
+    const resp=Math.max(0,p.responseTime);
+    totalWait+=wait; totalTAT+=tat; totalResp+=resp; totalBurst+=p.burstOrig;
+    
+    return `<tr data-res-pid="${p.pid}" style="transition:all 0.2s;">
+      <td><span style="font-weight:800;color:${getPidColor(p.pid)}">P${p.pid}</span></td>
+      <td>${p.arrival}</td>
+      <td>${p.burstOrig}</td>
+      <td>${p.completionTime}</td>
+      <td>${tat}</td>
+      <td>${Math.max(0,wait)}</td>
+      <td>${resp}</td>
+    </tr>`;
+  }).join('')+`<tr class="avg-row"><td colspan="3">Promedio</td><td>—</td><td>${(totalTAT/procs.length).toFixed(2)}</td><td>${(totalWait/procs.length).toFixed(2)}</td><td>${(totalResp/procs.length).toFixed(2)}</td></tr>`;
+  
   document.getElementById('results-area').style.display='block';
   const cpu=(totalBurst/totalTime*100).toFixed(1);
   document.getElementById('m-cpu').textContent=cpu+'%';
@@ -751,27 +875,61 @@ function memSecondChanceFix(refs, n) {
 // MÓDULO 4 — THREAD MANAGER (Web Workers = Cores)
 // ══════════════════════════════════════
 
+// 1. Inyectamos el Worker en memoria (Blob) para evitar bloqueos CORS por abrir "file://"
+const workerCode = `
+let workerId = -1;
+self.onmessage = function(e) {
+  const { type, data } = e.data;
+  if (type === 'INIT') { workerId = data.workerId; self.postMessage({ type: 'READY', workerId }); return; }
+  if (type === 'RUN_PROCESS') { runProcess(data); return; }
+  if (type === 'TERMINATE') { self.close(); }
+};
+async function runProcess(proc) {
+  const { pid, burstTime, quantum, algo } = proc;
+  const slice = quantum || burstTime;
+  self.postMessage({ type: 'PROCESS_START', pid, workerId, timestamp: Date.now() });
+  
+  let remaining = burstTime;
+  const runFor = Math.min(slice, remaining);
+  
+  for (let tick = 0; tick < runFor; tick++) {
+    let dummy = 0;
+    for (let i = 0; i < 50000; i++) { dummy += Math.sqrt(i); } // Carga real de CPU en el thread
+    
+    self.postMessage({ type: 'TICK', pid, workerId, tick: tick + 1, totalTicks: runFor, remaining: remaining - tick - 1 });
+    await new Promise(r => setTimeout(r, 0)); // Respiro al hilo
+  }
+  
+  remaining -= runFor;
+  if (remaining <= 0) {
+    self.postMessage({ type: 'PROCESS_DONE', pid, workerId, completionTime: Date.now() });
+  } else {
+    self.postMessage({ type: 'PROCESS_PREEMPTED', pid, workerId, remaining });
+  }
+}`;
+const workerBlob = new Blob([workerCode], { type: 'application/javascript' });
+const workerUrl = URL.createObjectURL(workerBlob);
+
 class ThreadManager {
   constructor(numCores) {
-    this.numCores = numCores;           // Cores configurables por el usuario
-    this.workers = [];                  // Array de Web Workers
-    this.coreStatus = [];              // 'idle' | 'busy' para cada core
-    this.processQueue = [];            // Cola de procesos pendientes
-    this.runningProcesses = new Map(); // pid → workerId
+    this.numCores = numCores;
+    this.workers = [];
+    this.coreStatus = [];
+    this.processQueue = [];
+    this.runningProcesses = new Map();
     this.completionCallbacks = new Map();
-    this.threadLog = [];               // Log de eventos de threads
+    this.threadLog = [];
     
     this.initWorkers();
   }
 
   initWorkers() {
-    // Terminar workers anteriores si existen
     this.workers.forEach(w => w.terminate());
     this.workers = [];
     this.coreStatus = [];
 
     for (let i = 0; i < this.numCores; i++) {
-      const worker = new Worker('process-worker.js');
+      const worker = new Worker(workerUrl); // Usa el Worker desde la memoria local
       
       worker.onmessage = (e) => this.handleWorkerMessage(e, i);
       worker.onerror   = (e) => this.handleWorkerError(e, i);
@@ -781,21 +939,16 @@ class ThreadManager {
       this.workers.push(worker);
       this.coreStatus.push('idle');
     }
-
     this.renderCoresUI();
   }
 
-  // Despachar un proceso a un core disponible
   dispatch(processConfig) {
     const freeCore = this.coreStatus.indexOf('idle');
-    
     if (freeCore === -1) {
-      // Todos los cores ocupados → encolar
       this.processQueue.push(processConfig);
-      this.logThread(`P${processConfig.pid} encolado (todos los cores ocupados)`);
+      this.logThread(`P${processConfig.pid} encolado (Todos los Cores ocupados)`);
       return;
     }
-
     this.assignToCore(processConfig, freeCore);
   }
 
@@ -804,6 +957,7 @@ class ThreadManager {
     this.runningProcesses.set(proc.pid, coreId);
     this.workers[coreId].postMessage({ type: 'RUN_PROCESS', data: proc });
     
+    setProcessState(proc.pid, 'running'); // Efecto visual
     this.logThread(`P${proc.pid} → Core ${coreId} (Thread OS #${coreId})`);
     this.renderCoresUI();
   }
@@ -816,17 +970,13 @@ class ThreadManager {
       this.runningProcesses.delete(pid);
       this.logThread(`P${pid} TERMINADO en Core ${workerId}`, 'done');
       
-      // Callback al simulador principal
       if (this.completionCallbacks.has(pid)) {
         this.completionCallbacks.get(pid)(pid, completionTime);
       }
-
-      // Despachar siguiente proceso de la cola
       if (this.processQueue.length > 0) {
         const next = this.processQueue.shift();
         this.assignToCore(next, workerId);
       }
-
       this.renderCoresUI();
     }
 
@@ -835,15 +985,16 @@ class ThreadManager {
     }
 
     if (type === 'PROCESS_PREEMPTED') {
-      // Para Round Robin: devolver a la cola con tiempo restante
       this.coreStatus[workerId] = 'idle';
       this.runningProcesses.delete(pid);
       
+      setProcessState(pid, 'ready');
+
       if (remaining > 0) {
         const originalProc = this.processQueue.find(p => p.pid === pid) 
           || { ...this.getProcessById(pid), burstTime: remaining };
         originalProc.burstTime = remaining;
-        this.processQueue.push(originalProc); // Re-encolar al final (RR)
+        this.processQueue.push(originalProc); // RR: Regresa a la cola
         this.logThread(`P${pid} preemptado, restante: ${remaining}`, 'preempt');
       }
 
@@ -851,32 +1002,21 @@ class ThreadManager {
         const next = this.processQueue.shift();
         this.assignToCore(next, workerId);
       }
-
       this.renderCoresUI();
     }
   }
 
   handleWorkerError(e, workerId) {
-    console.error(`Error en Worker ${workerId}:`, e);
     this.logThread(`ERROR en Core ${workerId}: ${e.message}`, 'error');
   }
 
-  // Ejecutar procesos según el algoritmo seleccionado
   runWithAlgorithm(processList, algo, quantum) {
-    // Ordenar la cola inicial según el algoritmo
     let sorted;
     switch(algo) {
-      case 'fcfs':
-        sorted = [...processList].sort((a,b) => a.arrival - b.arrival);
-        break;
-      case 'sjf':
-        sorted = [...processList].sort((a,b) => a.burst - b.burst);
-        break;
-      case 'priority_p':
-        sorted = [...processList].sort((a,b) => a.priority - b.priority);
-        break;
-      default: // rr, srtf, etc.
-        sorted = [...processList].sort((a,b) => a.arrival - b.arrival);
+      case 'fcfs': sorted = [...processList].sort((a,b) => a.arrival - b.arrival); break;
+      case 'sjf': sorted = [...processList].sort((a,b) => a.burstOrig - b.burstOrig); break;
+      case 'priority_p': sorted = [...processList].sort((a,b) => a.priority - b.priority); break;
+      default: sorted = [...processList].sort((a,b) => a.arrival - b.arrival);
     }
 
     sorted.forEach(p => {
@@ -895,21 +1035,17 @@ class ThreadManager {
   }
 
   logThread(msg, type = 'info') {
-    const entry = { msg, type, time: Date.now() };
-    this.threadLog.push(entry);
+    this.threadLog.push({ msg, type, time: Date.now() });
     this.renderThreadLog();
   }
 
-  getProcessById(pid) {
-    return processes.find(p => p.pid === pid) || {};
-  }
+  getProcessById(pid) { return processes.find(p => p.pid === pid) || {}; }
 
   terminate() {
     this.workers.forEach(w => w.terminate());
     this.workers = [];
   }
 
-  // ── UI RENDERING ──
   renderCoresUI() {
     const el = document.getElementById('cores-grid');
     if (!el) return;
@@ -918,6 +1054,11 @@ class ThreadManager {
       const status = this.coreStatus[i];
       const runningPid = [...this.runningProcesses.entries()].find(([, cid]) => cid === i)?.[0];
       const isActive = status === 'busy';
+
+      // Creamos el HTML del PID por separado para evitar errores de sintaxis en VS Code
+      const pidHtml = (isActive && runningPid !== undefined)
+        ? '<span style="color:' + getPidColor(runningPid) + ';font-size:20px;font-weight:800">P' + runningPid + '</span>'
+        : '<span style="opacity:0.3">—</span>';
 
       return `
         <div class="core-card ${isActive ? 'core-active' : 'core-idle'}">
@@ -928,23 +1069,20 @@ class ThreadManager {
               ${isActive ? 'RUNNING' : 'IDLE'}
             </span>
           </div>
-          <div class="core-pid">
-            ${isActive && runningPid !== undefined
-              ? `<span style="color:${getPidColor(runningPid)};font-size:20px;font-weight:800">P${runningPid}</span>`
-              : '<span style="opacity:0.3">—</span>'}
+          <div class="core-pid">${pidHtml}</div>
+          <div style="height:4px;background:var(--border);border-radius:2px;margin-top:6px;overflow:hidden;">
+            <div id="core-progress-${i}" style="height:100%;width:0%;background:var(--mi-green);transition:width 0.1s linear"></div>
           </div>
-          <div class="core-thread-id">Thread OS #${i}</div>
+          <div class="core-thread-id" style="margin-top:6px">Thread OS #${i}</div>
         </div>`;
     }).join('');
 
-    // Actualizar contador
     const busyCount = this.coreStatus.filter(s => s === 'busy').length;
-    const qLen = this.processQueue.length;
     const el2 = document.getElementById('thread-stats');
     if (el2) {
       el2.innerHTML = `
         <span>Cores activos: <b>${busyCount}/${this.numCores}</b></span>
-        <span>En cola: <b>${qLen}</b></span>
+        <span>En cola: <b>${this.processQueue.length}</b></span>
         <span>Completados: <b>${this.completionCallbacks.size}</b></span>`;
     }
   }
@@ -958,77 +1096,85 @@ class ThreadManager {
   renderThreadLog() {
     const el = document.getElementById('thread-log');
     if (!el) return;
-    const recent = this.threadLog.slice(-20).reverse();
-    el.innerHTML = recent.map(e => {
+    el.innerHTML = this.threadLog.slice(-20).reverse().map(e => {
       const cls = { done:'success', error:'error', preempt:'warn' }[e.type] || 'info';
       return `<div class="log-line ${cls}">${e.msg}</div>`;
     }).join('');
   }
 }
 
-// ── Instancia global del ThreadManager ──
 let threadManager = null;
 
 function initThreadManager() {
   const cores = parseInt(document.getElementById('num-cores').value) || 2;
   if (threadManager) threadManager.terminate();
   threadManager = new ThreadManager(cores);
-  toast(`ThreadManager iniciado — ${cores} cores (Web Workers)`, 'success');
+  toast(`ThreadManager iniciado — ${cores} cores`, 'success');
 }
 
 function runThreadSimulation() {
   if (!threadManager) { toast('Inicia el ThreadManager primero', 'warn'); return; }
   if (processes.length === 0) { toast('Agrega procesos primero', 'warn'); return; }
 
-  const algo    = document.getElementById('thread-algo').value;
+  // Restablecer el estado visual de los procesos antes de ejecutar
+  processes.forEach(p => { if(!p.isFork) { p.state = 'new'; p.forksSpawned = false; } });
+  
+  // Pre-calcular forks antes de enviarlos a los hilos
+  let nextPid = Math.max(...processes.map(p=>p.pid), 0) + 1;
+  let newForks = [];
+  processes.forEach(p => {
+      if(!p.isFork && p.forks > 0 && !p.forksSpawned) {
+          p.forksSpawned = true; 
+          for(let i=0; i<p.forks; i++) {
+              let child = {...p, pid: nextPid++, isFork: true, parentPid: p.pid, forks: 0, state: 'new', remaining: p.burstOrig};
+              getPidColor(child.pid);
+              newForks.push(child);
+          }
+      }
+  });
+  if(newForks.length > 0) {
+      processes.push(...newForks);
+      renderProcessTable();
+  }
+  updateStateCounts();
+
+  const algo = document.getElementById('thread-algo').value;
   const quantum = parseInt(document.getElementById('thread-quantum').value) || 2;
 
   let completedThreads = 0;
+  threadManager.completionCallbacks.clear();
 
-  // Registrar callbacks de completado para cada proceso
   processes.forEach(p => {
-    threadManager.onProcessComplete(p.pid, (pid, time) => {
+    threadManager.onProcessComplete(p.pid, (pid) => {
       setProcessState(pid, 'terminated');
-      log(`P${pid} terminado por Thread (Core ${threadManager.runningProcesses.get(pid) ?? '?'})`, 'success');
       completedThreads++;
-        
       if (completedThreads === processes.length) {
-
             threadEndTime = performance.now();
-
-            const totalTime =
-                (threadEndTime - threadStartTime).toFixed(2);
-
-            toast(
-                `Todos los threads terminaron en ${totalTime} ms`,
-                'success'
-            );
-
-            document.getElementById('thread-total-time')
-                .textContent = totalTime + ' ms';
+            const totalTime = (threadEndTime - threadStartTime).toFixed(2);
+            toast(`Simulación Paralela completada en ${totalTime} ms`, 'success');
         }
-
-        log(
-          `P${pid} terminado por Thread`,
-          'success'
-        );
     });
-});
+  });
 
   threadStartTime = performance.now();
-
-  // Despachar todos los procesos — el manager los distribuye entre Workers
   threadManager.runWithAlgorithm(processes, algo, quantum);
-  toast(`▶ ${processes.length} procesos despachados a ${threadManager.numCores} threads`, 'success');
+  toast(`▶ ${processes.length} procesos despachados`, 'success');
 }
 
 function stopThreadSimulation() {
   if (threadManager) {
     threadManager.terminate();
     threadManager = null;
+    document.getElementById('cores-grid').innerHTML = '<div style="color:var(--text-dim);font-size:13px;padding:20px">Inicia el ThreadManager para ver los cores</div>';
     toast('Workers terminados', 'warn');
   }
 }
+
+// Para ocultar/mostrar el input del quantum según el algoritmo:
+document.getElementById('thread-algo')?.addEventListener('change', function() {
+  const qGroup = document.getElementById('thread-quantum-group');
+  if(qGroup) qGroup.style.display = this.value === 'rr' ? 'block' : 'none';
+});
 
 // ══════════════════════════════════════
 // LOG & INIT
@@ -1204,7 +1350,6 @@ function renderCmpMetrics(suffix, m, mOther) {
   respEl.textContent = m.resp.toFixed(2);
   ctxEl.textContent  = m.sw;
  
-  // Color: green = mejor, red = peor
   waitEl.className = 'cmp-mc-val' + (m.wait <= mOther.wait ? ' best' : ' worst');
   tatEl.className  = 'cmp-mc-val' + (m.tat  <= mOther.tat  ? ' best' : ' worst');
   cpuEl.className  = 'cmp-mc-val' + (m.cpu  >= mOther.cpu  ? ' best' : ' worst');
@@ -1238,7 +1383,6 @@ function renderCmpSummary(labelA, labelB, mA, mB) {
     </tr>`;
   }).join('');
  
-  // Determinar ganador global
   let scoreA = 0, scoreB = 0;
   rows.forEach(r => {
     const aBetter = r.lower ? r.a < r.b : r.a > r.b;
@@ -1248,12 +1392,11 @@ function renderCmpSummary(labelA, labelB, mA, mB) {
   document.getElementById('cmp-winner-a').style.display = scoreA > scoreB ? 'inline-flex' : 'none';
   document.getElementById('cmp-winner-b').style.display = scoreB > scoreA ? 'inline-flex' : 'none';
 }
- 
+
 function runComparison() {
   const procs = getCmpProcesses();
   if (!procs || !procs.length) return;
  
-  // Asegurar colores para los pids de los presets
   procs.forEach(p => getPidColor(p.pid));
  
   const q       = parseInt(document.getElementById('cmp-quantum').value) || 2;
@@ -1262,14 +1405,15 @@ function runComparison() {
   const labelA  = CMP_ALGO_LABELS[algoA] || algoA;
   const labelB  = CMP_ALGO_LABELS[algoB] || algoB;
  
-  // Temporalmente sustituir quantum global para MLQ
   const origQuantum = document.getElementById('sched-quantum').value;
   document.getElementById('sched-quantum').value = q;
   document.getElementById('mlq-q0').value = q;
   document.getElementById('mlq-q1').value = q * 2;
  
+  window.isComparing = true;
   const resA = runCmpAlgo(algoA, procs, q);
   const resB = runCmpAlgo(algoB, procs, q);
+  window.isComparing = false;
  
   document.getElementById('sched-quantum').value = origQuantum;
  
@@ -1288,7 +1432,7 @@ function runComparison() {
   document.getElementById('cmp-badge-b').textContent = labelB;
  
   toast(`⚔️ ${labelA} vs ${labelB} — completado`, 'success');
-  log(`Comparación: ${labelA} vs ${labelB} con ${procs.length} procesos`, 'info');
+  log(`Comparación: ${labelA} vs ${labelB} con ${procs.length} procesos base`, 'info');
 }
  
 function resetComparison() {
