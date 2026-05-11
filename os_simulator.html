@@ -278,6 +278,39 @@
         <span><span class="status-dot terminated"></span> Terminated (Complete)</span>
       </div>
     </div>
+
+        <div class="section-header">
+      <h2>Control Room <span class="badge">Diagrama de Estados</span></h2>
+      <p class="section-desc">Visualización en tiempo real del flujo de procesos entre estados</p>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <div class="panel">
+        <div class="panel-title"> Diagrama de Transición de Estados</div>
+        <div class="states-flow">
+          <div class="state-node-box new" id="state-box-new"><span class="sn-icon">🟣</span><span class="sn-name">NEW</span><span class="sn-count new" id="cnt-new">0</span></div>
+          <div class="arrow-wrap"><span class="arrow-label">admit</span><span class="arrow-line">→</span></div>
+          <div class="state-node-box ready" id="state-box-ready"><span class="sn-icon">🔵</span><span class="sn-name">READY</span><span class="sn-count ready" id="cnt-ready">0</span></div>
+          <div class="arrow-wrap"><span class="arrow-label">dispatch</span><span class="arrow-line">→</span></div>
+          <div class="state-node-box running" id="state-box-running"><span class="sn-icon">🟢</span><span class="sn-name">RUNNING</span><span class="sn-count running" id="cnt-running">0</span></div>
+          <div class="arrow-wrap"><span class="arrow-label">exit</span><span class="arrow-line">→</span></div>
+          <div class="state-node-box terminated" id="state-box-terminated"><span class="sn-icon">⚫</span><span class="sn-name">TERMINATED</span><span class="sn-count terminated" id="cnt-terminated">0</span></div>
+        </div>
+        <div class="states-secondary">
+          <div class="state-node-box waiting" id="state-box-waiting" style="display:inline-flex"><span class="sn-icon">🟡</span><span class="sn-name">WAITING</span><span class="sn-count waiting" id="cnt-waiting">0</span></div>
+          <div style="font-size:12px;color:var(--text-muted);padding:10px;display:flex;flex-direction:column;gap:4px;justify-content:center">
+            <div>← I/O wait (Running → Waiting)</div>
+            <div>→ I/O done (Waiting → Ready)</div>
+            <div>← Preempt (Running → Ready)</div>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">📟 Event Log <span class="hint">— Tiempo real</span></div>
+        <div class="event-log" id="event-log"><div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div></div>
+        <div class="btn-row" style="margin-top:10px"><button class="mi-btn ghost" id="btn-clear-log">🗑️ Limpiar Log</button></div>
+      </div>
+    </div>
+
   </section>
 
   <!-- ══════════ TAB 3: MEMORIA ══════════ -->
@@ -380,37 +413,6 @@
 
   <!-- ══════════ TAB 4: ESTADOS ══════════ -->
   <section class="tab-content" id="tab-states">
-    <div class="section-header">
-      <h2>Control Room <span class="badge">Diagrama de Estados</span></h2>
-      <p class="section-desc">Visualización en tiempo real del flujo de procesos entre estados</p>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
-      <div class="panel">
-        <div class="panel-title"> Diagrama de Transición de Estados</div>
-        <div class="states-flow">
-          <div class="state-node-box new" id="state-box-new"><span class="sn-icon">🟣</span><span class="sn-name">NEW</span><span class="sn-count new" id="cnt-new">0</span></div>
-          <div class="arrow-wrap"><span class="arrow-label">admit</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box ready" id="state-box-ready"><span class="sn-icon">🔵</span><span class="sn-name">READY</span><span class="sn-count ready" id="cnt-ready">0</span></div>
-          <div class="arrow-wrap"><span class="arrow-label">dispatch</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box running" id="state-box-running"><span class="sn-icon">🟢</span><span class="sn-name">RUNNING</span><span class="sn-count running" id="cnt-running">0</span></div>
-          <div class="arrow-wrap"><span class="arrow-label">exit</span><span class="arrow-line">→</span></div>
-          <div class="state-node-box terminated" id="state-box-terminated"><span class="sn-icon">⚫</span><span class="sn-name">TERMINATED</span><span class="sn-count terminated" id="cnt-terminated">0</span></div>
-        </div>
-        <div class="states-secondary">
-          <div class="state-node-box waiting" id="state-box-waiting" style="display:inline-flex"><span class="sn-icon">🟡</span><span class="sn-name">WAITING</span><span class="sn-count waiting" id="cnt-waiting">0</span></div>
-          <div style="font-size:12px;color:var(--text-muted);padding:10px;display:flex;flex-direction:column;gap:4px;justify-content:center">
-            <div>← I/O wait (Running → Waiting)</div>
-            <div>→ I/O done (Waiting → Ready)</div>
-            <div>← Preempt (Running → Ready)</div>
-          </div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="panel-title">📟 Event Log <span class="hint">— Tiempo real</span></div>
-        <div class="event-log" id="event-log"><div class="log-empty">Los eventos aparecerán aquí durante la simulación...</div></div>
-        <div class="btn-row" style="margin-top:10px"><button class="mi-btn ghost" id="btn-clear-log">🗑️ Limpiar Log</button></div>
-      </div>
-    </div>
   </section>
 
     <!-- ══════════ TAB 5: THREADS ══════════ -->
