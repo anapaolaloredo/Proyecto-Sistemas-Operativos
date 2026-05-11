@@ -1601,3 +1601,278 @@ function resetAllComparison() {
   document.getElementById('cmp-all-summary').style.display = 'none';
   toast('Comparación reiniciada', 'info');
 }
+
+// ══════════════════════════════════════
+// DEMO DE PARALELISMO — REEMPLAZA runParallelDemo() y agrega buildDemoCores()
+// ══════════════════════════════════════
+
+function buildDemoCores() {
+  const n = parseInt(document.getElementById('demo-cores').value) || 4;
+  const area = document.getElementById('demo-cores-area');
+  if (!area) return;
+  area.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px';
+    row.innerHTML =
+      '<span style="min-width:64px;color:var(--text-muted)">Worker ' + i + '</span>' +
+      '<div style="flex:1;height:12px;background:var(--bg-panel2);border-radius:6px;overflow:hidden">' +
+        '<div id="demo-bar-' + i + '" style="height:100%;width:0%;background:#2e7d32;transition:width 0.12s linear;border-radius:6px"></div>' +
+      '</div>' +
+      '<span id="demo-bar-lbl-' + i + '" style="min-width:36px;text-align:right;color:var(--text-muted)">0%</span>';
+    area.appendChild(row);
+  }
+}
+
+// Llama buildDemoCores al inicio para que las barras aparezcan al cargar la página
+buildDemoCores();
+
+async function runParallelDemo() {
+  const n      = parseInt(document.getElementById('demo-cores').value) || 4;
+  const load   = parseInt(document.getElementById('demo-load').value)  || 4;
+  const tickMs = 120;          // ms por tick → visible en pantalla
+  const ticks  = 8;            // pasos de progreso por worker
+  const ops    = load * 150000; // operaciones reales de CPU
+
+  // Reconstruye las barras con el N actual
+  buildDemoCores();
+
+  // Resetear métricas
+  document.getElementById('demo-parallel-time').textContent = '—';
+  document.getElementById('demo-seq-time').textContent      = '—';
+  document.getElementById('demo-speedup').textContent       = '—';
+  document.getElementById('demo-verdict').style.display     = 'none';
+  document.getElementById('demo-gantt').innerHTML           = '';
+
+  const startAll   = performance.now();
+  const workerTimes = new Array(n).fill(0);
+
+  // Código del worker embebido en un Blob (sin archivo externo)
+  const workerSrc = `
+    self.onmessage = async function(e) {
+      var ops    = e.data.ops;
+      var ticks  = e.data.ticks;
+      var tickMs = e.data.tickMs;
+      var perTick = Math.floor(ops / ticks);
+      var dummy = 0;
+      for (var t = 0; t < ticks; t++) {
+        for (var k = 0; k < perTick; k++) dummy += Math.sqrt(k);
+        self.postMessage({ type: 'tick', pct: Math.round((t + 1) / ticks * 100) });
+        await new Promise(function(r){ setTimeout(r, tickMs); });
+      }
+      self.postMessage({ type: 'done', dummy: dummy });
+    };
+  `;
+
+  // Lanza N workers en paralelo y espera a todos
+  const promises = Array.from({ length: n }, function(_, i) {
+    return new Promise(function(resolve) {
+      var blob = new Blob([workerSrc], { type: 'application/javascript' });
+      var url  = URL.createObjectURL(blob);
+      var w    = new Worker(url);
+      var wStart = performance.now();
+
+      w.onmessage = function(e) {
+        if (e.data.type === 'tick') {
+          var bar = document.getElementById('demo-bar-' + i);
+          var lbl = document.getElementById('demo-bar-lbl-' + i);
+          if (bar) bar.style.width = e.data.pct + '%';
+          if (lbl) lbl.textContent = e.data.pct + '%';
+        } else {
+          workerTimes[i] = performance.now() - wStart;
+          URL.revokeObjectURL(url);
+          w.terminate();
+          resolve(workerTimes[i]);
+        }
+      };
+
+      w.onerror = function(err) {
+        console.error('Worker ' + i + ' error:', err);
+        URL.revokeObjectURL(url);
+        w.terminate();
+        resolve(0);
+      };
+
+      w.postMessage({ ops: ops, ticks: ticks, tickMs: tickMs });
+    });
+  });
+
+  await Promise.all(promises);
+
+  var parallelMs = Math.round(performance.now() - startAll);
+  var seqEstMs   = Math.round(workerTimes.reduce(function(a, b){ return a + b; }, 0));
+  var speedup    = seqEstMs > 0 ? (seqEstMs / parallelMs).toFixed(2) : '1.00';
+
+  document.getElementById('demo-parallel-time').textContent = parallelMs + ' ms';
+  document.getElementById('demo-seq-time').textContent      = seqEstMs  + ' ms';
+  document.getElementById('demo-speedup').textContent       = speedup + 'x';
+
+  // Veredicto
+  var verdict = document.getElementById('demo-verdict');
+  verdict.style.display = 'block';
+  var isParallel = parseFloat(speedup) > 1.1;
+  verdict.style.background   = isParallel ? 'rgba(46,125,50,0.12)'  : 'rgba(198,40,40,0.10)';
+  verdict.style.borderColor  = isParallel ? '#2e7d32'               : '#c62828';
+  verdict.style.color        = isParallel ? '#2e7d32'               : '#c62828';
+  verdict.style.borderWidth  = '1px';
+  verdict.style.borderStyle  = 'solid';
+  verdict.style.borderRadius = '8px';
+  verdict.style.padding      = '10px 14px';
+  verdict.textContent = isParallel
+    ? '✅ Paralelismo confirmado — ' + n + ' workers corrieron ' + speedup + 'x más rápido que en serie estimado.'
+    : '⚠️ Speedup bajo (' + speedup + 'x) — el entorno puede estar limitando los threads reales.';
+
+  // Mini Gantt: una barra por worker con su tiempo real
+  var ganttEl = document.getElementById('demo-gantt');
+  var maxTime = Math.max.apply(null, workerTimes);
+  workerTimes.forEach(function(ms, i) {
+    var pct = maxTime > 0 ? Math.round(ms / maxTime * 100) : 100;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:4px';
+    row.innerHTML =
+      '<span style="min-width:64px;color:var(--text-muted)">Worker ' + i + '</span>' +
+      '<div style="flex:1;height:14px;background:var(--bg-panel2);border-radius:4px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:#1565c0;border-radius:4px"></div>' +
+      '</div>' +
+      '<span style="min-width:58px;text-align:right;color:var(--text-muted)">' + Math.round(ms) + ' ms</span>';
+    ganttEl.appendChild(row);
+  });
+}
+
+
+// ══════════════════════════════════════
+// DEMO DE PARALELISMO — REEMPLAZA runParallelDemo() y agrega buildDemoCores()
+// ══════════════════════════════════════
+
+function buildDemoCores() {
+  const n = parseInt(document.getElementById('demo-cores').value) || 4;
+  const area = document.getElementById('demo-cores-area');
+  if (!area) return;
+  area.innerHTML = '';
+  for (let i = 0; i < n; i++) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:13px';
+    row.innerHTML =
+      '<span style="min-width:64px;color:var(--text-muted)">Worker ' + i + '</span>' +
+      '<div style="flex:1;height:12px;background:var(--bg-panel2);border-radius:6px;overflow:hidden">' +
+        '<div id="demo-bar-' + i + '" style="height:100%;width:0%;background:#2e7d32;transition:width 0.12s linear;border-radius:6px"></div>' +
+      '</div>' +
+      '<span id="demo-bar-lbl-' + i + '" style="min-width:36px;text-align:right;color:var(--text-muted)">0%</span>';
+    area.appendChild(row);
+  }
+}
+
+// Llama buildDemoCores al inicio para que las barras aparezcan al cargar la página
+buildDemoCores();
+
+async function runParallelDemo() {
+  const n      = parseInt(document.getElementById('demo-cores').value) || 4;
+  const load   = parseInt(document.getElementById('demo-load').value)  || 4;
+  const tickMs = 120;          // ms por tick → visible en pantalla
+  const ticks  = 8;            // pasos de progreso por worker
+  const ops    = load * 150000; // operaciones reales de CPU
+
+  // Reconstruye las barras con el N actual
+  buildDemoCores();
+
+  // Resetear métricas
+  document.getElementById('demo-parallel-time').textContent = '—';
+  document.getElementById('demo-seq-time').textContent      = '—';
+  document.getElementById('demo-speedup').textContent       = '—';
+  document.getElementById('demo-verdict').style.display     = 'none';
+  document.getElementById('demo-gantt').innerHTML           = '';
+
+  const startAll   = performance.now();
+  const workerTimes = new Array(n).fill(0);
+
+  // Código del worker embebido en un Blob (sin archivo externo)
+  const workerSrc = `
+    self.onmessage = async function(e) {
+      var ops    = e.data.ops;
+      var ticks  = e.data.ticks;
+      var tickMs = e.data.tickMs;
+      var perTick = Math.floor(ops / ticks);
+      var dummy = 0;
+      for (var t = 0; t < ticks; t++) {
+        for (var k = 0; k < perTick; k++) dummy += Math.sqrt(k);
+        self.postMessage({ type: 'tick', pct: Math.round((t + 1) / ticks * 100) });
+        await new Promise(function(r){ setTimeout(r, tickMs); });
+      }
+      self.postMessage({ type: 'done', dummy: dummy });
+    };
+  `;
+
+  // Lanza N workers en paralelo y espera a todos
+  const promises = Array.from({ length: n }, function(_, i) {
+    return new Promise(function(resolve) {
+      var blob = new Blob([workerSrc], { type: 'application/javascript' });
+      var url  = URL.createObjectURL(blob);
+      var w    = new Worker(url);
+      var wStart = performance.now();
+
+      w.onmessage = function(e) {
+        if (e.data.type === 'tick') {
+          var bar = document.getElementById('demo-bar-' + i);
+          var lbl = document.getElementById('demo-bar-lbl-' + i);
+          if (bar) bar.style.width = e.data.pct + '%';
+          if (lbl) lbl.textContent = e.data.pct + '%';
+        } else {
+          workerTimes[i] = performance.now() - wStart;
+          URL.revokeObjectURL(url);
+          w.terminate();
+          resolve(workerTimes[i]);
+        }
+      };
+
+      w.onerror = function(err) {
+        console.error('Worker ' + i + ' error:', err);
+        URL.revokeObjectURL(url);
+        w.terminate();
+        resolve(0);
+      };
+
+      w.postMessage({ ops: ops, ticks: ticks, tickMs: tickMs });
+    });
+  });
+
+  await Promise.all(promises);
+
+  var parallelMs = Math.round(performance.now() - startAll);
+  var seqEstMs   = Math.round(workerTimes.reduce(function(a, b){ return a + b; }, 0));
+  var speedup    = seqEstMs > 0 ? (seqEstMs / parallelMs).toFixed(2) : '1.00';
+
+  document.getElementById('demo-parallel-time').textContent = parallelMs + ' ms';
+  document.getElementById('demo-seq-time').textContent      = seqEstMs  + ' ms';
+  document.getElementById('demo-speedup').textContent       = speedup + 'x';
+
+  // Veredicto
+  var verdict = document.getElementById('demo-verdict');
+  verdict.style.display = 'block';
+  var isParallel = parseFloat(speedup) > 1.1;
+  verdict.style.background   = isParallel ? 'rgba(46,125,50,0.12)'  : 'rgba(198,40,40,0.10)';
+  verdict.style.borderColor  = isParallel ? '#2e7d32'               : '#c62828';
+  verdict.style.color        = isParallel ? '#2e7d32'               : '#c62828';
+  verdict.style.borderWidth  = '1px';
+  verdict.style.borderStyle  = 'solid';
+  verdict.style.borderRadius = '8px';
+  verdict.style.padding      = '10px 14px';
+  verdict.textContent = isParallel
+    ? '✅ Paralelismo confirmado — ' + n + ' workers corrieron ' + speedup + 'x más rápido que en serie estimado.'
+    : '⚠️ Speedup bajo (' + speedup + 'x) — el entorno puede estar limitando los threads reales.';
+
+  // Mini Gantt: una barra por worker con su tiempo real
+  var ganttEl = document.getElementById('demo-gantt');
+  var maxTime = Math.max.apply(null, workerTimes);
+  workerTimes.forEach(function(ms, i) {
+    var pct = maxTime > 0 ? Math.round(ms / maxTime * 100) : 100;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:4px';
+    row.innerHTML =
+      '<span style="min-width:64px;color:var(--text-muted)">Worker ' + i + '</span>' +
+      '<div style="flex:1;height:14px;background:var(--bg-panel2);border-radius:4px;overflow:hidden">' +
+        '<div style="height:100%;width:' + pct + '%;background:#1565c0;border-radius:4px"></div>' +
+      '</div>' +
+      '<span style="min-width:58px;text-align:right;color:var(--text-muted)">' + Math.round(ms) + ' ms</span>';
+    ganttEl.appendChild(row);
+  });
+}
