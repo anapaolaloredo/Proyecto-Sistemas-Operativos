@@ -1451,3 +1451,204 @@ function resetComparison() {
   document.getElementById('cmp-summary-panel').style.display = 'none';
   toast('Comparación reiniciada', 'info');
 }
+
+// ══════════════════════════════════════════════════════════════
+// DEMO DE PARALELISMO REAL — agregar al FINAL de script.js
+// (antes del último updateStateCounts() y renderDoorSimulation())
+// ══════════════════════════════════════════════════════════════
+
+// ── Colores de la app para los cores de la demo ──
+const DEMO_COLORS = [
+  '#1565c0','#7b1fa2','#00838f','#2e7d32',
+  '#e65100','#ad1457','#4527a0','#c62828'
+];
+
+// ── Construir las barras de progreso de la demo ──
+function buildDemoCores() {
+  const n = parseInt(document.getElementById('demo-cores').value) || 4;
+  const area = document.getElementById('demo-cores-area');
+  if (!area) return;
+
+  area.innerHTML = Array.from({ length: n }, (_, i) => `
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+      <span style="font-size:12px;color:var(--text-muted);width:70px;flex-shrink:0">
+        Worker ${i}
+      </span>
+      <div style="flex:1;height:28px;background:var(--bg-panel2);border-radius:6px;
+                  border:1px solid var(--border);overflow:hidden">
+        <div id="dpbar-${i}"
+             style="height:100%;width:0%;border-radius:6px;
+                    background:${DEMO_COLORS[i % DEMO_COLORS.length]};
+                    transition:width 0.08s linear;
+                    display:flex;align-items:center;padding-left:8px;
+                    font-size:11px;font-weight:700;color:#fff">
+        </div>
+      </div>
+      <span id="dptime-${i}"
+            style="font-size:12px;color:var(--text-muted);width:72px;text-align:right">
+        —
+      </span>
+    </div>`).join('');
+}
+
+// ── Runner de la demo ──
+function runParallelDemo() {
+  const numCores = parseInt(document.getElementById('demo-cores').value) || 4;
+  const load     = parseInt(document.getElementById('demo-load').value)  || 4;
+  const iters    = load * 800000;
+
+  // Reset UI
+  buildDemoCores();
+  for (let i = 0; i < numCores; i++) {
+    const bar  = document.getElementById(`dpbar-${i}`);
+    const time = document.getElementById(`dptime-${i}`);
+    if (bar)  { bar.style.width = '0%'; bar.textContent = ''; }
+    if (time) { time.textContent = '...'; time.style.color = 'var(--text-muted)'; }
+  }
+  document.getElementById('demo-parallel-time').textContent = '...';
+  document.getElementById('demo-seq-time').textContent      = '...';
+  document.getElementById('demo-speedup').textContent       = '...';
+  document.getElementById('demo-verdict').style.display     = 'none';
+  document.getElementById('demo-gantt').innerHTML           = '';
+
+  // Worker en Blob — igual que el patrón que ya usa tu app
+  const demoWorkerCode = `
+    self.onmessage = function(e) {
+      if (e.data.type !== 'RUN') return;
+      const { id, iterations } = e.data;
+      const t0 = performance.now();
+      let dummy = 0;
+      for (let i = 0; i < iterations; i++) { dummy += Math.sqrt(i); }
+      const elapsed = performance.now() - t0;
+      self.postMessage({ id, elapsed, dummy });
+    };`;
+
+  const blob      = new Blob([demoWorkerCode], { type: 'application/javascript' });
+  const blobUrl   = URL.createObjectURL(blob);
+
+  const workers   = [];
+  const wallTimes = new Array(numCores);
+  const startTs   = new Array(numCores);
+  const globalT0  = performance.now();
+
+  for (let i = 0; i < numCores; i++) {
+    startTs[i] = performance.now();
+    const w = new Worker(blobUrl);
+
+    w.onmessage = (e) => {
+      const { id, elapsed } = e.data;
+      const wall = performance.now() - startTs[id];
+      wallTimes[id] = wall;
+
+      // Barra al 100 %
+      const bar  = document.getElementById(`dpbar-${id}`);
+      const time = document.getElementById(`dptime-${id}`);
+      if (bar) {
+        bar.style.width   = '100%';
+        bar.textContent   = Math.round(wall) + ' ms';
+      }
+      if (time) {
+        time.textContent  = Math.round(wall) + ' ms';
+        time.style.color  = 'var(--mi-green)';
+      }
+
+      w.terminate();
+      workers[id] = null;
+
+      // ¿Todos terminaron?
+      const done = wallTimes.filter(v => v !== undefined).length;
+      if (done === numCores) {
+        URL.revokeObjectURL(blobUrl);
+        _showDemoResults(wallTimes, performance.now() - globalT0, numCores);
+      }
+    };
+
+    w.onerror = (err) => {
+      console.error('Demo worker error:', err);
+    };
+
+    workers.push(w);
+    w.postMessage({ type: 'RUN', id: i, iterations: iters });
+  }
+
+  // Animar barras en tiempo real (polling ligero)
+  const anim = setInterval(() => {
+    const elapsed = performance.now() - globalT0;
+    const estTotal = (load * 800000) / 2e6 * 1000; // estimado burdo
+    for (let i = 0; i < numCores; i++) {
+      if (wallTimes[i] !== undefined) continue; // ya terminó
+      const bar = document.getElementById(`dpbar-${i}`);
+      if (bar) {
+        const pct = Math.min(95, (elapsed / Math.max(estTotal, 100)) * 100);
+        bar.style.width = pct + '%';
+        bar.textContent  = Math.round(elapsed) + ' ms…';
+      }
+    }
+    if (wallTimes.filter(v => v !== undefined).length === numCores) clearInterval(anim);
+  }, 60);
+}
+
+// ── Mostrar resultados y gantt ──
+function _showDemoResults(wallTimes, parallelMs, numCores) {
+  const parallel  = Math.round(parallelMs);
+  const seqEst    = Math.round(wallTimes.reduce((a, b) => a + b, 0));
+  const speedup   = (seqEst / Math.max(parallel, 1)).toFixed(2);
+
+  document.getElementById('demo-parallel-time').textContent = parallel + ' ms';
+  document.getElementById('demo-seq-time').textContent      = seqEst  + ' ms';
+  document.getElementById('demo-speedup').textContent       = speedup + 'x';
+
+  // Veredicto
+  const vEl = document.getElementById('demo-verdict');
+  vEl.style.display = 'block';
+  const isParallel  = parseFloat(speedup) >= 1.3;
+  vEl.style.background  = isParallel ? 'rgba(46,125,50,0.12)' : 'rgba(230,81,0,0.10)';
+  vEl.style.borderColor = isParallel ? 'var(--mi-green)'       : '#e65100';
+  vEl.style.color       = isParallel ? 'var(--mi-green)'       : '#e65100';
+  vEl.innerHTML = isParallel
+    ? `✅ Paralelismo confirmado: ${numCores} workers corrieron simultáneamente. Tiempo paralelo: <b>${parallel} ms</b> vs estimado secuencial: <b>${seqEst} ms</b> → Speedup de <b>${speedup}x</b>.`
+    : `⚠️ Speedup de ${speedup}x — con 1 core el paralelismo no aplica. Sube a 2 o más cores para ver la diferencia real.`;
+
+  // Mini Gantt — cada fila = 1 worker, ancho proporcional a su wall-time
+  const maxT   = Math.max(...wallTimes);
+  const ganttEl = document.getElementById('demo-gantt');
+  ganttEl.innerHTML = wallTimes.map((t, i) => {
+    const pct   = ((t / maxT) * 100).toFixed(1);
+    const color = DEMO_COLORS[i % DEMO_COLORS.length];
+    return `
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text-muted);width:64px;flex-shrink:0">
+          Worker ${i}
+        </span>
+        <div style="flex:1;height:22px;background:var(--bg-panel2);border-radius:4px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:4px;
+                      display:flex;align-items:center;padding-left:8px">
+            <span style="font-size:10px;font-weight:700;color:#fff;white-space:nowrap">
+              T=0 → ${Math.round(t)}ms
+            </span>
+          </div>
+        </div>
+        <span style="font-size:11px;color:${color};font-weight:700;width:64px;text-align:right">
+          ${Math.round(t)} ms
+        </span>
+      </div>`;
+  }).join('');
+
+  // Fila de referencia secuencial
+  ganttEl.innerHTML += `
+    <div style="margin-top:8px;padding:8px 10px;background:var(--bg-panel2);border-radius:6px;
+                font-size:11px;color:var(--text-muted);display:flex;gap:16px">
+      <span>▶ Si fuera secuencial: <b style="color:var(--text-dim)">${seqEst} ms</b></span>
+      <span>⚡ En paralelo real: <b style="color:var(--mi-green)">${parallel} ms</b></span>
+      <span>🚀 Speedup: <b style="color:var(--mi-green)">${speedup}x</b></span>
+    </div>`;
+}
+
+// ── Inicializar barras al cargar y al cambiar el slider ──
+document.addEventListener('DOMContentLoaded', () => {
+  buildDemoCores();
+});
+// Fallback por si DOMContentLoaded ya pasó
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+  buildDemoCores();
+}

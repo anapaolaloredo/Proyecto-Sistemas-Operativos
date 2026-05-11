@@ -35,7 +35,7 @@
   <button class="nav-btn" data-tab="memory"><span class="nav-icon"></span> Módulo 3 — Paginación</button>
   <button class="nav-btn" data-tab="states"><span class="nav-icon"></span> Diagrama de Estados</button>
   <button class="nav-btn" data-tab="threads">Módulo 4 — Threads & Cores</button>
-    <button class="nav-btn" data-tab="comparison">⚔️ Módulo 5 — Comparación</button>
+    <button class="nav-btn" data-tab="comparison">Módulo 5 — Comparación</button>
 
 </nav>
 
@@ -415,12 +415,13 @@
 
     <!-- ══════════ TAB 5: THREADS ══════════ -->
 
-  <section class="tab-content" id="tab-threads">
-    <div class="section-header">
-      <h2>Scare Floor Multi-Core <span class="badge">Threads & Paralelismo</span></h2>
-      <p class="section-desc">Cada proceso se ejecuta en un Web Worker real (thread OS). Configura el número de cores y observa ejecución paralela verdadera</p>
-    </div>
+<section class="tab-content" id="tab-threads">
+  <div class="section-header">
+    <h2>Scare Floor Multi-Core <span class="badge">Threads & Paralelismo</span></h2>
+    <p class="section-desc">Cada proceso se ejecuta en un Web Worker real (thread OS). Configura el número de cores y observa ejecución paralela verdadera</p>
+  </div>
 
+  <!-- ─── PANEL PRINCIPAL: CONFIG + CORES ─── -->
   <div class="panel-grid">
     <div class="panel">
       <div class="panel-title">⚙️ Configuración de Cores</div>
@@ -446,13 +447,16 @@
       </div>
       <div class="btn-row">
         <button class="mi-btn primary" onclick="initThreadManager()">🧵 Iniciar Workers</button>
-        <button class="mi-btn secondary" onclick="runThreadSimulation()">▶ Ejecutar en paralelo</button>
-        <button class="mi-btn ghost" onclick="stopThreadSimulation()">⏹ Stop</button>
+        <button class="mi-btn secondary" onclick="runThreadSimulation()">▶️ Ejecutar en paralelo</button>
+        <button class="mi-btn ghost" onclick="stopThreadSimulation()">⏹️ Stop</button>
       </div>
-
-      <!-- Stats -->
       <div id="thread-stats" style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:var(--text-muted)">
         <span>Cores activos: <b>0</b></span>
+      </div>
+      <!-- Tiempo total -->
+      <div style="margin-top:12px;padding:10px 14px;background:var(--bg-panel2);border-radius:8px;font-size:13px;display:flex;align-items:center;gap:10px">
+        <span style="color:var(--text-muted)">⏱️ Tiempo paralelo total:</span>
+        <span id="thread-total-time" style="font-weight:700;color:var(--mi-green)">—</span>
       </div>
     </div>
 
@@ -466,6 +470,72 @@
     </div>
   </div>
 
+  <!-- ─── PANEL: DEMOSTRACIÓN DE PARALELISMO REAL ─── -->
+  <div class="panel" style="margin-top:0">
+    <div class="panel-title">⚡ Demostración de Paralelismo Real
+      <span style="font-size:11px;font-weight:400;color:var(--text-muted);margin-left:8px">
+        — Workers reales compitiendo por CPU al mismo tiempo
+      </span>
+    </div>
+    <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">
+      Esta prueba lanza N workers simultáneos. Cada uno ejecuta 800,000 operaciones
+      <code>Math.sqrt</code> reales dentro de su propio hilo del SO.
+      Si el tiempo total es menor que la suma individual → hay paralelismo real.
+    </p>
+
+    <!-- Controles de la demo -->
+    <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+      <div class="form-group" style="margin:0;min-width:160px">
+        <label>Cores a demostrar</label>
+        <input type="range" id="demo-cores" min="1" max="8" value="4"
+               style="width:100%"
+               oninput="document.getElementById('demo-cores-lbl').textContent=this.value; buildDemoCores()"/>
+      </div>
+      <span id="demo-cores-lbl" style="font-size:15px;font-weight:700;min-width:16px">4</span>
+
+      <div class="form-group" style="margin:0;min-width:160px">
+        <label>Carga por worker</label>
+        <input type="range" id="demo-load" min="1" max="8" value="4"
+               style="width:100%"
+               oninput="document.getElementById('demo-load-lbl').textContent=this.value"/>
+      </div>
+      <span id="demo-load-lbl" style="font-size:15px;font-weight:700;min-width:16px">4</span>
+
+      <button class="mi-btn primary" style="margin-left:auto" onclick="runParallelDemo()">
+        ⚡ Lanzar prueba de paralelismo
+      </button>
+    </div>
+
+    <!-- Barras de progreso por core -->
+    <div id="demo-cores-area" style="margin-bottom:16px"></div>
+
+    <!-- Métricas de paralelismo -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+      <div style="background:var(--bg-panel2);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Tiempo paralelo (ms)</div>
+        <div id="demo-parallel-time" style="font-size:22px;font-weight:700;color:var(--mi-blue)">—</div>
+      </div>
+      <div style="background:var(--bg-panel2);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Tiempo secuencial estimado (ms)</div>
+        <div id="demo-seq-time" style="font-size:22px;font-weight:700;color:var(--text-dim)">—</div>
+      </div>
+      <div style="background:var(--bg-panel2);border-radius:8px;padding:14px;text-align:center">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:4px">Speedup real</div>
+        <div id="demo-speedup" style="font-size:22px;font-weight:700;color:var(--mi-green)">—</div>
+      </div>
+    </div>
+
+    <!-- Veredicto -->
+    <div id="demo-verdict" style="display:none;border-radius:8px;padding:12px 16px;font-size:13px;border:1px solid transparent"></div>
+
+    <!-- Mini gantt de la demo (línea de tiempo por worker) -->
+    <div style="margin-top:14px">
+      <div class="panel-title" style="font-size:12px;margin-bottom:8px">🗂️ Línea de tiempo — cada fila = 1 worker corriendo en paralelo</div>
+      <div id="demo-gantt" style="display:flex;flex-direction:column;gap:4px"></div>
+    </div>
+  </div>
+
+  <!-- ─── PANEL: EVENT LOG ─── -->
   <div class="panel">
     <div class="panel-title">📟 Thread Event Log</div>
     <div id="thread-log" class="event-log" style="height:200px">
@@ -474,7 +544,8 @@
   </div>
 </section>
 
-  <!-- ══════════ TAB 5: COMPARACIÓN DE ALGORITMOS ══════════ -->
+
+<!-- ══════════ TAB 5: COMPARACIÓN DE ALGORITMOS ══════════ -->
   <section class="tab-content" id="tab-comparison">
     <div class="section-header">
       <h2>⚔️ Scare Floor Dual <span class="badge">Comparación de Algoritmos</span></h2>
