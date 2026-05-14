@@ -601,6 +601,10 @@
           <label>Quantum (RR/MLFQ/MLQ)</label>
           <input type="number" id="cmp-quantum" class="mi-input" value="2" min="1"/>
         </div>
+        <div class="form-group" style="margin:0;min-width:120px">
+          <label>Cores (CPU)</label>
+          <input type="number" id="cmp-cores" class="mi-input" value="2" min="1" max="16"/>
+        </div>
         <div style="margin-top:16px;display:flex;gap:8px">
           <button class="mi-btn primary" onclick="runAllComparison()">⚔️ Comparar TODOS los algoritmos</button>
           <button class="mi-btn ghost" onclick="resetAllComparison()">↺ Reset</button>
