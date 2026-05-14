@@ -226,28 +226,161 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
 .seat-chair.empty{background:linear-gradient(180deg,#37474f,#263238);opacity:0.4;}
 .seat-chair.has-monster{animation:seat-bounce 0.4s ease;}
 @keyframes seat-bounce{0%{transform:scale(0.8);}60%{transform:scale(1.1);}100%{transform:scale(1);}}
+/* ── RACK DESLIZANTE ESTILO MONSTERS INC ── */
 .door-stations-title{font-family:var(--font-display);font-size:13px;color:#90caf9;letter-spacing:1px;margin-bottom:10px;text-align:center;}
-.door-stations-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:12px;}
-.door-station{display:flex;flex-direction:column;align-items:center;gap:5px;}
-.door-station-label{font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);font-family:var(--font-mono);letter-spacing:1px;}
-.mi-door-frame{position:relative;width:90px;height:126px;}
-.mi-door-arch{position:absolute;inset:0;background:linear-gradient(180deg,#4a4a4a,#2d2d2d);border-radius:10px 10px 3px 3px;border:3px solid #5d5d5d;box-shadow:0 6px 20px rgba(0,0,0,0.5),inset 0 2px 4px rgba(255,255,255,0.05);}
-.mi-door-panel{position:absolute;top:4px;left:4px;right:4px;bottom:4px;border-radius:7px 7px 2px 2px;transition:all 0.5s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;overflow:hidden;}
-.mi-door-panel.idle{background:linear-gradient(160deg,#1a237e,#283593);box-shadow:inset 0 2px 8px rgba(0,0,0,0.4);}
-.mi-door-panel.running{animation:door-glow 0.8s ease-in-out infinite alternate;}
-@keyframes door-glow{0%{box-shadow:0 0 15px rgba(67,160,71,0.6),inset 0 2px 8px rgba(0,0,0,0.2);}100%{box-shadow:0 0 30px rgba(67,160,71,0.9),inset 0 2px 8px rgba(0,0,0,0.1);}}
-.mi-door-panel.complete{background:linear-gradient(160deg,#37474f,#263238);opacity:0.6;}
-.mi-door-knob{position:absolute;right:7px;top:50%;transform:translateY(-50%);width:7px;height:7px;border-radius:50%;background:radial-gradient(circle at 30% 30%,#ffd54f,#f9a825);box-shadow:0 2px 4px rgba(0,0,0,0.4);}
-.mi-door-number{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.5);color:rgba(255,255,255,0.8);font-size:8px;font-weight:700;font-family:var(--font-mono);padding:2px 7px;border-radius:4px;white-space:nowrap;}
-.mi-door-monster{font-size:22px;line-height:1;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));animation:monster-wiggle 0.5s ease infinite alternate;}
-@keyframes monster-wiggle{0%{transform:rotate(-5deg) scale(1);}100%{transform:rotate(5deg) scale(1.05);}}
-.mi-door-pid{font-family:var(--font-display);font-size:12px;color:white;text-shadow:0 0 8px rgba(255,255,255,0.5);}
-.mi-door-progress{position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(0,0,0,0.3);}
-.mi-door-progress-fill{height:100%;width:0%;background:linear-gradient(90deg,#43a047,#a5d6a7);transition:width 0.3s ease;border-radius:0 2px 2px 0;}
-.door-status-badge{font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;font-family:var(--font-mono);}
+
+/* El rack horizontal: riel superior + riel inferior + puertas deslizando */
+.rack-container{position:relative;background:linear-gradient(180deg,#0a0a1a 0%,#0d1b3e 40%,#0a1628 100%);border:2px solid #1a237e;border-radius:12px;overflow:hidden;margin-bottom:8px;min-height:200px;}
+
+/* Luces de techo del Scare Floor */
+.rack-ceiling{position:absolute;top:0;left:0;right:0;height:18px;background:linear-gradient(90deg,#1a237e,#283593,#1a237e);display:flex;align-items:center;padding:0 10px;gap:14px;z-index:5;}
+.rack-ceiling-light{width:8px;height:8px;border-radius:50%;background:#f9a825;box-shadow:0 0 8px #f9a825,0 0 16px rgba(249,168,37,0.5);animation:ceiling-blink 2s ease-in-out infinite;}
+.rack-ceiling-light:nth-child(2){animation-delay:0.3s;}
+.rack-ceiling-light:nth-child(3){animation-delay:0.6s;}
+.rack-ceiling-light:nth-child(4){animation-delay:0.9s;}
+.rack-ceiling-light:nth-child(5){animation-delay:1.2s;}
+.rack-ceiling-light:nth-child(6){animation-delay:1.5s;}
+.rack-ceiling-light:nth-child(7){animation-delay:1.8s;}
+@keyframes ceiling-blink{0%,100%{opacity:1;}50%{opacity:0.4;}}
+
+/* Rieles del rack */
+.rack-rail-top{position:absolute;top:18px;left:0;right:0;height:14px;background:linear-gradient(180deg,#546e7a,#37474f,#263238);border-bottom:3px solid #78909c;box-shadow:inset 0 -3px 8px rgba(0,0,0,0.5),0 3px 10px rgba(0,0,0,0.4);z-index:4;}
+.rack-rail-top::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 24px,rgba(0,0,0,0.2) 24px,rgba(0,0,0,0.2) 26px);}
+.rack-rail-bottom{position:absolute;bottom:0;left:0;right:0;height:14px;background:linear-gradient(180deg,#263238,#37474f,#546e7a);border-top:3px solid #78909c;box-shadow:inset 0 3px 8px rgba(0,0,0,0.5);z-index:4;}
+.rack-rail-bottom::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 24px,rgba(0,0,0,0.2) 24px,rgba(0,0,0,0.2) 26px);}
+
+
+/* El marco/colgador de la puerta (el ganchito del rack) */
+.rack-hanger{width:2px;height:14px;background:linear-gradient(180deg,#90a4ae,#546e7a);margin:0 auto;border-radius:1px;position:relative;}
+.rack-hanger::before{content:'';position:absolute;top:-4px;left:50%;transform:translateX(-50%);width:10px;height:6px;border:2px solid #90a4ae;border-bottom:none;border-radius:4px 4px 0 0;}
+
+/* La puerta en sí: diseño más elaborado */
+.mi-door-frame{position:relative;width:88px;height:130px;cursor:default;}
+/* Marco exterior de madera/metal */
+.mi-door-arch{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#5d4037,#4e342e,#3e2723);
+  border-radius:8px 8px 4px 4px;
+  border:3px solid #8d6e63;
+  box-shadow:0 8px 24px rgba(0,0,0,0.6),inset 0 1px 3px rgba(255,255,255,0.08);
+}
+/* Arco superior de la puerta */
+.mi-door-arch::before{
+  content:'';position:absolute;top:-3px;left:50%;transform:translateX(-50%);
+  width:40px;height:6px;
+  background:linear-gradient(90deg,#8d6e63,#a1887f,#8d6e63);
+  border-radius:4px 4px 0 0;
+}
+/* Bisagras */
+.mi-door-arch::after{
+  content:'';position:absolute;left:3px;top:25%;
+  width:5px;height:16px;
+  background:linear-gradient(90deg,#bdbdbd,#9e9e9e);
+  border-radius:2px;
+  box-shadow:0 40px 0 #9e9e9e;
+}
+
+/* Panel de la puerta (la superficie coloreada) */
+.mi-door-panel{
+  position:absolute;top:5px;left:5px;right:5px;bottom:5px;
+  border-radius:5px 5px 3px 3px;
+  transition:all 0.45s cubic-bezier(0.4,0,0.2,1);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+  overflow:hidden;
+  /* Molde de panel en relieve */
+  box-shadow:inset 0 2px 6px rgba(255,255,255,0.12),inset 0 -2px 6px rgba(0,0,0,0.3);
+}
+/* Efecto de moldura en el panel */
+.mi-door-panel::before{
+  content:'';position:absolute;
+  top:8px;left:8px;right:8px;bottom:8px;
+  border:1.5px solid rgba(255,255,255,0.12);
+  border-radius:3px;pointer-events:none;
+}
+
+/* Estados del panel */
+.mi-door-panel.idle{
+  background:linear-gradient(160deg,#1a237e 0%,#283593 60%,#1565c0 100%);
+}
+.mi-door-panel.running{
+  animation:door-glow 0.7s ease-in-out infinite alternate;
+}
+@keyframes door-glow{
+  0%{box-shadow:0 0 20px rgba(76,175,80,0.7),0 0 40px rgba(76,175,80,0.3),inset 0 2px 6px rgba(255,255,255,0.15);}
+  100%{box-shadow:0 0 35px rgba(76,175,80,1),0 0 60px rgba(76,175,80,0.5),inset 0 2px 6px rgba(255,255,255,0.2);}
+}
+.mi-door-panel.complete{
+  background:linear-gradient(160deg,#1b2838,#263238);
+  opacity:0.55;
+  filter:grayscale(0.4);
+}
+
+/* Pomo / manija de la puerta */
+.mi-door-knob{
+  position:absolute;right:8px;top:50%;transform:translateY(-50%);
+  width:9px;height:9px;
+  border-radius:50%;
+  background:radial-gradient(circle at 30% 30%,#fff59d,#ffd54f,#f9a825);
+  box-shadow:0 2px 6px rgba(0,0,0,0.5),0 0 4px rgba(255,213,79,0.5);
+}
+.mi-door-knob::after{content:'';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:2px;height:7px;background:#8d6e63;border-radius:1px;}
+
+/* Número en la parte baja de la puerta */
+.mi-door-number{
+  position:absolute;bottom:8px;left:50%;transform:translateX(-50%);
+  background:rgba(0,0,0,0.6);color:rgba(255,255,255,0.85);
+  font-size:8px;font-weight:700;font-family:var(--font-mono);
+  padding:2px 8px;border-radius:4px;white-space:nowrap;
+  border:1px solid rgba(255,255,255,0.1);
+}
+
+/* Monstruo dentro de la puerta */
+.mi-door-monster{
+  font-size:26px;line-height:1;
+  filter:drop-shadow(0 3px 6px rgba(0,0,0,0.6));
+  animation:monster-wiggle 0.45s ease infinite alternate;
+  position:relative;z-index:1;
+}
+@keyframes monster-wiggle{
+  0%{transform:rotate(-6deg) scale(1) translateY(0);}
+  100%{transform:rotate(6deg) scale(1.08) translateY(-2px);}
+}
+
+/* PID label dentro de la puerta */
+.mi-door-pid{
+  font-family:var(--font-display);font-size:12px;color:white;
+  text-shadow:0 0 10px rgba(255,255,255,0.7);
+  position:relative;z-index:1;
+}
+
+/* Barra de progreso al fondo de la puerta */
+.mi-door-progress{position:absolute;bottom:0;left:0;right:0;height:5px;background:rgba(0,0,0,0.4);}
+.mi-door-progress-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#43a047,#66bb6a,#a5d6a7);
+  transition:width 0.4s ease;
+  border-radius:0 3px 3px 0;
+  box-shadow:0 0 6px rgba(67,160,71,0.5);
+}
+
+/* Indicador de estado debajo de la puerta */
+.door-status-badge{font-size:9px;font-weight:700;padding:2px 9px;border-radius:20px;font-family:var(--font-mono);margin-top:2px;}
 .door-status-badge.idle{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.4);}
-.door-status-badge.running{background:rgba(67,160,71,0.2);color:#a5d6a7;}
+.door-status-badge.running{background:rgba(76,175,80,0.25);color:#a5d6a7;box-shadow:0 0 6px rgba(76,175,80,0.3);}
 .door-status-badge.complete{background:rgba(84,110,122,0.2);color:#90a4ae;}
+
+/* Label del proceso sobre la puerta */
+.door-station-label{font-size:9px;font-weight:700;color:rgba(255,255,255,0.5);font-family:var(--font-mono);letter-spacing:1px;}
+
+/* Efecto de luz de suelo cuando corre */
+.rack-door-slot.state-running::after{
+  content:'';position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
+  width:60px;height:12px;
+  background:radial-gradient(ellipse,rgba(76,175,80,0.5) 0%,transparent 70%);
+  border-radius:50%;
+  animation:floor-glow 0.7s ease-in-out infinite alternate;
+}
+@keyframes floor-glow{0%{opacity:0.5;transform:translateX(-50%) scaleX(0.8);}100%{opacity:1;transform:translateX(-50%) scaleX(1.2);}}
 .scream-sidebar{display:flex;flex-direction:column;gap:10px;}
 .scream-log-panel{background:rgba(0,0,0,0.3);border:1.5px solid rgba(255,255,255,0.08);border-radius:var(--radius-lg);padding:12px;flex:1;}
 .scream-log-title{font-family:var(--font-display);font-size:12px;color:#f9a825;letter-spacing:1px;margin-bottom:8px;}
@@ -264,6 +397,60 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
 .top-monster-bar{flex:1;height:5px;background:rgba(255,255,255,0.08);border-radius:3px;overflow:hidden;}
 .top-monster-bar-fill{height:100%;background:linear-gradient(90deg,#7b1fa2,#ce93d8);border-radius:3px;transition:width 0.5s ease;}
 .door-color-0{background:linear-gradient(160deg,#0d47a1,#1565c0)!important;} .door-color-1{background:linear-gradient(160deg,#4a148c,#7b1fa2)!important;} .door-color-2{background:linear-gradient(160deg,#006064,#00838f)!important;} .door-color-3{background:linear-gradient(160deg,#1b5e20,#2e7d32)!important;} .door-color-4{background:linear-gradient(160deg,#bf360c,#e65100)!important;} .door-color-5{background:linear-gradient(160deg,#880e4f,#ad1457)!important;} .door-color-6{background:linear-gradient(160deg,#311b92,#4527a0)!important;} .door-color-7{background:linear-gradient(160deg,#004d40,#00695c)!important;} .door-color-8{background:linear-gradient(160deg,#b71c1c,#c62828)!important;} .door-color-9{background:linear-gradient(160deg,#263238,#37474f)!important;}
+
+/* ── RACK ANIMATIONS: deslizamiento real de puertas ── */
+
+/* Las puertas idle están ligeramente hacia atrás/opacas */
+.rack-door-slot{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:8px 10px;flex-shrink:0;position:relative;
+  transition:transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s ease;
+  will-change:transform,opacity;
+}
+
+/* La puerta ACTIVA se empuja hacia adelante (más grande, iluminada) */
+.rack-door-slot.state-running{
+  transform:translateY(-6px) scale(1.08) !important;
+  z-index:10;
+  filter:drop-shadow(0 8px 20px rgba(76,175,80,0.6));
+}
+/* Puertas idle se encogen un poco */
+.rack-door-slot.state-idle{
+  transform:scale(0.93) translateY(4px);
+  opacity:0.75;
+}
+/* Puertas done se encogen más y se decoloran */
+.rack-door-slot.state-complete{
+  transform:scale(0.87) translateY(6px);
+  opacity:0.45;
+  filter:grayscale(0.5);
+}
+
+/* Efecto de luz en el piso cuando la puerta está activa */
+.rack-door-slot.state-running::after{
+  content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);
+  width:70px;height:14px;
+  background:radial-gradient(ellipse,rgba(76,175,80,0.55) 0%,transparent 70%);
+  border-radius:50%;
+  animation:floor-light 0.7s ease-in-out infinite alternate;
+}
+@keyframes floor-light{
+  0%{transform:translateX(-50%) scaleX(0.7);opacity:0.6;}
+  100%{transform:translateX(-50%) scaleX(1.3);opacity:1;}
+}
+
+/* El rack-track tiene scroll suave */
+.rack-track{
+  position:absolute;top:32px;bottom:14px;left:0;right:0;
+  overflow-x:auto;overflow-y:hidden;
+  display:flex;align-items:flex-end;
+  gap:4px;padding:0 20px 10px;
+  scrollbar-width:thin;scrollbar-color:#1a237e transparent;
+  scroll-behavior:smooth;
+}
+.rack-track::-webkit-scrollbar{height:5px;}
+.rack-track::-webkit-scrollbar-thumb{background:#283593;border-radius:3px;}
+
 .scare-flash{animation:scare-flash-anim 0.3s ease!important;}
 @keyframes scare-flash-anim{0%{filter:brightness(1);}50%{filter:brightness(2) hue-rotate(30deg);}100%{filter:brightness(1);}}
 .doors-status-bar{padding:9px 16px;background:rgba(0,0,0,0.3);border-top:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:10px;font-size:11px;color:rgba(255,255,255,0.5);font-family:var(--font-mono);}
@@ -356,8 +543,8 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
   .mi-btn{padding:7px 11px;font-size:11px;}
   .scream-stat{min-width:60px;padding:6px 10px;}
   .scream-stat-val{font-size:17px;}
-  .door-stations-grid{grid-template-columns:repeat(auto-fill,minmax(85px,1fr));}
-  .mi-door-frame{width:78px;height:108px;}
+  .rack-container{min-height:170px;}
+  .mi-door-frame{width:76px;height:112px;}
   .theater-seats{min-height:60px;}
   .sim-info-bar{gap:7px;padding:7px 10px;}
   .states-flow{padding:12px;}
@@ -369,8 +556,8 @@ body{background:var(--bg-base);color:var(--text-primary);font-family:var(--font-
   .section-header h2{font-size:16px;}
   .doors-header-title{font-size:13px;}
   .scream-meter-label{font-size:10px;}
-  .door-stations-grid{grid-template-columns:repeat(auto-fill,minmax(75px,1fr));gap:8px;}
-  .mi-door-frame{width:68px;height:96px;}
+  .rack-container{min-height:155px;}
+  .mi-door-frame{width:66px;height:98px;}
   .mi-door-monster{font-size:18px;}
   .gantt-block{min-width:28px;}
   .mem-counters{grid-template-columns:1fr 1fr;}
