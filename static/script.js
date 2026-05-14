@@ -629,9 +629,151 @@ function resetDoorSimulation(){doorState={screamUnits:0,totalUnits:0,completed:0
 function updateDoorSimulation(){processes.forEach(p=>{if(!doorProcessState[p.pid])doorProcessState[p.pid]={burstOrig:p.burstOrig,done:0,progress:0};});doorState.totalUnits=processes.reduce((s,p)=>s+p.burstOrig,0);renderDoorSimulation();}
 function updateDoorSimulationStep(seg){if(seg.pid===null){currentDoorPid=null;}else{const pid=seg.pid;currentDoorPid=pid;const dur=seg.end-seg.start;if(!doorProcessState[pid]){const p=processes.find(x=>x.pid===pid);doorProcessState[pid]={burstOrig:p?p.burstOrig:dur,done:0,progress:0};}doorProcessState[pid].done+=dur;const orig=doorProcessState[pid].burstOrig;doorProcessState[pid].progress=Math.min(100,(doorProcessState[pid].done/orig)*100);screamTotal+=dur;doorState.screamUnits=screamTotal;doorState.totalUnits=Math.max(doorState.totalUnits,screamTotal);if(!doorState.topMonsters[pid])doorState.topMonsters[pid]=0;doorState.topMonsters[pid]+=dur;doorState.scareLog.push({pid,time:seg.start,emoji:getMonsterEmoji(pid)});if(doorState.scareLog.length>30)doorState.scareLog.shift();}doorState.completed=Object.values(doorProcessState).filter(d=>d.progress>=100).length;doorState.running=currentDoorPid!==null?1:0;renderDoorSimulation();}
 function finishDoorSimulation(){processes.forEach(p=>{if(!doorProcessState[p.pid])doorProcessState[p.pid]={burstOrig:p.burstOrig,done:p.burstOrig,progress:100};doorProcessState[p.pid].progress=100;doorProcessState[p.pid].done=doorProcessState[p.pid].burstOrig;});currentDoorPid=null;doorState.completed=processes.length;doorState.running=0;renderDoorSimulation();}
-function renderDoorSimulation(){const procs=processes;document.getElementById('door-completed').textContent=doorState.completed;document.getElementById('door-running-count').textContent=doorState.running;document.getElementById('door-total').textContent=procs.length;const totalBurst=procs.reduce((s,p)=>s+p.burstOrig,0)||1;const pct=Math.min(100,(screamTotal/totalBurst)*100);document.getElementById('scream-bar-fill').style.width=pct+'%';document.getElementById('scream-pct').textContent=Math.round(pct)+'%';renderWaitingRoom();renderDoorStations();renderScareLog();renderTopMonsters();}
+function renderDoorSimulation(){const procs=processes;document.getElementById('door-completed').textContent=doorState.completed;document.getElementById('door-running-count').textContent=doorState.running;document.getElementById('door-total').textContent=procs.length;const totalBurst=procs.reduce((s,p)=>s+p.burstOrig,0)||1;const pct=Math.min(100,(screamTotal/totalBurst)*100);document.getElementById('scream-bar-fill').style.width=pct+'%';document.getElementById('scream-pct').textContent=Math.round(pct)+'%';renderWaitingRoom();renderDoorStations();renderScareLog();renderTopMonsters();
+  // Auto-scroll rack to keep the active door centered
+  if(currentDoorPid!==null){
+    const rack=document.getElementById('rack-track-inner');
+    const activeSlot=rack&&rack.querySelector('.state-running');
+    if(activeSlot&&rack){
+      const target=activeSlot.offsetLeft-(rack.clientWidth/2)+(activeSlot.offsetWidth/2);
+      rack.scrollTo({left:Math.max(0,target),behavior:'smooth'});
+    }
+  }
+  // Scroll rack to keep active door visible
+  if(currentDoorPid !== null){
+    const rack = document.getElementById('rack-track-inner');
+    const activeSlot = rack && rack.querySelector('.state-running');
+    if(activeSlot && rack){
+      const slotLeft = activeSlot.offsetLeft;
+      const slotWidth = activeSlot.offsetWidth;
+      const rackWidth = rack.clientWidth;
+      const targetScroll = slotLeft - (rackWidth/2) + (slotWidth/2);
+      rack.scrollTo({left: Math.max(0,targetScroll), behavior:'smooth'});
+    }
+  }
+}
 function renderWaitingRoom(){const el=document.getElementById('theater-seats');const MAX=14;const waiting=processes.filter(p=>{const ds=doorProcessState[p.pid];return !ds||ds.progress<100;});document.getElementById('waiting-room-count').textContent=waiting.length+' waiting';let html='';for(let i=0;i<MAX;i++){const p=waiting[i];if(p){const isR=p.pid===currentDoorPid;html+=`<div class="theater-seat"><div class="seat-chair has-monster${isR?' scare-flash':''}" title="P${p.pid}">${getMonsterEmoji(p.pid)}</div><div class="seat-label" style="color:${getPidColor(p.pid)}">P${p.pid}</div></div>`;}else{html+=`<div class="theater-seat"><div class="seat-chair empty"></div><div class="seat-label" style="opacity:0.2">#${i+1}</div></div>`;}}el.innerHTML=html;}
-function renderDoorStations(){const el=document.getElementById('door-stations-grid');if(!processes.length){el.innerHTML=`<div style="grid-column:1/-1;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:20px;font-style:italic"> Las puertas aparecerán cuando agregues procesos</div>`;return;}el.innerHTML=processes.map(p=>{const ds=doorProcessState[p.pid]||{progress:0,done:0,burstOrig:p.burstOrig};const isR=p.pid===currentDoorPid;const isDone=ds.progress>=100;const colorIdx=getPidColorIdx(p.pid);let panelClass=isDone?'complete':isR?'running':'idle';const doorColorClass=isDone?'':`door-color-${colorIdx}`;return`<div class="door-station"><div class="door-station-label">DOOR #${p.pid}</div><div class="mi-door-frame"><div class="mi-door-arch"></div><div class="mi-door-panel ${panelClass} ${doorColorClass}" title="P${p.pid} | ${Math.round(ds.progress)}% complete">${isR?`<div class="mi-door-monster">${getMonsterEmoji(p.pid)}</div><div class="mi-door-pid">P${p.pid}</div>`:isDone?`<div style="font-size:20px">✅</div><div style="font-size:10px;color:rgba(255,255,255,0.5);font-weight:700">DONE</div>`:`<div style="font-size:18px;opacity:0.3">${getMonsterEmoji(p.pid)}</div><div class="mi-door-pid" style="opacity:0.5">P${p.pid}</div>`}<div class="mi-door-knob"></div><div class="mi-door-number">D${p.pid}</div><div class="mi-door-progress"><div class="mi-door-progress-fill" style="width:${ds.progress}%"></div></div></div></div><div class="door-status-badge ${panelClass}">${isDone?'✓ DONE':isR?'⚡ SCARE':'IDLE'}</div></div>`;}).join('');}
+function renderDoorStations(){
+  const rack = document.getElementById('rack-track-inner');
+  if(!rack) return;
+
+  if(!processes.length){
+    rack.innerHTML = `<div style="margin:auto;text-align:center;color:rgba(255,255,255,0.3);font-size:13px;padding:40px 20px;font-style:italic">🚪 Las puertas aparecerán cuando agregues procesos</div>`;
+    return;
+  }
+
+  const currentPids = new Set(processes.map(p=>p.pid));
+
+  // --- 1. REMOVE doors that no longer exist ---
+  [...rack.querySelectorAll('.rack-door-slot')].forEach(slot => {
+    const pid = parseInt(slot.dataset.pid);
+    if(!currentPids.has(pid) && !slot.dataset.removing) {
+      slot.dataset.removing = '1';
+      slot.style.transform = 'translateX(-120px) scaleY(0.5)';
+      slot.style.opacity   = '0';
+      slot.style.transition = 'transform 0.5s ease-in, opacity 0.4s ease-in';
+      setTimeout(() => slot.remove(), 520);
+    }
+  });
+
+  // --- 2. ADD new doors (slide in from the right side of the rack) ---
+  processes.forEach(p => {
+    if(!rack.querySelector(`[data-pid="${p.pid}"]`)) {
+      const slot = document.createElement('div');
+      slot.className = 'rack-door-slot';
+      slot.dataset.pid = p.pid;
+      // Start off-screen to the right, then animate in
+      slot.style.transform  = 'translateX(160px) scaleY(0.6)';
+      slot.style.opacity    = '0';
+      slot.style.transition = 'none';
+      rack.appendChild(slot);
+      // Force reflow then animate into position
+      slot.getBoundingClientRect();
+      slot.style.transition = 'transform 0.65s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s ease-out';
+      slot.style.transform  = 'translateX(0) scaleY(1)';
+      slot.style.opacity    = '1';
+    }
+  });
+
+  // --- 3. UPDATE each door's content (only inner HTML, preserving the slot element) ---
+  processes.forEach(p => {
+    const slot = rack.querySelector(`[data-pid="${p.pid}"]`);
+    if(!slot || slot.dataset.removing) return;
+
+    const ds       = doorProcessState[p.pid] || {progress:0, done:0, burstOrig:p.burstOrig};
+    const isR      = p.pid === currentDoorPid;
+    const isDone   = ds.progress >= 100;
+    const colorIdx = getPidColorIdx(p.pid);
+    const panelClass    = isDone ? 'complete' : isR ? 'running' : 'idle';
+    const doorColorClass = isDone ? '' : `door-color-${colorIdx}`;
+
+    // Update slot state for floor-glow css class
+    slot.className = 'rack-door-slot state-' + panelClass;
+    slot.dataset.pid = p.pid;
+
+    // Find existing elements to update in-place (avoids animation reset)
+    let frame = slot.querySelector('.mi-door-frame');
+    if(!frame) {
+      // First render of this slot: build full HTML
+      slot.innerHTML = `
+        <div class="door-station-label">P${p.pid}</div>
+        <div class="rack-hanger"></div>
+        <div class="mi-door-frame">
+          <div class="mi-door-arch"></div>
+          <div class="mi-door-panel ${panelClass} ${doorColorClass}">
+            <div class="mi-door-inner-content"></div>
+            <div class="mi-door-knob"></div>
+            <div class="mi-door-number">D${p.pid}</div>
+            <div class="mi-door-progress"><div class="mi-door-progress-fill"></div></div>
+          </div>
+        </div>
+        <div class="door-status-badge ${panelClass}">IDLE</div>`;
+    }
+
+    // Update panel class (state change — triggers CSS transition / animation)
+    const panel = slot.querySelector('.mi-door-panel');
+    if(panel) {
+      panel.className = `mi-door-panel ${panelClass} ${doorColorClass}`;
+    }
+
+    // Update inner content (monster / done / idle)
+    const inner = slot.querySelector('.mi-door-inner-content');
+    if(inner) {
+      if(isR) {
+        inner.innerHTML = `<div class="mi-door-monster">${getMonsterEmoji(p.pid)}</div><div class="mi-door-pid">P${p.pid}</div>`;
+      } else if(isDone) {
+        inner.innerHTML = `<div style="font-size:22px">✅</div><div style="font-size:9px;color:rgba(255,255,255,0.5);font-weight:700;font-family:monospace;letter-spacing:1px">DONE</div>`;
+      } else {
+        inner.innerHTML = `<div style="font-size:20px;opacity:0.28">${getMonsterEmoji(p.pid)}</div><div class="mi-door-pid" style="opacity:0.4">P${p.pid}</div>`;
+      }
+    }
+
+    // Update progress bar width (smooth CSS transition handles animation)
+    const fill = slot.querySelector('.mi-door-progress-fill');
+    if(fill) fill.style.width = ds.progress + '%';
+
+    // Update status badge
+    const badge = slot.querySelector('.door-status-badge');
+    if(badge) {
+      badge.className = `door-status-badge ${panelClass}`;
+      badge.textContent = isDone ? '✓ DONE' : isR ? '⚡ SCARE' : 'IDLE';
+    }
+
+    // --- SLIDING EFFECT: when this door becomes RUNNING, slide it toward the "active" zone ---
+    // We nudge it slightly to the left (simulating the rack feeding doors forward)
+    if(isR && !slot.dataset.wasRunning) {
+      slot.dataset.wasRunning = '1';
+      slot.style.transition = 'transform 0.5s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.3s';
+      slot.style.transform  = 'translateX(-6px) scaleY(1.04)';
+      setTimeout(()=>{
+        slot.style.transform = 'translateX(0) scaleY(1)';
+      }, 500);
+    } else if(!isR) {
+      delete slot.dataset.wasRunning;
+    }
+  });
+}
+
 function renderScareLog(){const el=document.getElementById('scream-log-entries');if(!doorState.scareLog.length){el.innerHTML='<div class="scream-log-empty">Los sustos aparecerán aquí...</div>';return;}el.innerHTML=[...doorState.scareLog].reverse().slice(0,20).map(e=>`<div class="scream-log-entry"><span>${e.emoji}</span><span class="entry-pid" style="color:${getPidColor(e.pid)}">P${e.pid}</span><span style="color:rgba(255,255,255,0.4)">⚡ scared!</span><span class="entry-time">T=${e.time}</span></div>`).join('');el.scrollTop=0;}
 function renderTopMonsters(){const el=document.getElementById('top-monsters-list');const entries=Object.entries(doorState.topMonsters).sort((a,b)=>b[1]-a[1]).slice(0,5);if(!entries.length){el.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.3);font-style:italic;text-align:center;padding:10px">Ejecuta para ver rankings</div>';return;}const maxVal=entries[0][1];const medals=['🥇','🥈','🥉','🏅','🏅'];el.innerHTML=entries.map(([pid,val],i)=>{const bw=Math.round((val/maxVal)*100);return`<div class="top-monster-row"><span class="top-monster-rank">${medals[i]}</span><span>${getMonsterEmoji(parseInt(pid))}</span><span style="color:${getPidColor(parseInt(pid))};font-size:12px;font-weight:700">P${pid}</span><div class="top-monster-bar"><div class="top-monster-bar-fill" style="width:${bw}%"></div></div><span style="font-size:10px;color:rgba(255,255,255,0.4);min-width:24px;text-align:right">${val}u</span></div>`;}).join('');}
 
