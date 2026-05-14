@@ -104,15 +104,38 @@ document.getElementById('btn-add-process').addEventListener('click', addProcess)
 document.getElementById('f-pid').addEventListener('keydown', e => { if(e.key==='Enter') addProcess(); });
 
 function addProcess() {
-  const pid      = parseInt(document.getElementById('f-pid').value);
-  const forks    = parseInt(document.getElementById('f-forks').value) || 0;
-  const arrival  = parseInt(document.getElementById('f-arrival').value) || 0;
-  const burst    = parseInt(document.getElementById('f-burst').value);
-  const priority = parseInt(document.getElementById('f-priority').value) || 1;
-  const pages    = parseInt(document.getElementById('f-pages').value) || 4;
+  // ── Leer valores raw para validar antes de parsear ──
+  const rawPid      = document.getElementById('f-pid').value;
+  const rawForks    = document.getElementById('f-forks').value;
+  const rawArrival  = document.getElementById('f-arrival').value;
+  const rawBurst    = document.getElementById('f-burst').value;
+  const rawPriority = document.getElementById('f-priority').value;
+  const rawPages    = document.getElementById('f-pages').value;
 
-  if (!pid || pid < 1) { toast('PID inválido','error'); return; }
-  if (!burst || burst < 1) { toast('Burst Time debe ser ≥ 1','error'); return; }
+  // Helper: detecta letras o caracteres no numéricos (permite - solo para priority)
+  function hasLetters(val) { return /[a-zA-Z]/.test(val); }
+  function isInvalidNumber(val) { return val !== '' && (isNaN(Number(val)) || hasLetters(val)); }
+
+  if (hasLetters(rawPid))      { toast('PID no puede contener letras','error'); return; }
+  if (hasLetters(rawForks))    { toast('Forks no puede contener letras','error'); return; }
+  if (hasLetters(rawArrival))  { toast('Arrival Time no puede contener letras','error'); return; }
+  if (hasLetters(rawBurst))    { toast('Burst Time no puede contener letras','error'); return; }
+  if (hasLetters(rawPriority)) { toast('Priority no puede contener letras','error'); return; }
+  if (hasLetters(rawPages))    { toast('Páginas no puede contener letras','error'); return; }
+
+  const pid      = parseInt(rawPid);
+  const forks    = parseInt(rawForks) || 0;
+  const arrival  = parseInt(rawArrival) || 0;
+  const burst    = parseInt(rawBurst);
+  const priority = parseInt(rawPriority) || 1;
+  const pages    = parseInt(rawPages) || 4;
+
+  // Validaciones de negativos (priority SÍ puede ser negativo)
+  if (!pid || pid < 1)      { toast('PID inválido (debe ser ≥ 1)','error'); return; }
+  if (!burst || burst < 1)  { toast('Burst Time debe ser ≥ 1','error'); return; }
+  if (arrival < 0)          { toast('Arrival Time no puede ser negativo','error'); return; }
+  if (forks < 0)            { toast('Forks no puede ser negativo','error'); return; }
+  if (pages < 1)            { toast('Páginas debe ser ≥ 1','error'); return; }
   if (processes.find(p => p.pid === pid)) { toast(`PID ${pid} ya existe`,'warn'); return; }
 
   processes.push({
@@ -384,7 +407,18 @@ function spawnForks(p, t, clone, queueArray = null, arrivedSet = null, isMultiLe
 
 function computeSchedule(){
   const algo=document.getElementById('sched-algo').value;
-  const quantum=parseInt(document.getElementById('sched-quantum').value)||2;
+  const rawQ = document.getElementById('sched-quantum').value;
+  if ((algo === 'rr' || algo === 'srtf') && (/[a-zA-Z]/.test(rawQ) || rawQ === '' || isNaN(Number(rawQ)))) {
+    toast('Quantum inválido: solo números enteros positivos','error'); return;
+  }
+  const quantum=parseInt(rawQ)||2;
+  if ((algo === 'rr' || algo === 'srtf') && quantum < 1) { toast('Quantum debe ser ≥ 1','error'); return; }
+  if ((algo === 'mlq' || algo === 'mlfq')) {
+    const rawQ0 = document.getElementById('mlq-q0').value;
+    const rawQ1 = document.getElementById('mlq-q1').value;
+    if (/[a-zA-Z]/.test(rawQ0) || rawQ0 === '' || isNaN(Number(rawQ0)) || parseInt(rawQ0) < 1) { toast('MLQ Q0 inválido: debe ser número entero ≥ 1','error'); return; }
+    if (/[a-zA-Z]/.test(rawQ1) || rawQ1 === '' || isNaN(Number(rawQ1)) || parseInt(rawQ1) < 1) { toast('MLQ Q1 inválido: debe ser número entero ≥ 1','error'); return; }
+  }
   const procs=processes.map(p=>({...p,remaining:p.burstOrig,responseRecorded:false,completionTime:0,responseTime:0,firstRun:-1}));
   let result;
   switch(algo){
@@ -1392,7 +1426,10 @@ class ThreadManager {
 let threadManager = null;
 
 function initThreadManager() {
-  const cores = parseInt(document.getElementById('num-cores').value) || 2;
+  const rawC = document.getElementById('num-cores').value;
+  if (/[a-zA-Z]/.test(rawC) || rawC === '' || isNaN(Number(rawC))) { toast('Cores inválido: solo números enteros positivos','error'); return; }
+  const cores = parseInt(rawC);
+  if (cores < 1) { toast('Cores debe ser ≥ 1','error'); return; }
   if (threadManager) threadManager.terminate();
   threadManager = new ThreadManager(cores);
   toast(`ThreadManager iniciado — ${cores} cores`, 'success');
@@ -1425,7 +1462,10 @@ function runThreadSimulation() {
   updateStateCounts();
 
   const algo = document.getElementById('thread-algo').value;
-  const quantum = parseInt(document.getElementById('thread-quantum').value) || 2;
+  const rawTQ = document.getElementById('thread-quantum').value;
+  if (/[a-zA-Z]/.test(rawTQ) || rawTQ === '' || isNaN(Number(rawTQ))) { toast('Quantum inválido: solo números enteros positivos','error'); return; }
+  const quantum = parseInt(rawTQ);
+  if (quantum < 1) { toast('Quantum debe ser ≥ 1','error'); return; }
 
   threadManager.completionCallbacks.clear();
 
@@ -1640,10 +1680,20 @@ function runAllComparison() {
   const procs = getCmpAllProcesses();
   if (!procs || !procs.length) return;
  
+  // Validar quantum
+  const rawQ = document.getElementById('cmp-quantum').value;
+  if (rawQ === '' || isNaN(Number(rawQ)) || /[a-zA-Z]/.test(rawQ)) { toast('Quantum inválido: solo números enteros positivos','error'); return; }
+  const q = parseInt(rawQ);
+  if (q < 1) { toast('Quantum debe ser ≥ 1','error'); return; }
+
+  // Validar cores
+  const rawC = document.getElementById('cmp-cores').value;
+  if (rawC === '' || isNaN(Number(rawC)) || /[a-zA-Z]/.test(rawC)) { toast('Cores inválido: solo números enteros positivos','error'); return; }
+  const cores = parseInt(rawC);
+  if (cores < 1) { toast('Cores debe ser ≥ 1','error'); return; }
+
   // Asegurar colores
   procs.forEach(p => getPidColor(p.pid));
- 
-  const q = parseInt(document.getElementById('cmp-quantum').value) || 2;
  
   // Ejecutar todos los algoritmos
   const results = ALL_ALGOS.map(algo => {
@@ -1746,8 +1796,8 @@ function runAllComparison() {
     </div>`;
   }).join('');
  
-  toast(`⚔️ ${ALL_ALGOS.length} algoritmos comparados con ${procs.length} procesos`, 'success');
-  log(`Comparación total: ${ALL_ALGOS.map(a=>a.label).join(', ')}`, 'info');
+  toast(`⚔️ ${ALL_ALGOS.length} algoritmos comparados — ${procs.length} procesos, Q=${q}, Cores=${cores}`, 'success');
+  log(`Comparación total: ${ALL_ALGOS.map(a=>a.label).join(', ')} | Quantum=${q} | Cores=${cores}`, 'info');
 }
  
 function resetAllComparison() {
