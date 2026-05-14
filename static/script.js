@@ -1153,7 +1153,12 @@ function memSecondChanceFix(refs, n) {
 // ══════════════════════════════════════
 
 // 1. Inyectamos el Worker en memoria (Blob) para evitar bloqueos CORS por abrir "file://"
+// MS_PER_TICK (definido dentro del worker): cada unidad de burstTime = 100 ms reales.
+// Así: burstTime=5 → ~500ms, burstTime=10 → ~1000ms, y más cores = menos tiempo total.
 const workerCode = `
+// Cada unidad de burstTime dura MS_PER_TICK ms reales.
+const MS_PER_TICK = 100;
+
 let workerId = -1;
 self.onmessage = function(e) {
   const { type, data } = e.data;
@@ -1161,22 +1166,26 @@ self.onmessage = function(e) {
   if (type === 'RUN_PROCESS') { runProcess(data); return; }
   if (type === 'TERMINATE') { self.close(); }
 };
+
+async function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
 async function runProcess(proc) {
   const { pid, burstTime, quantum, algo } = proc;
   const slice = quantum || burstTime;
+
   self.postMessage({ type: 'PROCESS_START', pid, workerId, timestamp: Date.now() });
-  
+
   let remaining = burstTime;
   const runFor = Math.min(slice, remaining);
-  
+
+  // Cada tick = MS_PER_TICK ms reales → el tiempo total escala con burstTime
   for (let tick = 0; tick < runFor; tick++) {
-    let dummy = 0;
-    for (let i = 0; i < 50000; i++) { dummy += Math.sqrt(i); } // Carga real de CPU en el thread
-    
+    await sleep(MS_PER_TICK); // Tiempo real proporcional al burst
     self.postMessage({ type: 'TICK', pid, workerId, tick: tick + 1, totalTicks: runFor, remaining: remaining - tick - 1 });
-    await new Promise(r => setTimeout(r, 0)); // Respiro al hilo
   }
-  
+
   remaining -= runFor;
   if (remaining <= 0) {
     self.postMessage({ type: 'PROCESS_DONE', pid, workerId, completionTime: Date.now() });
@@ -1418,18 +1427,22 @@ function runThreadSimulation() {
   const algo = document.getElementById('thread-algo').value;
   const quantum = parseInt(document.getElementById('thread-quantum').value) || 2;
 
-  let completedThreads = 0;
   threadManager.completionCallbacks.clear();
 
-  processes.forEach(p => {
-    threadManager.onProcessComplete(p.pid, (pid) => {
-      setProcessState(pid, 'terminated');
+  // Snapshot de los PIDs que realmente se van a despachar (incluyendo forks ya añadidos)
+  const dispatchedPids = new Set(processes.map(p => p.pid));
+  let completedThreads = 0;
+  const totalToComplete = dispatchedPids.size;
+
+  dispatchedPids.forEach(pid => {
+    threadManager.onProcessComplete(pid, (donePid) => {
+      setProcessState(donePid, 'terminated');
       completedThreads++;
-      if (completedThreads === processes.length) {
-            threadEndTime = performance.now();
-            const totalTime = (threadEndTime - threadStartTime).toFixed(2);
-            toast(`Simulación Paralela completada en ${totalTime} ms`, 'success');
-        }
+      if (completedThreads === totalToComplete) {
+        threadEndTime = performance.now();
+        const totalTime = (threadEndTime - threadStartTime).toFixed(2);
+        toast(`Simulación Paralela completada en ${totalTime} ms`, 'success');
+      }
     });
   });
 
