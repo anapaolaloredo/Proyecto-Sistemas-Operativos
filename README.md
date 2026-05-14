@@ -3,16 +3,7 @@
 
 Este proyecto es un simulador interactivo y didáctico diseñado para enseñar los conceptos fundamentales de los Sistemas Operativos utilizando una temática visual inspirada en *Monsters, Inc.*. A través de sus módulos, los usuarios pueden comprender de manera gráfica cómo una computadora administra sus recursos, procesa tareas concurrentes y gestiona su memoria RAM.
 
-<<<<<<< HEAD
 Se registran procesos, se planean según su enfoque, se puede realizar la paginación y se observan threads, así como una comparación entre todos.
-
-Alumno y Matrícula:
-- Estefania Nájera de la Rosa – 614978 (Creación de poster, diseño de interfaz y resumen de teoría)
-  
-- Victor Hugo Gutierrez Cavazos – 612081 (Desarrollo de backend)
-=======
----
->>>>>>> 2e35e1d (merge)
 
 ## 🚀 Instrucciones de Ejecución
 1. Descargar y descomprimir el archivo `.zip`.
